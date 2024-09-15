@@ -45,11 +45,11 @@ func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRe
 		reqChan.GetPublic(),
 	)
 	if err != nil {
-		if errors.Is(err, chanserv.ErrChannelExitsts) {
-			return nil, status.Error(codes.AlreadyExists, "channel already exists")
+		if errors.Is(err, chanserv.ErrInvalidCredentials) {
+			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
 		}
 
-		return nil, status.Error(codes.Internal, "internal error")
+		return nil, status.Error(codes.InvalidArgument, "invalid credentials")
 	}
 
 	return &lpv1.CreateChannelResponse{
@@ -79,7 +79,7 @@ func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest)
 			return nil, status.Error(codes.NotFound, "channel not found")
 		}
 
-		return nil, status.Error(codes.Internal, "internal error")
+		return nil, status.Error(codes.NotFound, "channel not found")
 	}
 
 	return &lpv1.GetChannelResponse{

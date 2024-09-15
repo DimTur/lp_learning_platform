@@ -12,7 +12,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/DimTur/lp_protos v0.0.2
+	github.com/DimTur/lp_protos v0.0.7
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0

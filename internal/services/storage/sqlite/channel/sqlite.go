@@ -57,7 +57,7 @@ func (s *SQLLiteStorage) SaveChannel(ctx context.Context, name string, descripti
 	if err != nil {
 		var sqliteErr sqlite3.Error
 		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrChannelExitsts)
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
 		}
 
 		return 0, fmt.Errorf("%s: %w", op, err)

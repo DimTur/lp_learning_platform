@@ -61,8 +61,8 @@ func (lp *LPHandlers) CreateChannel(ctx context.Context, name string, descriptio
 
 	id, err := lp.channelSaver.SaveChannel(ctx, name, description, userID, public)
 	if err != nil {
-		if errors.Is(err, storage.ErrChannelExitsts) {
-			lp.log.Warn("channel alredy exists", slog.String("err", err.Error()))
+		if errors.Is(err, storage.ErrInvalidCredentials) {
+			lp.log.Warn("invalid arguments", slog.String("err", err.Error()))
 			return 0, fmt.Errorf("%s: %w", op, err)
 		}
 
