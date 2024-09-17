@@ -1,0 +1,5 @@
+grpc_server:
+  address: ":8002"
+  timeout: "2s"
+storage:
+  path: "./storage/lp.db"
