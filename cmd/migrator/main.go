@@ -2,40 +2,53 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
+	"os"
 
 	// Library for migrations
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/joho/godotenv"
+
 	// Driver for perfirming migrations
-	_ "github.com/golang-migrate/migrate/v4/database/sqlite3"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	// Driver for getting migrations from files
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func main() {
-	var storagePath, migrationsPath, migrationsTable string
+	if err := godotenv.Load(); err != nil {
+		panic("Error loading .env file")
+	}
 
-	flag.StringVar(&storagePath, "storage-path", "", "path to storage")
-	flag.StringVar(&migrationsPath, "migrations-path", "", "path to migrations")
-	flag.StringVar(&migrationsTable, "migrations-table", "migrations", "name of migrations table")
-	flag.Parse()
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	dbname := os.Getenv("DB_NAME")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASS")
+	migrationsPath := os.Getenv("MIGRATIONS_PATH")
+	migrationsTable := os.Getenv("MIGRATIONS_TABLE")
 
-	if storagePath == "" {
-		panic("storage-path is required")
+	if dbname == "" || user == "" || password == "" {
+		panic("database credentials are required")
 	}
 	if migrationsPath == "" {
 		panic("migrations-path is required")
 	}
 
+	// Forming a connection string to PostgreSQL
+	postgresURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable&x-migrations-table=%s",
+		user, password, host, port, dbname, migrationsTable)
+
+	// Creating a Migrator
 	m, err := migrate.New(
 		"file://"+migrationsPath,
-		fmt.Sprintf("sqlite3://%s?x-migrations-table=%s", storagePath, migrationsTable),
+		postgresURL,
 	)
 	if err != nil {
 		panic(err)
 	}
 
+	// Using migrations
 	if err := m.Up(); err != nil {
 		if errors.Is(err, migrate.ErrNoChange) {
 			fmt.Println("no migrations to apply")

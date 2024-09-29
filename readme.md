@@ -1,7 +1,22 @@
-**Before start you need to apply migrations**
+## !!!Attention!!! 
 
-    go run ./cmd/migrator --storage-path=./storage/lp.db --migrations-path=./migrations
+**All .env and config files for demonstration purpose**
 
-**Start service**
+## Start service
+
+Start docker container with postgresql
+
+    docker compose up -d
+
+Start APP
 
     go run cmd/main.go serve --config=./config/config.yaml
+
+Stop docker container with postgresql if you needed
+
+    docker compose down -v
+
+If you need apply some new migration use command
+
+    docker compose up migrator
+    
