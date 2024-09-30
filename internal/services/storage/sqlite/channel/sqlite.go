@@ -90,7 +90,7 @@ func (s *SQLLiteStorage) GetChannelByID(ctx context.Context, chanID int64) (mode
 		&channel.Description,
 		&channel.CreatedBy,
 		&channel.LastModifiedBy,
-		&channel.Public,
+		// &channel.Public,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

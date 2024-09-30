@@ -32,7 +32,7 @@ type Server struct {
 
 func NewGRPCServer(
 	gRPCAddr string,
-	lpHandlers lp_handlers.LPHandlers,
+	lpHandlers lp_handlers.ChannelHandlers,
 	logger *slog.Logger,
 ) (*Server, error) {
 	const op = "grpc-server"

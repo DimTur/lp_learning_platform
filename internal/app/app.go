@@ -5,7 +5,7 @@ import (
 
 	grpcapp "github.com/DimTur/lp_learning_platform/internal/app/grpc"
 	"github.com/DimTur/lp_learning_platform/internal/services/channel"
-	sqlite "github.com/DimTur/lp_learning_platform/internal/services/storage/sqlite/channel"
+	postgresql "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
 )
 
 type App struct {
@@ -13,14 +13,15 @@ type App struct {
 }
 
 func NewApp(
-	storage sqlite.SQLLiteStorage,
+	storage *postgresql.ChannelPostgresStorage,
 	grpcAddr string,
 	logger *slog.Logger,
 ) (*App, error) {
 	lpGRPCHandlers := channel.New(
 		logger,
-		&storage,
-		&storage,
+		storage,
+		storage,
+		storage,
 	)
 
 	grpcServer, err := grpcapp.NewGRPCServer(

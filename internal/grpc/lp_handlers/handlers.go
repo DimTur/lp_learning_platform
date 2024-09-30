@@ -6,98 +6,163 @@ import (
 
 	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	chanserv "github.com/DimTur/lp_learning_platform/internal/services/channel"
-	lpv1 "github.com/DimTur/lp_protos/gen/go/lp"
+	lpv1 "github.com/DimTur/lp_learning_platform/pkg/server/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-type LPHandlers interface {
-	CreateChannel(ctx context.Context,
-		name string,
-		description string,
-		userID int64,
-		public bool) (id int64, err error)
-	// CreatePlan(ctx context.Context, plan lpv1.CreatePlanRequest) (resp lpv1.CreatePlanResponse, err error)
-	// CreateLesson(ctx context.Context, lesson lpv1.CreateLessonRequest) (resp lpv1.CreateLessonResponse, err error)
+type ChannelHandlers interface {
+	CreateChannel(ctx context.Context, channel models.Channel) (id int64, err error)
 	GetChannel(ctx context.Context, channelID int64) (channel models.Channel, err error)
-	// GetPlan(ctx context.Context, plan lpv1.GetPlanRequest) (resp lpv1.GetPlanResponse, err error)
-	// GetLesson(ctx context.Context, lesson lpv1.GetLessonRequest) (resp lpv1.GetLessonResponse, err error)
+	GetChannels(ctx context.Context, limit, offset int64) (channels []models.Channel, err error)
+	UpdateChannel(ctx context.Context, updChannel models.UpdateChannelRequest) (id int64, err error)
+	DeleteChannel(ctx context.Context, channelID int64) (err error)
 }
 
 type serverAPI struct {
-	learningPlatform LPHandlers
+	channelHandlers ChannelHandlers
 
 	lpv1.UnsafeLearningPlatformServer
 }
 
-func RegisterLPServiceServer(gRPC *grpc.Server, lp LPHandlers) {
-	lpv1.RegisterLearningPlatformServer(gRPC, &serverAPI{learningPlatform: lp})
+func RegisterLPServiceServer(gRPC *grpc.Server, ch ChannelHandlers) {
+	lpv1.RegisterLearningPlatformServer(gRPC, &serverAPI{channelHandlers: ch})
 }
 
 func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRequest) (*lpv1.CreateChannelResponse, error) {
 	reqChan := req.GetChannel()
-	channelID, err := s.learningPlatform.CreateChannel(
-		ctx,
-		reqChan.GetName(),
-		reqChan.GetDescription(),
-		reqChan.GetCreatedBy(),
-		reqChan.GetPublic(),
-	)
+
+	channel := models.Channel{
+		Name:           reqChan.GetName(),
+		Description:    reqChan.GetDescription(),
+		CreatedBy:      reqChan.GetCreatedBy(),
+		LastModifiedBy: reqChan.GetCreatedBy(),
+	}
+
+	channelID, err := s.channelHandlers.CreateChannel(ctx, channel)
 	if err != nil {
 		if errors.Is(err, chanserv.ErrInvalidCredentials) {
 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
 		}
 
-		return nil, status.Error(codes.InvalidArgument, "invalid credentials")
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &lpv1.CreateChannelResponse{
 		Channel: &lpv1.Channel{
-			ChannelId:      channelID,
-			Name:           reqChan.GetName(),
-			Description:    reqChan.GetDescription(),
-			CreatedBy:      reqChan.GetCreatedBy(),
-			Public:         reqChan.GetPublic(),
-			LastModifiedBy: reqChan.GetCreatedBy(),
-		},
-	}, nil
-}
-
-func (s *serverAPI) CreatePlan(ctx context.Context, req *lpv1.CreatePlanRequest) (*lpv1.CreatePlanResponse, error) {
-	return &lpv1.CreatePlanResponse{}, nil
-}
-
-func (s *serverAPI) CreateLesson(ctx context.Context, req *lpv1.CreateLessonRequest) (*lpv1.CreateLessonResponse, error) {
-	return &lpv1.CreateLessonResponse{}, nil
-}
-
-func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest) (*lpv1.GetChannelResponse, error) {
-	channel, err := s.learningPlatform.GetChannel(ctx, req.GetChannelId())
-	if err != nil {
-		if errors.Is(err, chanserv.ErrInvalidCredentials) {
-			return nil, status.Error(codes.NotFound, "channel not found")
-		}
-
-		return nil, status.Error(codes.NotFound, "channel not found")
-	}
-
-	return &lpv1.GetChannelResponse{
-		Channel: &lpv1.Channel{
-			ChannelId:      channel.ID,
+			Id:             channelID,
 			Name:           channel.Name,
 			Description:    channel.Description,
 			CreatedBy:      channel.CreatedBy,
-			Public:         channel.Public,
 			LastModifiedBy: channel.LastModifiedBy,
 		},
 	}, nil
 }
 
-func (s *serverAPI) GetPlan(ctx context.Context, req *lpv1.GetPlanRequest) (*lpv1.GetPlanResponse, error) {
-	return &lpv1.GetPlanResponse{}, nil
+func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest) (*lpv1.GetChannelResponse, error) {
+	channel, err := s.channelHandlers.GetChannel(ctx, req.GetId())
+	if err != nil {
+		if errors.Is(err, chanserv.ErrChannelNotFound) {
+			return nil, status.Error(codes.NotFound, "channel not found")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &lpv1.GetChannelResponse{
+		Channel: &lpv1.Channel{
+			Id:             channel.ID,
+			Name:           channel.Name,
+			Description:    channel.Description,
+			CreatedBy:      channel.CreatedBy,
+			LastModifiedBy: channel.LastModifiedBy,
+			CreatedAt:      timestamppb.New(channel.CreatedAt),
+			Modified:       timestamppb.New(channel.Modified),
+		},
+	}, nil
 }
 
-func (s *serverAPI) GetLesson(ctx context.Context, req *lpv1.GetLessonRequest) (*lpv1.GetLessonResponse, error) {
-	return &lpv1.GetLessonResponse{}, nil
+func (s *serverAPI) GetChannels(ctx context.Context, req *lpv1.GetChannelsRequest) (*lpv1.GetChannelsResponse, error) {
+	channels, err := s.channelHandlers.GetChannels(ctx, req.GetLimit(), req.GetOffset())
+	if err != nil {
+		if errors.Is(err, chanserv.ErrChannelNotFound) {
+			return nil, status.Error(codes.NotFound, "channels not found")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	var responseChannels []*lpv1.Channel
+	for _, channel := range channels {
+		responseChannels = append(responseChannels, &lpv1.Channel{
+			Id:             channel.ID,
+			Name:           channel.Name,
+			Description:    channel.Description,
+			CreatedBy:      channel.CreatedBy,
+			LastModifiedBy: channel.LastModifiedBy,
+			CreatedAt:      timestamppb.New(channel.CreatedAt),
+			Modified:       timestamppb.New(channel.Modified),
+		})
+	}
+
+	return &lpv1.GetChannelsResponse{
+		Channels: responseChannels,
+	}, nil
+}
+
+func (s *serverAPI) UpdateChannel(ctx context.Context, req *lpv1.UpdateChannelRequest) (*lpv1.UpdateChannelResponse, error) {
+	var name *string
+	if req.GetChannel().GetName() != "" {
+		name = proto.String(req.GetChannel().GetName())
+	}
+
+	var description *string
+	if req.GetChannel().GetDescription() != "" {
+		description = proto.String(req.GetChannel().GetDescription())
+	}
+
+	updChannel := models.UpdateChannelRequest{
+		ID:             req.GetChannel().GetId(),
+		Name:           name,
+		Description:    description,
+		LastModifiedBy: req.GetChannel().GetLastModifiedBy(),
+	}
+
+	id, err := s.channelHandlers.UpdateChannel(ctx, updChannel)
+	if err != nil {
+		if errors.Is(err, chanserv.ErrChannelNotFound) {
+			return nil, status.Error(codes.NotFound, "channel not found")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &lpv1.UpdateChannelResponse{
+		Channel: &lpv1.UpdateChannel{
+			Id:             id,
+			Name:           req.GetChannel().GetName(),
+			Description:    req.GetChannel().GetDescription(),
+			LastModifiedBy: req.GetChannel().GetLastModifiedBy(),
+		},
+	}, nil
+}
+
+func (s *serverAPI) DeleteChannel(ctx context.Context, req *lpv1.DeleteChannelRequest) (*lpv1.DeleteChannelResponse, error) {
+	channelID := req.GetId()
+
+	err := s.channelHandlers.DeleteChannel(ctx, channelID)
+	if err != nil {
+		if errors.Is(err, chanserv.ErrChannelNotFound) {
+			return nil, status.Error(codes.NotFound, "channel not found")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &lpv1.DeleteChannelResponse{
+		Success: true,
+	}, nil
 }

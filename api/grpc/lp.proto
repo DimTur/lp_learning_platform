@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package lp.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "lp.lp.v1;lp1";
+
+service LearningPlatform {
+    rpc CreateChannel (CreateChannelRequest) returns (CreateChannelResponse);
+    rpc GetChannel (GetChannelRequest) returns (GetChannelResponse);
+    rpc GetChannels (GetChannelsRequest) returns (GetChannelsResponse);
+    rpc UpdateChannel (UpdateChannelRequest) returns (UpdateChannelResponse);
+    rpc DeleteChannel (DeleteChannelRequest) returns (DeleteChannelResponse);
+}
+
+message Channel {
+    int64 id = 1; // ID of the channel.
+    string name = 2; // Name of the channel.
+    string description = 3; // Description of the channel.
+    int64 created_by = 4; // User ID who creates the channel.
+    int64 last_modified_by = 5; // ID of the user who modified the channel.
+    google.protobuf.Timestamp created_at = 6; // Timestamp when the channel was created.
+    google.protobuf.Timestamp modified = 7; // Timestamp when the channel was last modified.
+}
+
+message UpdateChannel {
+    int64 id = 1; // ID of the channel.
+    string name = 2; // Name of the channel.
+    string description = 3; // Description of the channel.
+    int64 last_modified_by = 4; // ID of the user who modified the channel.
+}
+
+message CreateChannelRequest {
+    Channel channel = 1; // The channel to be created.
+}
+
+message CreateChannelResponse {
+    Channel channel = 1; // The created channel, including its ID.
+}
+
+message GetChannelRequest {
+    int64 id = 1; // ID of the channel to retrieve.
+}
+
+message GetChannelResponse {
+    Channel channel = 1; // The retrieved channel.
+}
+
+message GetChannelsRequest {
+    int64 limit = 1; // Limit for pagination.
+    int64 offset = 2; // Offset for pagination.
+}
+
+message GetChannelsResponse {
+    repeated Channel channels = 1; // The retrieved list of channels.
+}
+
+message UpdateChannelRequest {
+    UpdateChannel channel = 1; // The channel with updated fields.
+}
+
+message UpdateChannelResponse {
+    UpdateChannel channel = 1; // The updated channel.
+}
+
+message DeleteChannelRequest {
+    int64 id = 1; // ID of the channel to delete.
+}
+
+message DeleteChannelResponse {
+    bool success = 1; // Indicates if the channel was successfully deleted.
+}

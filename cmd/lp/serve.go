@@ -1,6 +1,7 @@
 package lp
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -8,7 +9,8 @@ import (
 
 	"github.com/DimTur/lp_learning_platform/internal/app"
 	"github.com/DimTur/lp_learning_platform/internal/config"
-	sqlite "github.com/DimTur/lp_learning_platform/internal/services/storage/sqlite/channel"
+	postgresql "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/cobra"
 )
 
@@ -30,10 +32,26 @@ func NewServeCmd() *cobra.Command {
 				return err
 			}
 
-			storage, err := sqlite.New(cfg.Storage.SQLitePath)
+			// storage, err := sqlite.New(cfg.Storage.SQLitePath)
+			// if err != nil {
+			// 	return err
+			// }
+
+			dsn := fmt.Sprintf(
+				"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+				cfg.Storage.User,
+				cfg.Storage.Password,
+				cfg.Storage.Host,
+				cfg.Storage.Port,
+				cfg.Storage.DBName,
+			)
+			storagePool, err := pgxpool.New(ctx, dsn)
 			if err != nil {
 				return err
 			}
+			defer storagePool.Close()
+
+			storage := postgresql.NewChannelStorage(storagePool)
 
 			application, err := app.NewApp(storage, cfg.GRPCServer.Address, log)
 			if err != nil {
@@ -48,9 +66,9 @@ func NewServeCmd() *cobra.Command {
 			log.Info("server listening:", slog.Any("port", cfg.GRPCServer.Address))
 			<-ctx.Done()
 
-			if err := storage.Close(); err != nil {
-				log.Error("storage.Close", slog.Any("err", err))
-			}
+			// if err := storagePool.Close(); err != nil {
+			// 	log.Error("storage.Close", slog.Any("err", err))
+			// }
 
 			grpcCloser()
 
