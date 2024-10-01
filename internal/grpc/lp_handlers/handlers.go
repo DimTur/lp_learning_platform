@@ -23,16 +23,25 @@ type ChannelHandlers interface {
 }
 
 type PlanHandlers interface {
-	CreatePlan(ctx context.Context, channel models.CreatePlan) (id int64, err error)
+	CreatePlan(ctx context.Context, plan models.CreatePlan) (id int64, err error)
 	GetPlan(ctx context.Context, planID int64) (plan models.Plan, err error)
 	GetPlans(ctx context.Context, channel_id int64, limit, offset int64) (plans []models.Plan, err error)
 	UpdatePlan(ctx context.Context, updPlan models.UpdatePlanRequest) (id int64, err error)
 	DeletePlan(ctx context.Context, planID int64) (err error)
 }
 
+type LessonHandlers interface {
+	CreateLesson(ctx context.Context, lesson models.CreateLesson) (id int64, err error)
+	GetLesson(ctx context.Context, lessonID int64) (lesson models.Lesson, err error)
+	GetLessons(ctx context.Context, plan_id int64, limit, offset int64) (lessons []models.Lesson, err error)
+	UpdateLesson(ctx context.Context, updLEsson models.UpdateLessonRequest) (id int64, err error)
+	DeleteLesson(ctx context.Context, lessonID int64) (err error)
+}
+
 type serverAPI struct {
 	channelHandlers ChannelHandlers
 	planHandlers    PlanHandlers
+	lessonHandlers  LessonHandlers
 
 	lpv1.UnsafeLearningPlatformServer
 }
@@ -41,10 +50,12 @@ func RegisterLPServiceServer(
 	gRPC *grpc.Server,
 	ch ChannelHandlers,
 	ph PlanHandlers,
+	lh LessonHandlers,
 ) {
 	lpv1.RegisterLearningPlatformServer(gRPC, &serverAPI{
 		channelHandlers: ch,
 		planHandlers:    ph,
+		lessonHandlers:  lh,
 	})
 }
 

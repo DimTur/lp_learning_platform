@@ -10,6 +10,7 @@ import (
 	"github.com/DimTur/lp_learning_platform/internal/app"
 	"github.com/DimTur/lp_learning_platform/internal/config"
 	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
+	lessonstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
 	planstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -55,12 +56,14 @@ func NewServeCmd() *cobra.Command {
 
 			channelStorage := channelstorage.NewChannelStorage(storagePool)
 			planStorage := planstorage.NewPlansStorage(storagePool)
+			lessonStorage := lessonstorage.NewLessonsStorage(storagePool)
 
 			validate := validator.New()
 
 			application, err := app.NewApp(
 				channelStorage,
 				planStorage,
+				lessonStorage,
 				cfg.GRPCServer.Address,
 				log,
 				validate,

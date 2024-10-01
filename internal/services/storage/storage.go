@@ -9,6 +9,9 @@ var (
 	ErrPlanExitsts  = errors.New("plan already exists")
 	ErrPlanNotFound = errors.New("plan not found")
 
+	ErrLessonExitsts  = errors.New("lesson already exists")
+	ErrLessonNotFound = errors.New("lesson not found")
+
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrRowsIteration      = errors.New("rows iteration failed")
 	ErrScanFailed         = errors.New("scan failed")

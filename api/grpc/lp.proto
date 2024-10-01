@@ -18,6 +18,12 @@ service LearningPlatform {
     rpc GetPlans (GetPlansRequest) returns (GetPlansResponse);
     rpc UpdatePlan (UpdatePlanRequest) returns (UpdatePlanResponse);
     rpc DeletePlan (DeletePlanRequest) returns (DeletePlanResponse);
+
+    rpc CreateLesson (CreateLessonRequest) returns (CreateLessonResponse);
+    rpc GetLesson (GetLessonRequest) returns (GetLessonResponse);
+    rpc GetLessons (GetLessonsRequest) returns (GetLessonsResponse);
+    rpc UpdateLesson (UpdateLessonRequest) returns (UpdateLessonResponse);
+    rpc DeleteLesson (DeleteLessonRequest) returns (DeleteLessonResponse);
 }
 
 message Channel {
@@ -94,7 +100,7 @@ message CreatePlanRequest {
     string description = 2; // Description of the plan.
     int64 created_by = 3; // User ID who creates the plan.
     int64 last_modified_by = 4; // ID of the user who modified the plan.
-    int64 channel_id = 5; // Сhannel ID within which the plan is created
+    int64 channel_id = 5; // Сhannel ID within which the plan is created.
 }
 
 message CreatePlanResponse {
@@ -110,13 +116,13 @@ message GetPlanResponse {
 }
 
 message GetPlansRequest {
-    int64 channel_id = 1; // ID of the channel that includes the plans
+    int64 channel_id = 1; // ID of the channel that includes the plans.
     int64 limit = 2; // Limit for pagination.
     int64 offset = 3; // Offset for pagination.
 }
 
 message GetPlansResponse {
-    repeated Plan plans = 1; // The retrieved list of planы.
+    repeated Plan plans = 1; // The retrieved list of plan.
 }
 
 message UpdatePlanRequest {
@@ -124,12 +130,12 @@ message UpdatePlanRequest {
     optional string name = 2; // Name of the plan.
     optional string description = 3; // Description of the plan.
     int64 last_modified_by = 4; // ID of the user who modified the plan.
-    optional bool is_published = 5; // Has the plan been published
-    optional bool public = 6; // Is the plan public
+    optional bool is_published = 5; // Has the plan been published.
+    optional bool public = 6; // Is the plan public.
 }
 
 message UpdatePlanResponse {
-    int64 id = 1; // ID of the updated plan .
+    int64 id = 1; // ID of the updated plan.
 }
 
 message DeletePlanRequest {
@@ -138,4 +144,61 @@ message DeletePlanRequest {
 
 message DeletePlanResponse {
     bool success = 1; // Indicates if the plan was successfully deleted.
+}
+
+message Lesson {
+    int64 id = 1; // ID of the lesson.
+    string name = 2; // Name of the lesson.
+    int64 created_by = 3; // User ID who creates the lesson.
+    int64 last_modified_by = 4; // ID of the user who modified the lesson.
+    google.protobuf.Timestamp created_at = 5; // Timestamp when the lesson was created.
+    google.protobuf.Timestamp modified = 6; // Timestamp when the lesson was last modified.
+}
+
+message CreateLessonRequest {
+    string name = 1; // Name of the lesson.
+    string description = 2; // Description of the lesson.
+    int64 created_by = 3; // User ID who creates the lesson.
+    int64 last_modified_by = 4; // ID of the user who modified the lesson.
+    int64 plan_id = 5; // Plan ID within which the lesson is created.
+}
+
+message CreateLessonResponse {
+    int64 id = 1; // ID of the new lesson.
+}
+
+message GetLessonRequest {
+    int64 id = 1; // ID of the lesson to retrieve.
+}
+
+message GetLessonResponse {
+    Lesson lesson = 1; // The retrieved lesson.
+}
+
+message GetLessonsRequest {
+    int64 plan_id = 1; // ID of the plan that includes the lesson.
+    int64 limit = 2; // Limit for pagination.
+    int64 offset = 3; // Offset for pagination.
+}
+
+message GetLessonsResponse {
+    repeated Lesson lessons = 1; // The retrieved list of lesson.
+}
+
+message UpdateLessonRequest {
+    int64 id = 1; // ID of the lesson.
+    optional string name = 2; // Name of the lesson.
+    int64 last_modified_by = 3; // ID of the user who modified the lesson.
+}
+
+message UpdateLessonResponse {
+    int64 id = 1; // ID of the updated lesson.
+}
+
+message DeleteLessonRequest {
+    int64 id = 1; // ID of the lesson to delete.
+}
+
+message DeleteLessonResponse {
+    bool success = 1; // Indicates if the lesson was successfully deleted.
 }

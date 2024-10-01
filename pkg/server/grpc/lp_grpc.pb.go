@@ -29,6 +29,11 @@ const (
 	LearningPlatform_GetPlans_FullMethodName      = "/lp.v1.LearningPlatform/GetPlans"
 	LearningPlatform_UpdatePlan_FullMethodName    = "/lp.v1.LearningPlatform/UpdatePlan"
 	LearningPlatform_DeletePlan_FullMethodName    = "/lp.v1.LearningPlatform/DeletePlan"
+	LearningPlatform_CreateLesson_FullMethodName  = "/lp.v1.LearningPlatform/CreateLesson"
+	LearningPlatform_GetLesson_FullMethodName     = "/lp.v1.LearningPlatform/GetLesson"
+	LearningPlatform_GetLessons_FullMethodName    = "/lp.v1.LearningPlatform/GetLessons"
+	LearningPlatform_UpdateLesson_FullMethodName  = "/lp.v1.LearningPlatform/UpdateLesson"
+	LearningPlatform_DeleteLesson_FullMethodName  = "/lp.v1.LearningPlatform/DeleteLesson"
 )
 
 // LearningPlatformClient is the client API for LearningPlatform service.
@@ -45,6 +50,11 @@ type LearningPlatformClient interface {
 	GetPlans(ctx context.Context, in *GetPlansRequest, opts ...grpc.CallOption) (*GetPlansResponse, error)
 	UpdatePlan(ctx context.Context, in *UpdatePlanRequest, opts ...grpc.CallOption) (*UpdatePlanResponse, error)
 	DeletePlan(ctx context.Context, in *DeletePlanRequest, opts ...grpc.CallOption) (*DeletePlanResponse, error)
+	CreateLesson(ctx context.Context, in *CreateLessonRequest, opts ...grpc.CallOption) (*CreateLessonResponse, error)
+	GetLesson(ctx context.Context, in *GetLessonRequest, opts ...grpc.CallOption) (*GetLessonResponse, error)
+	GetLessons(ctx context.Context, in *GetLessonsRequest, opts ...grpc.CallOption) (*GetLessonsResponse, error)
+	UpdateLesson(ctx context.Context, in *UpdateLessonRequest, opts ...grpc.CallOption) (*UpdateLessonResponse, error)
+	DeleteLesson(ctx context.Context, in *DeleteLessonRequest, opts ...grpc.CallOption) (*DeleteLessonResponse, error)
 }
 
 type learningPlatformClient struct {
@@ -155,6 +165,56 @@ func (c *learningPlatformClient) DeletePlan(ctx context.Context, in *DeletePlanR
 	return out, nil
 }
 
+func (c *learningPlatformClient) CreateLesson(ctx context.Context, in *CreateLessonRequest, opts ...grpc.CallOption) (*CreateLessonResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateLessonResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_CreateLesson_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) GetLesson(ctx context.Context, in *GetLessonRequest, opts ...grpc.CallOption) (*GetLessonResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetLessonResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_GetLesson_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) GetLessons(ctx context.Context, in *GetLessonsRequest, opts ...grpc.CallOption) (*GetLessonsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetLessonsResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_GetLessons_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) UpdateLesson(ctx context.Context, in *UpdateLessonRequest, opts ...grpc.CallOption) (*UpdateLessonResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateLessonResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_UpdateLesson_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) DeleteLesson(ctx context.Context, in *DeleteLessonRequest, opts ...grpc.CallOption) (*DeleteLessonResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteLessonResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_DeleteLesson_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LearningPlatformServer is the server API for LearningPlatform service.
 // All implementations must embed UnimplementedLearningPlatformServer
 // for forward compatibility.
@@ -169,6 +229,11 @@ type LearningPlatformServer interface {
 	GetPlans(context.Context, *GetPlansRequest) (*GetPlansResponse, error)
 	UpdatePlan(context.Context, *UpdatePlanRequest) (*UpdatePlanResponse, error)
 	DeletePlan(context.Context, *DeletePlanRequest) (*DeletePlanResponse, error)
+	CreateLesson(context.Context, *CreateLessonRequest) (*CreateLessonResponse, error)
+	GetLesson(context.Context, *GetLessonRequest) (*GetLessonResponse, error)
+	GetLessons(context.Context, *GetLessonsRequest) (*GetLessonsResponse, error)
+	UpdateLesson(context.Context, *UpdateLessonRequest) (*UpdateLessonResponse, error)
+	DeleteLesson(context.Context, *DeleteLessonRequest) (*DeleteLessonResponse, error)
 	mustEmbedUnimplementedLearningPlatformServer()
 }
 
@@ -208,6 +273,21 @@ func (UnimplementedLearningPlatformServer) UpdatePlan(context.Context, *UpdatePl
 }
 func (UnimplementedLearningPlatformServer) DeletePlan(context.Context, *DeletePlanRequest) (*DeletePlanResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePlan not implemented")
+}
+func (UnimplementedLearningPlatformServer) CreateLesson(context.Context, *CreateLessonRequest) (*CreateLessonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateLesson not implemented")
+}
+func (UnimplementedLearningPlatformServer) GetLesson(context.Context, *GetLessonRequest) (*GetLessonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLesson not implemented")
+}
+func (UnimplementedLearningPlatformServer) GetLessons(context.Context, *GetLessonsRequest) (*GetLessonsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLessons not implemented")
+}
+func (UnimplementedLearningPlatformServer) UpdateLesson(context.Context, *UpdateLessonRequest) (*UpdateLessonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateLesson not implemented")
+}
+func (UnimplementedLearningPlatformServer) DeleteLesson(context.Context, *DeleteLessonRequest) (*DeleteLessonResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLesson not implemented")
 }
 func (UnimplementedLearningPlatformServer) mustEmbedUnimplementedLearningPlatformServer() {}
 func (UnimplementedLearningPlatformServer) testEmbeddedByValue()                          {}
@@ -410,6 +490,96 @@ func _LearningPlatform_DeletePlan_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LearningPlatform_CreateLesson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateLessonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).CreateLesson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_CreateLesson_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).CreateLesson(ctx, req.(*CreateLessonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_GetLesson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLessonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).GetLesson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_GetLesson_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).GetLesson(ctx, req.(*GetLessonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_GetLessons_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLessonsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).GetLessons(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_GetLessons_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).GetLessons(ctx, req.(*GetLessonsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_UpdateLesson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateLessonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).UpdateLesson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_UpdateLesson_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).UpdateLesson(ctx, req.(*UpdateLessonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_DeleteLesson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteLessonRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).DeleteLesson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_DeleteLesson_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).DeleteLesson(ctx, req.(*DeleteLessonRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LearningPlatform_ServiceDesc is the grpc.ServiceDesc for LearningPlatform service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -456,6 +626,26 @@ var LearningPlatform_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePlan",
 			Handler:    _LearningPlatform_DeletePlan_Handler,
+		},
+		{
+			MethodName: "CreateLesson",
+			Handler:    _LearningPlatform_CreateLesson_Handler,
+		},
+		{
+			MethodName: "GetLesson",
+			Handler:    _LearningPlatform_GetLesson_Handler,
+		},
+		{
+			MethodName: "GetLessons",
+			Handler:    _LearningPlatform_GetLessons_Handler,
+		},
+		{
+			MethodName: "UpdateLesson",
+			Handler:    _LearningPlatform_UpdateLesson_Handler,
+		},
+		{
+			MethodName: "DeleteLesson",
+			Handler:    _LearningPlatform_DeleteLesson_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
