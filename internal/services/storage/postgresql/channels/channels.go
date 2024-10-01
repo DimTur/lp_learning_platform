@@ -70,9 +70,6 @@ func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID i
 		&channel.Modified,
 	)
 	if err != nil {
-		// if err == pgx.ErrNoRows {
-		// 	return (models.Channel)(channel), fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
-		// }
 		return (models.Channel)(channel), fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
 	}
 

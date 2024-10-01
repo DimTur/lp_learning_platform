@@ -22,14 +22,30 @@ type ChannelHandlers interface {
 	DeleteChannel(ctx context.Context, channelID int64) (err error)
 }
 
+type PlanHandlers interface {
+	CreatePlan(ctx context.Context, channel models.CreatePlan) (id int64, err error)
+	GetPlan(ctx context.Context, planID int64) (plan models.Plan, err error)
+	GetPlans(ctx context.Context, channel_id int64, limit, offset int64) (plans []models.Plan, err error)
+	UpdatePlan(ctx context.Context, updPlan models.UpdatePlanRequest) (id int64, err error)
+	DeletePlan(ctx context.Context, planID int64) (err error)
+}
+
 type serverAPI struct {
 	channelHandlers ChannelHandlers
+	planHandlers    PlanHandlers
 
 	lpv1.UnsafeLearningPlatformServer
 }
 
-func RegisterLPServiceServer(gRPC *grpc.Server, ch ChannelHandlers) {
-	lpv1.RegisterLearningPlatformServer(gRPC, &serverAPI{channelHandlers: ch})
+func RegisterLPServiceServer(
+	gRPC *grpc.Server,
+	ch ChannelHandlers,
+	ph PlanHandlers,
+) {
+	lpv1.RegisterLearningPlatformServer(gRPC, &serverAPI{
+		channelHandlers: ch,
+		planHandlers:    ph,
+	})
 }
 
 func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRequest) (*lpv1.CreateChannelResponse, error) {
