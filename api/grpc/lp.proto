@@ -12,6 +12,12 @@ service LearningPlatform {
     rpc GetChannels (GetChannelsRequest) returns (GetChannelsResponse);
     rpc UpdateChannel (UpdateChannelRequest) returns (UpdateChannelResponse);
     rpc DeleteChannel (DeleteChannelRequest) returns (DeleteChannelResponse);
+
+    rpc CreatePlan (CreatePlanRequest) returns (CreatePlanResponse);
+    rpc GetPlan (GetPlanRequest) returns (GetPlanResponse);
+    rpc GetPlans (GetPlansRequest) returns (GetPlansResponse);
+    rpc UpdatePlan (UpdatePlanRequest) returns (UpdatePlanResponse);
+    rpc DeletePlan (DeletePlanRequest) returns (DeletePlanResponse);
 }
 
 message Channel {
@@ -54,8 +60,8 @@ message GetChannelsResponse {
 
 message UpdateChannelRequest {
     int64 id = 1; // ID of the channel.
-    string name = 2; // Name of the channel.
-    string description = 3; // Description of the channel.
+    optional string name = 2; // Name of the channel.
+    optional string description = 3; // Description of the channel.
     int64 last_modified_by = 4; // ID of the user who modified the channel.
 }
 
@@ -69,4 +75,67 @@ message DeleteChannelRequest {
 
 message DeleteChannelResponse {
     bool success = 1; // Indicates if the channel was successfully deleted.
+}
+
+message Plan {
+    int64 id = 1; // ID of the plan.
+    string name = 2; // Name of the plan.
+    string description = 3; // Description of the plan.
+    int64 created_by = 4; // User ID who creates the plan.
+    int64 last_modified_by = 5; // ID of the user who modified the plan.
+    bool is_published = 6; //
+    bool public = 7; // 
+    google.protobuf.Timestamp created_at = 8; // Timestamp when the plan was created.
+    google.protobuf.Timestamp modified = 9; // Timestamp when the plan was last modified.
+}
+
+message CreatePlanRequest {
+    string name = 1; // Name of the plan.
+    string description = 2; // Description of the plan.
+    int64 created_by = 3; // User ID who creates the plan.
+    int64 last_modified_by = 4; // ID of the user who modified the plan.
+    int64 channel_id = 5; // Сhannel ID within which the plan is created
+}
+
+message CreatePlanResponse {
+    int64 id = 1; // ID of the new plan.
+}
+
+message GetPlanRequest {
+    int64 id = 1; // ID of the plan to retrieve.
+}
+
+message GetPlanResponse {
+    Plan plan = 1; // The retrieved plan.
+}
+
+message GetPlansRequest {
+    int64 channel_id = 1; // ID of the channel that includes the plans
+    int64 limit = 2; // Limit for pagination.
+    int64 offset = 3; // Offset for pagination.
+}
+
+message GetPlansResponse {
+    repeated Plan plans = 1; // The retrieved list of planы.
+}
+
+message UpdatePlanRequest {
+    int64 id = 1; // ID of the plan.
+    optional string name = 2; // Name of the plan.
+    optional string description = 3; // Description of the plan.
+    int64 last_modified_by = 4; // ID of the user who modified the plan.
+    optional bool is_published = 5; // Has the plan been published
+    optional bool public = 6; // Is the plan public
+}
+
+message UpdatePlanResponse {
+    int64 id = 1; // ID of the updated plan .
+}
+
+message DeletePlanRequest {
+    int64 id = 1; // ID of the plan to delete.
+}
+
+message DeletePlanResponse {
+    bool success = 1; // Indicates if the plan was successfully deleted.
 }

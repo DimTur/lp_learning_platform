@@ -5,7 +5,9 @@ import (
 
 	grpcapp "github.com/DimTur/lp_learning_platform/internal/app/grpc"
 	"github.com/DimTur/lp_learning_platform/internal/services/channel"
-	postgresql "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
+	"github.com/DimTur/lp_learning_platform/internal/services/plan"
+	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
+	planstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -14,22 +16,32 @@ type App struct {
 }
 
 func NewApp(
-	storage *postgresql.ChannelPostgresStorage,
+	channelStorage *channelstorage.ChannelPostgresStorage,
+	planStorage *planstorage.PlansPostgresStorage,
 	grpcAddr string,
 	logger *slog.Logger,
 	validator *validator.Validate,
 ) (*App, error) {
-	lpGRPCHandlers := channel.New(
+	lpGRPCChannelHandlers := channel.New(
 		logger,
 		validator,
-		storage,
-		storage,
-		storage,
+		channelStorage,
+		channelStorage,
+		channelStorage,
+	)
+
+	lpGRPCPlanHandlers := plan.New(
+		logger,
+		validator,
+		planStorage,
+		planStorage,
+		planStorage,
 	)
 
 	grpcServer, err := grpcapp.NewGRPCServer(
 		grpcAddr,
-		lpGRPCHandlers,
+		lpGRPCChannelHandlers,
+		lpGRPCPlanHandlers,
 		logger,
 		validator,
 	)

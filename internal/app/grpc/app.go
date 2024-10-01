@@ -34,7 +34,8 @@ type Server struct {
 
 func NewGRPCServer(
 	gRPCAddr string,
-	lpHandlers lp_handlers.ChannelHandlers,
+	channelHandlers lp_handlers.ChannelHandlers,
+	planHandlers lp_handlers.PlanHandlers,
 	logger *slog.Logger,
 	validator *validator.Validate,
 ) (*Server, error) {
@@ -63,7 +64,11 @@ func NewGRPCServer(
 			recovery.StreamServerInterceptor(recovery.WithRecoveryHandler(grpcPanicRecoveryHandler)),
 		),
 	)
-	lp_handlers.RegisterLPServiceServer(gRPCSrv, lpHandlers)
+	lp_handlers.RegisterLPServiceServer(
+		gRPCSrv,
+		channelHandlers,
+		planHandlers,
+	)
 
 	// register health check service
 	healthService := NewHealthChecker(logger)

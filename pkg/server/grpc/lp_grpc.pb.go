@@ -24,6 +24,11 @@ const (
 	LearningPlatform_GetChannels_FullMethodName   = "/lp.v1.LearningPlatform/GetChannels"
 	LearningPlatform_UpdateChannel_FullMethodName = "/lp.v1.LearningPlatform/UpdateChannel"
 	LearningPlatform_DeleteChannel_FullMethodName = "/lp.v1.LearningPlatform/DeleteChannel"
+	LearningPlatform_CreatePlan_FullMethodName    = "/lp.v1.LearningPlatform/CreatePlan"
+	LearningPlatform_GetPlan_FullMethodName       = "/lp.v1.LearningPlatform/GetPlan"
+	LearningPlatform_GetPlans_FullMethodName      = "/lp.v1.LearningPlatform/GetPlans"
+	LearningPlatform_UpdatePlan_FullMethodName    = "/lp.v1.LearningPlatform/UpdatePlan"
+	LearningPlatform_DeletePlan_FullMethodName    = "/lp.v1.LearningPlatform/DeletePlan"
 )
 
 // LearningPlatformClient is the client API for LearningPlatform service.
@@ -35,6 +40,11 @@ type LearningPlatformClient interface {
 	GetChannels(ctx context.Context, in *GetChannelsRequest, opts ...grpc.CallOption) (*GetChannelsResponse, error)
 	UpdateChannel(ctx context.Context, in *UpdateChannelRequest, opts ...grpc.CallOption) (*UpdateChannelResponse, error)
 	DeleteChannel(ctx context.Context, in *DeleteChannelRequest, opts ...grpc.CallOption) (*DeleteChannelResponse, error)
+	CreatePlan(ctx context.Context, in *CreatePlanRequest, opts ...grpc.CallOption) (*CreatePlanResponse, error)
+	GetPlan(ctx context.Context, in *GetPlanRequest, opts ...grpc.CallOption) (*GetPlanResponse, error)
+	GetPlans(ctx context.Context, in *GetPlansRequest, opts ...grpc.CallOption) (*GetPlansResponse, error)
+	UpdatePlan(ctx context.Context, in *UpdatePlanRequest, opts ...grpc.CallOption) (*UpdatePlanResponse, error)
+	DeletePlan(ctx context.Context, in *DeletePlanRequest, opts ...grpc.CallOption) (*DeletePlanResponse, error)
 }
 
 type learningPlatformClient struct {
@@ -95,6 +105,56 @@ func (c *learningPlatformClient) DeleteChannel(ctx context.Context, in *DeleteCh
 	return out, nil
 }
 
+func (c *learningPlatformClient) CreatePlan(ctx context.Context, in *CreatePlanRequest, opts ...grpc.CallOption) (*CreatePlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePlanResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_CreatePlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) GetPlan(ctx context.Context, in *GetPlanRequest, opts ...grpc.CallOption) (*GetPlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPlanResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_GetPlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) GetPlans(ctx context.Context, in *GetPlansRequest, opts ...grpc.CallOption) (*GetPlansResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPlansResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_GetPlans_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) UpdatePlan(ctx context.Context, in *UpdatePlanRequest, opts ...grpc.CallOption) (*UpdatePlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdatePlanResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_UpdatePlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) DeletePlan(ctx context.Context, in *DeletePlanRequest, opts ...grpc.CallOption) (*DeletePlanResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeletePlanResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_DeletePlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LearningPlatformServer is the server API for LearningPlatform service.
 // All implementations must embed UnimplementedLearningPlatformServer
 // for forward compatibility.
@@ -104,6 +164,11 @@ type LearningPlatformServer interface {
 	GetChannels(context.Context, *GetChannelsRequest) (*GetChannelsResponse, error)
 	UpdateChannel(context.Context, *UpdateChannelRequest) (*UpdateChannelResponse, error)
 	DeleteChannel(context.Context, *DeleteChannelRequest) (*DeleteChannelResponse, error)
+	CreatePlan(context.Context, *CreatePlanRequest) (*CreatePlanResponse, error)
+	GetPlan(context.Context, *GetPlanRequest) (*GetPlanResponse, error)
+	GetPlans(context.Context, *GetPlansRequest) (*GetPlansResponse, error)
+	UpdatePlan(context.Context, *UpdatePlanRequest) (*UpdatePlanResponse, error)
+	DeletePlan(context.Context, *DeletePlanRequest) (*DeletePlanResponse, error)
 	mustEmbedUnimplementedLearningPlatformServer()
 }
 
@@ -128,6 +193,21 @@ func (UnimplementedLearningPlatformServer) UpdateChannel(context.Context, *Updat
 }
 func (UnimplementedLearningPlatformServer) DeleteChannel(context.Context, *DeleteChannelRequest) (*DeleteChannelResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteChannel not implemented")
+}
+func (UnimplementedLearningPlatformServer) CreatePlan(context.Context, *CreatePlanRequest) (*CreatePlanResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePlan not implemented")
+}
+func (UnimplementedLearningPlatformServer) GetPlan(context.Context, *GetPlanRequest) (*GetPlanResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPlan not implemented")
+}
+func (UnimplementedLearningPlatformServer) GetPlans(context.Context, *GetPlansRequest) (*GetPlansResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPlans not implemented")
+}
+func (UnimplementedLearningPlatformServer) UpdatePlan(context.Context, *UpdatePlanRequest) (*UpdatePlanResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePlan not implemented")
+}
+func (UnimplementedLearningPlatformServer) DeletePlan(context.Context, *DeletePlanRequest) (*DeletePlanResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePlan not implemented")
 }
 func (UnimplementedLearningPlatformServer) mustEmbedUnimplementedLearningPlatformServer() {}
 func (UnimplementedLearningPlatformServer) testEmbeddedByValue()                          {}
@@ -240,6 +320,96 @@ func _LearningPlatform_DeleteChannel_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LearningPlatform_CreatePlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).CreatePlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_CreatePlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).CreatePlan(ctx, req.(*CreatePlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_GetPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).GetPlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_GetPlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).GetPlan(ctx, req.(*GetPlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_GetPlans_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPlansRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).GetPlans(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_GetPlans_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).GetPlans(ctx, req.(*GetPlansRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_UpdatePlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).UpdatePlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_UpdatePlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).UpdatePlan(ctx, req.(*UpdatePlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_DeletePlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePlanRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).DeletePlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_DeletePlan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).DeletePlan(ctx, req.(*DeletePlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LearningPlatform_ServiceDesc is the grpc.ServiceDesc for LearningPlatform service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +436,26 @@ var LearningPlatform_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteChannel",
 			Handler:    _LearningPlatform_DeleteChannel_Handler,
+		},
+		{
+			MethodName: "CreatePlan",
+			Handler:    _LearningPlatform_CreatePlan_Handler,
+		},
+		{
+			MethodName: "GetPlan",
+			Handler:    _LearningPlatform_GetPlan_Handler,
+		},
+		{
+			MethodName: "GetPlans",
+			Handler:    _LearningPlatform_GetPlans_Handler,
+		},
+		{
+			MethodName: "UpdatePlan",
+			Handler:    _LearningPlatform_UpdatePlan_Handler,
+		},
+		{
+			MethodName: "DeletePlan",
+			Handler:    _LearningPlatform_DeletePlan_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

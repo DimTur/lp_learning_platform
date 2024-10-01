@@ -9,7 +9,8 @@ import (
 
 	"github.com/DimTur/lp_learning_platform/internal/app"
 	"github.com/DimTur/lp_learning_platform/internal/config"
-	postgresql "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
+	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
+	planstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/cobra"
@@ -52,11 +53,18 @@ func NewServeCmd() *cobra.Command {
 			}
 			defer storagePool.Close()
 
-			storage := postgresql.NewChannelStorage(storagePool)
+			channelStorage := channelstorage.NewChannelStorage(storagePool)
+			planStorage := planstorage.NewPlansStorage(storagePool)
 
 			validate := validator.New()
 
-			application, err := app.NewApp(storage, cfg.GRPCServer.Address, log, validate)
+			application, err := app.NewApp(
+				channelStorage,
+				planStorage,
+				cfg.GRPCServer.Address,
+				log,
+				validate,
+			)
 			if err != nil {
 				return err
 			}
