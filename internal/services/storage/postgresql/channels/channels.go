@@ -7,7 +7,6 @@ import (
 
 	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
-	"github.com/jackc/pgx"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -25,7 +24,7 @@ const createChannelQuery = `
 	VALUES ($1, $2, $3, $4, $5, $6)
 	RETURNING id`
 
-func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel models.Channel) (int64, error) {
+func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel models.CreateChannel) (int64, error) {
 	const op = "storage.postgresql.channels.channels.CreateChannel"
 
 	var id int64
@@ -52,7 +51,7 @@ func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel mode
 }
 
 const getChannelByIDQuery = `
-	SELECT name, description, created_by, last_modified_by, created_at, modified 
+	SELECT id, name, description, created_by, last_modified_by, created_at, modified 
 	FROM channels 
 	WHERE id = $1`
 
@@ -71,10 +70,10 @@ func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID i
 		&channel.Modified,
 	)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			return (models.Channel)(channel), fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
-		}
-		return (models.Channel)(channel), fmt.Errorf("%s: %w", op, err)
+		// if err == pgx.ErrNoRows {
+		// 	return (models.Channel)(channel), fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
+		// }
+		return (models.Channel)(channel), fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
 	}
 
 	return (models.Channel)(channel), nil
@@ -146,11 +145,7 @@ func (c *ChannelPostgresStorage) UpdateChannel(ctx context.Context, updChannel m
 		updChannel.LastModifiedBy,
 	).Scan(&id)
 	if err != nil {
-		if err == pgx.ErrNoRows {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
-		}
-
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
 	}
 	return id, nil
 }

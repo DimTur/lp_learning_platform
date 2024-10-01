@@ -15,7 +15,7 @@ import (
 )
 
 type ChannelHandlers interface {
-	CreateChannel(ctx context.Context, channel models.Channel) (id int64, err error)
+	CreateChannel(ctx context.Context, channel models.CreateChannel) (id int64, err error)
 	GetChannel(ctx context.Context, channelID int64) (channel models.Channel, err error)
 	GetChannels(ctx context.Context, limit, offset int64) (channels []models.Channel, err error)
 	UpdateChannel(ctx context.Context, updChannel models.UpdateChannelRequest) (id int64, err error)
@@ -33,13 +33,11 @@ func RegisterLPServiceServer(gRPC *grpc.Server, ch ChannelHandlers) {
 }
 
 func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRequest) (*lpv1.CreateChannelResponse, error) {
-	reqChan := req.GetChannel()
-
-	channel := models.Channel{
-		Name:           reqChan.GetName(),
-		Description:    reqChan.GetDescription(),
-		CreatedBy:      reqChan.GetCreatedBy(),
-		LastModifiedBy: reqChan.GetCreatedBy(),
+	channel := models.CreateChannel{
+		Name:           req.GetName(),
+		Description:    req.GetDescription(),
+		CreatedBy:      req.GetCreatedBy(),
+		LastModifiedBy: req.GetCreatedBy(),
 	}
 
 	channelID, err := s.channelHandlers.CreateChannel(ctx, channel)
@@ -52,13 +50,7 @@ func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRe
 	}
 
 	return &lpv1.CreateChannelResponse{
-		Channel: &lpv1.Channel{
-			Id:             channelID,
-			Name:           channel.Name,
-			Description:    channel.Description,
-			CreatedBy:      channel.CreatedBy,
-			LastModifiedBy: channel.LastModifiedBy,
-		},
+		Id: channelID,
 	}, nil
 }
 
@@ -88,11 +80,14 @@ func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest)
 func (s *serverAPI) GetChannels(ctx context.Context, req *lpv1.GetChannelsRequest) (*lpv1.GetChannelsResponse, error) {
 	channels, err := s.channelHandlers.GetChannels(ctx, req.GetLimit(), req.GetOffset())
 	if err != nil {
-		if errors.Is(err, chanserv.ErrChannelNotFound) {
+		switch {
+		case errors.Is(err, chanserv.ErrChannelNotFound):
 			return nil, status.Error(codes.NotFound, "channels not found")
+		case errors.Is(err, chanserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
 		}
-
-		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	var responseChannels []*lpv1.Channel
@@ -115,38 +110,34 @@ func (s *serverAPI) GetChannels(ctx context.Context, req *lpv1.GetChannelsReques
 
 func (s *serverAPI) UpdateChannel(ctx context.Context, req *lpv1.UpdateChannelRequest) (*lpv1.UpdateChannelResponse, error) {
 	var name *string
-	if req.GetChannel().GetName() != "" {
-		name = proto.String(req.GetChannel().GetName())
+	if req.GetName() != "" {
+		name = proto.String(req.GetName())
 	}
 
 	var description *string
-	if req.GetChannel().GetDescription() != "" {
-		description = proto.String(req.GetChannel().GetDescription())
+	if req.GetDescription() != "" {
+		description = proto.String(req.GetDescription())
 	}
 
 	updChannel := models.UpdateChannelRequest{
-		ID:             req.GetChannel().GetId(),
+		ID:             req.GetId(),
 		Name:           name,
 		Description:    description,
-		LastModifiedBy: req.GetChannel().GetLastModifiedBy(),
+		LastModifiedBy: req.GetLastModifiedBy(),
 	}
 
 	id, err := s.channelHandlers.UpdateChannel(ctx, updChannel)
 	if err != nil {
-		if errors.Is(err, chanserv.ErrChannelNotFound) {
-			return nil, status.Error(codes.NotFound, "channel not found")
+		switch {
+		case errors.Is(err, chanserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
 		}
-
-		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &lpv1.UpdateChannelResponse{
-		Channel: &lpv1.UpdateChannel{
-			Id:             id,
-			Name:           req.GetChannel().GetName(),
-			Description:    req.GetChannel().GetDescription(),
-			LastModifiedBy: req.GetChannel().GetLastModifiedBy(),
-		},
+		Id: id,
 	}, nil
 }
 

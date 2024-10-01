@@ -24,19 +24,15 @@ message Channel {
     google.protobuf.Timestamp modified = 7; // Timestamp when the channel was last modified.
 }
 
-message UpdateChannel {
-    int64 id = 1; // ID of the channel.
-    string name = 2; // Name of the channel.
-    string description = 3; // Description of the channel.
+message CreateChannelRequest {
+    string name = 1; // Name of the channel.
+    string description = 2; // Description of the channel.
+    int64 created_by = 3; // User ID who creates the channel.
     int64 last_modified_by = 4; // ID of the user who modified the channel.
 }
 
-message CreateChannelRequest {
-    Channel channel = 1; // The channel to be created.
-}
-
 message CreateChannelResponse {
-    Channel channel = 1; // The created channel, including its ID.
+    int64 id = 1; // ID of the new channel.
 }
 
 message GetChannelRequest {
@@ -57,11 +53,14 @@ message GetChannelsResponse {
 }
 
 message UpdateChannelRequest {
-    UpdateChannel channel = 1; // The channel with updated fields.
+    int64 id = 1; // ID of the channel.
+    string name = 2; // Name of the channel.
+    string description = 3; // Description of the channel.
+    int64 last_modified_by = 4; // ID of the user who modified the channel.
 }
 
 message UpdateChannelResponse {
-    UpdateChannel channel = 1; // The updated channel.
+    int64 id = 1; // ID of the updated channel .
 }
 
 message DeleteChannelRequest {

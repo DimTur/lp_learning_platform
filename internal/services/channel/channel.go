@@ -9,10 +9,12 @@ import (
 
 	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
+	"github.com/DimTur/lp_learning_platform/internal/utils"
+	"github.com/go-playground/validator/v10"
 )
 
 type ChannelSaver interface {
-	CreateChannel(ctx context.Context, channel models.Channel) (id int64, err error)
+	CreateChannel(ctx context.Context, channel models.CreateChannel) (id int64, err error)
 	UpdateChannel(ctx context.Context, updChannel models.UpdateChannelRequest) (id int64, err error)
 }
 
@@ -34,6 +36,7 @@ var (
 
 type LPHandlers struct {
 	log             *slog.Logger
+	validator       *validator.Validate
 	channelSaver    ChannelSaver
 	channelProvider ChannelProvider
 	channelDel      ChannelDel
@@ -41,12 +44,14 @@ type LPHandlers struct {
 
 func New(
 	log *slog.Logger,
+	validator *validator.Validate,
 	channelSaver ChannelSaver,
 	channelProvider ChannelProvider,
 	channelDel ChannelDel,
 ) *LPHandlers {
 	return &LPHandlers{
 		log:             log,
+		validator:       validator,
 		channelSaver:    channelSaver,
 		channelProvider: channelProvider,
 		channelDel:      channelDel,
@@ -54,13 +59,20 @@ func New(
 }
 
 // CreateChannel creats new channel in the system and returns channel ID.
-func (lp *LPHandlers) CreateChannel(ctx context.Context, channel models.Channel) (int64, error) {
+func (lp *LPHandlers) CreateChannel(ctx context.Context, channel models.CreateChannel) (int64, error) {
 	const op = "channel.CreateChannel"
 
 	log := lp.log.With(
 		slog.String("op", op),
 		slog.String("name", channel.Name),
 	)
+
+	// Validation
+	err := lp.validator.Struct(channel)
+	if err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
 
 	now := time.Now()
 	channel.CreatedAt = now
@@ -98,7 +110,7 @@ func (lp *LPHandlers) GetChannel(ctx context.Context, channelID int64) (models.C
 	if err != nil {
 		if errors.Is(err, storage.ErrChannelNotFound) {
 			lp.log.Warn("channel not found", slog.String("err", err.Error()))
-			return channel, fmt.Errorf("%s: %w", op, err)
+			return channel, ErrChannelNotFound
 		}
 
 		log.Error("failed to get channel", slog.String("err", err.Error()))
@@ -118,12 +130,23 @@ func (lp *LPHandlers) GetChannels(ctx context.Context, limit, offset int64) ([]m
 
 	log.Info("getting channels")
 
+	// Validation
+	params := utils.ChannelQueryParams{
+		Limit:  limit,
+		Offset: offset,
+	}
+
+	if err := lp.validator.Struct(params); err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
 	var channels []models.Channel
 	channels, err := lp.channelProvider.GetChannels(ctx, limit, offset)
 	if err != nil {
 		if errors.Is(err, storage.ErrChannelNotFound) {
 			lp.log.Warn("channels not found", slog.String("err", err.Error()))
-			return channels, fmt.Errorf("%s: %w", op, err)
+			return channels, fmt.Errorf("%s: %w", op, ErrChannelNotFound)
 		}
 
 		log.Error("failed to get channels", slog.String("err", err.Error()))
@@ -143,10 +166,17 @@ func (lp *LPHandlers) UpdateChannel(ctx context.Context, updChannel models.Updat
 
 	log.Info("updating channel")
 
+	// Validation
+	err := lp.validator.Struct(updChannel)
+	if err != nil {
+		log.Warn("validation failed", slog.String("err", err.Error()))
+		return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
 	id, err := lp.channelSaver.UpdateChannel(ctx, updChannel)
 	if err != nil {
-		if errors.Is(err, storage.ErrChannelNotFound) {
-			lp.log.Warn("channel not found", slog.String("err", err.Error()))
+		if errors.Is(err, storage.ErrInvalidCredentials) {
+			lp.log.Warn("invalid credentials", slog.String("err", err.Error()))
 			return 0, fmt.Errorf("%s: %w", op, err)
 		}
 
