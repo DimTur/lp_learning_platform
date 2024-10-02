@@ -88,7 +88,7 @@ const getPlanByIDQuery = `
 func (p *PlansPostgresStorage) GetPlanByID(ctx context.Context, planID int64) (models.Plan, error) {
 	const op = "storage.postgresql.plans.plans.GetPlanByID"
 
-	var plan models.DBPlan
+	var plan DBPlan
 
 	err := p.db.QueryRow(ctx, getPlanByIDQuery, planID).Scan(
 		&plan.ID,
@@ -132,7 +132,7 @@ const getPlansQuery = `
 func (p *PlansPostgresStorage) GetPlans(ctx context.Context, channel_id int64, limit, offset int64) ([]models.Plan, error) {
 	const op = "storage.postgresql.plans.plans.GetPlans"
 
-	var plans []models.DBPlan
+	var plans []DBPlan
 
 	rows, err := p.db.Query(ctx, getPlansQuery, channel_id, limit, offset)
 	if err != nil {
@@ -141,7 +141,7 @@ func (p *PlansPostgresStorage) GetPlans(ctx context.Context, channel_id int64, l
 	defer rows.Close()
 
 	for rows.Next() {
-		var plan models.DBPlan
+		var plan DBPlan
 		if err := rows.Scan(
 			&plan.ID,
 			&plan.Name,

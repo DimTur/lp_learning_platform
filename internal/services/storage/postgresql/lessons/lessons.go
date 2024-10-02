@@ -87,7 +87,7 @@ const getLessonByIDQuery = `
 func (l *LessonsPostgresStorage) GetLessonByID(ctx context.Context, lessonID int64) (models.Lesson, error) {
 	const op = "storage.postgresql.lessons.lessons.GetLessonByID"
 
-	var lesson models.DBLesson
+	var lesson DBLesson
 
 	err := l.db.QueryRow(ctx, getLessonByIDQuery, lessonID).Scan(
 		&lesson.ID,
@@ -125,7 +125,7 @@ const getLessonsQuery = `
 func (l *LessonsPostgresStorage) GetLessons(ctx context.Context, plan_id int64, limit, offset int64) ([]models.Lesson, error) {
 	const op = "storage.postgresql.lessons.lessons.GetLessons"
 
-	var lessons []models.DBLesson
+	var lessons []DBLesson
 
 	rows, err := l.db.Query(ctx, getLessonsQuery, plan_id, limit, offset)
 	if err != nil {
@@ -134,7 +134,7 @@ func (l *LessonsPostgresStorage) GetLessons(ctx context.Context, plan_id int64, 
 	defer rows.Close()
 
 	for rows.Next() {
-		var lesson models.DBLesson
+		var lesson DBLesson
 		if err := rows.Scan(
 			&lesson.ID,
 			&lesson.Name,
