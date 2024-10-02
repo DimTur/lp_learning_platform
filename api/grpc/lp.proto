@@ -36,6 +36,17 @@ message Channel {
     google.protobuf.Timestamp modified = 7; // Timestamp when the channel was last modified.
 }
 
+message ChannelWithPlans {
+    int64 id = 1; // ID of the channel.
+    string name = 2; // Name of the channel.
+    string description = 3; // Description of the channel.
+    int64 created_by = 4; // User ID who creates the channel.
+    int64 last_modified_by = 5; // ID of the user who modified the channel.
+    google.protobuf.Timestamp created_at = 6; // Timestamp when the channel was created.
+    google.protobuf.Timestamp modified = 7; // Timestamp when the channel was last modified.
+    repeated Plan plans = 8;
+}
+
 message CreateChannelRequest {
     string name = 1; // Name of the channel.
     string description = 2; // Description of the channel.
@@ -52,7 +63,7 @@ message GetChannelRequest {
 }
 
 message GetChannelResponse {
-    Channel channel = 1; // The retrieved channel.
+    ChannelWithPlans channel = 1; // The retrieved channel.
 }
 
 message GetChannelsRequest {

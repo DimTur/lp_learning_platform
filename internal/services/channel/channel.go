@@ -19,7 +19,7 @@ type ChannelSaver interface {
 }
 
 type ChannelProvider interface {
-	GetChannelByID(ctx context.Context, channelID int64) (channel models.Channel, err error)
+	GetChannelByID(ctx context.Context, channelID int64) (channel models.ChannelWithPlans, err error)
 	GetChannels(ctx context.Context, limit, offset int64) (channels []models.Channel, err error)
 }
 
@@ -95,7 +95,7 @@ func (chh *ChannelHandlers) CreateChannel(ctx context.Context, channel models.Cr
 }
 
 // GetChannelByID gets channel by ID and returns it.
-func (chh *ChannelHandlers) GetChannel(ctx context.Context, channelID int64) (models.Channel, error) {
+func (chh *ChannelHandlers) GetChannel(ctx context.Context, channelID int64) (models.ChannelWithPlans, error) {
 	const op = "channel.GetChannelByID"
 
 	log := chh.log.With(
@@ -105,7 +105,7 @@ func (chh *ChannelHandlers) GetChannel(ctx context.Context, channelID int64) (mo
 
 	log.Info("getting channel")
 
-	var channel models.Channel
+	var channel models.ChannelWithPlans
 	channel, err := chh.channelProvider.GetChannelByID(ctx, channelID)
 	if err != nil {
 		if errors.Is(err, storage.ErrChannelNotFound) {

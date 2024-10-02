@@ -50,30 +50,105 @@ func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel mode
 	return id, nil
 }
 
-const getChannelByIDQuery = `
-	SELECT id, name, description, created_by, last_modified_by, created_at, modified 
-	FROM channels 
-	WHERE id = $1`
+const getChannelWithPlansQuery = `
+	SELECT
+		c.id AS channel_id,
+		c.name AS channel_name,
+		c.description AS channel_description,
+		c.created_by AS channel_created_by,
+		c.last_modified_by AS channel_last_modified_by,
+		c.created_at AS channel_created_at,
+		c.modified AS channel_modified,
+		p.id AS plan_id,
+		p.name AS plan_name,
+		p.description AS plan_description,
+		p.created_by AS plan_created_by,
+		p.last_modified_by AS plan_last_modified_by,
+		p.is_published AS plan_is_published,
+		p.public AS plan_public,
+		p.created_at AS plan_created_at,
+		p.modified AS plan_modified
+	FROM
+		channels c
+	LEFT JOIN
+		channels_plans cp ON c.id = cp.channel_id
+	LEFT JOIN
+		plans p ON cp.plan_id = p.id
+	WHERE
+		c.id = $1`
 
-func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID int64) (models.Channel, error) {
+func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID int64) (models.ChannelWithPlans, error) {
 	const op = "storage.postgresql.channels.channels.GetChannelByID"
 
-	var channel models.DBChannel
-
-	err := c.db.QueryRow(ctx, getChannelByIDQuery, channelID).Scan(
-		&channel.ID,
-		&channel.Name,
-		&channel.Description,
-		&channel.CreatedBy,
-		&channel.LastModifiedBy,
-		&channel.CreatedAt,
-		&channel.Modified,
-	)
+	rows, err := c.db.Query(ctx, getChannelWithPlansQuery, channelID)
 	if err != nil {
-		return (models.Channel)(channel), fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
+		return models.ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
+	}
+	defer rows.Close()
+
+	var dbChannel DBChannelWithPlans
+	dbChannel.Plans = []DBPlanInChannels{}
+
+	for rows.Next() {
+		var plan DBPlanInChannels
+		err := rows.Scan(
+			&dbChannel.ID,
+			&dbChannel.Name,
+			&dbChannel.Description,
+			&dbChannel.CreatedBy,
+			&dbChannel.LastModifiedBy,
+			&dbChannel.CreatedAt,
+			&dbChannel.Modified,
+			&plan.ID,
+			&plan.Name,
+			&plan.Description,
+			&plan.CreatedBy,
+			&plan.LastModifiedBy,
+			&plan.IsPublished,
+			&plan.Public,
+			&plan.CreatedAt,
+			&plan.Modified,
+		)
+		if err != nil {
+			return models.ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
+		}
+
+		if plan.ID.Valid {
+			dbChannel.Plans = append(dbChannel.Plans, plan)
+		}
 	}
 
-	return (models.Channel)(channel), nil
+	if err := rows.Err(); err != nil {
+		return models.ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	channel := models.ChannelWithPlans{
+		ID:             dbChannel.ID,
+		Name:           dbChannel.Name,
+		Description:    dbChannel.Description,
+		CreatedBy:      dbChannel.CreatedBy,
+		LastModifiedBy: dbChannel.LastModifiedBy,
+		CreatedAt:      dbChannel.CreatedAt,
+		Modified:       dbChannel.Modified,
+		Plans:          make([]models.PlanInChannel, 0, len(dbChannel.Plans)),
+	}
+
+	for _, dbPlan := range dbChannel.Plans {
+		plan := models.PlanInChannel{
+			ID:             dbPlan.ID.Int64,
+			Name:           dbPlan.Name.String,
+			Description:    dbPlan.Description.String,
+			CreatedBy:      dbPlan.CreatedBy.Int64,
+			LastModifiedBy: dbPlan.LastModifiedBy.Int64,
+			IsPublished:    dbPlan.IsPublished.Bool,
+			Public:         dbPlan.Public.Bool,
+			CreatedAt:      dbPlan.CreatedAt.Time,
+			Modified:       dbPlan.Modified.Time,
+		}
+		channel.Plans = append(channel.Plans, plan)
+	}
+
+	return channel, nil
 }
 
 const getChannelsQuery = `
@@ -85,7 +160,7 @@ const getChannelsQuery = `
 func (c *ChannelPostgresStorage) GetChannels(ctx context.Context, limit, offset int64) ([]models.Channel, error) {
 	const op = "storage.postgresql.channels.channels.GetChannels"
 
-	var channels []models.DBChannel
+	var channels []DBChannel
 
 	rows, err := c.db.Query(ctx, getChannelsQuery, limit, offset)
 	if err != nil {
@@ -94,7 +169,7 @@ func (c *ChannelPostgresStorage) GetChannels(ctx context.Context, limit, offset 
 	defer rows.Close()
 
 	for rows.Next() {
-		var channel models.DBChannel
+		var channel DBChannel
 		if err := rows.Scan(
 			&channel.ID,
 			&channel.Name,

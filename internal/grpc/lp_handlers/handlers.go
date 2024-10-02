@@ -16,7 +16,7 @@ import (
 
 type ChannelHandlers interface {
 	CreateChannel(ctx context.Context, channel models.CreateChannel) (id int64, err error)
-	GetChannel(ctx context.Context, channelID int64) (channel models.Channel, err error)
+	GetChannel(ctx context.Context, channelID int64) (channel models.ChannelWithPlans, err error)
 	GetChannels(ctx context.Context, limit, offset int64) (channels []models.Channel, err error)
 	UpdateChannel(ctx context.Context, updChannel models.UpdateChannelRequest) (id int64, err error)
 	DeleteChannel(ctx context.Context, channelID int64) (err error)
@@ -91,8 +91,23 @@ func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	var plans []*lpv1.Plan
+	for _, plan := range channel.Plans {
+		plans = append(plans, &lpv1.Plan{
+			Id:             plan.ID,
+			Name:           plan.Name,
+			Description:    plan.Description,
+			CreatedBy:      plan.CreatedBy,
+			LastModifiedBy: plan.LastModifiedBy,
+			IsPublished:    plan.IsPublished,
+			Public:         plan.Public,
+			CreatedAt:      timestamppb.New(plan.CreatedAt),
+			Modified:       timestamppb.New(plan.Modified),
+		})
+	}
+
 	return &lpv1.GetChannelResponse{
-		Channel: &lpv1.Channel{
+		Channel: &lpv1.ChannelWithPlans{
 			Id:             channel.ID,
 			Name:           channel.Name,
 			Description:    channel.Description,
@@ -100,6 +115,7 @@ func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest)
 			LastModifiedBy: channel.LastModifiedBy,
 			CreatedAt:      timestamppb.New(channel.CreatedAt),
 			Modified:       timestamppb.New(channel.Modified),
+			Plans:          plans,
 		},
 	}, nil
 }
