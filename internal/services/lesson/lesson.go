@@ -120,12 +120,12 @@ func (lh *LessonHandlers) GetLesson(ctx context.Context, lessonID int64) (models
 }
 
 // GetLessons gets lessons and returns them.
-func (lh *LessonHandlers) GetLessons(ctx context.Context, plan_id int64, limit, offset int64) ([]models.Lesson, error) {
+func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, offset int64) ([]models.Lesson, error) {
 	const op = "lessons.GetLessons"
 
 	log := lh.log.With(
 		slog.String("op", op),
-		slog.Int64("getting lessons included in plan with id", plan_id),
+		slog.Int64("getting lessons included in plan with id", planID),
 	)
 
 	log.Info("getting lessons")
@@ -142,7 +142,7 @@ func (lh *LessonHandlers) GetLessons(ctx context.Context, plan_id int64, limit, 
 	}
 
 	var lessons []models.Lesson
-	lessons, err := lh.lessonProvider.GetLessons(ctx, plan_id, limit, offset)
+	lessons, err := lh.lessonProvider.GetLessons(ctx, planID, limit, offset)
 	if err != nil {
 		if errors.Is(err, storage.ErrLessonNotFound) {
 			lh.log.Warn("lessons not found", slog.String("err", err.Error()))
