@@ -122,12 +122,12 @@ const getLessonsQuery = `
 	ORDER BY l.id
 	LIMIT $2 OFFSET $3`
 
-func (l *LessonsPostgresStorage) GetLessons(ctx context.Context, plan_id int64, limit, offset int64) ([]models.Lesson, error) {
+func (l *LessonsPostgresStorage) GetLessons(ctx context.Context, planID int64, limit, offset int64) ([]models.Lesson, error) {
 	const op = "storage.postgresql.lessons.lessons.GetLessons"
 
 	var lessons []DBLesson
 
-	rows, err := l.db.Query(ctx, getLessonsQuery, plan_id, limit, offset)
+	rows, err := l.db.Query(ctx, getLessonsQuery, planID, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
