@@ -6,6 +6,8 @@ import (
 
 	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	chanserv "github.com/DimTur/lp_learning_platform/internal/services/channel"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/questions"
 	lpv1 "github.com/DimTur/lp_learning_platform/pkg/server/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -38,10 +40,40 @@ type LessonHandlers interface {
 	DeleteLesson(ctx context.Context, lessonID int64) (err error)
 }
 
+type PageHandlers interface {
+	CreatePage(ctx context.Context, page pages.CreatePage) (int64, error)
+	GetPage(ctx context.Context, pageID int64, contentType string) (pages.Page, error)
+	GetPages(ctx context.Context, lessonID int64, limit, offset int64) ([]pages.BasePage, error)
+	UpdatePage(ctx context.Context, updPage pages.UpdatePage) (int64, error)
+	DeletePage(ctx context.Context, pageID int64) error
+	// CreateImagePage(ctx context.Context, imagePage models.CreateImagePage) (int64, error)
+	// CreateVideoPage(ctx context.Context, videoPage models.CreateVideoPage) (int64, error)
+	// CreatePDFPage(ctx context.Context, pdfPage models.CreatePDFPage) (int64, error)
+	// CreateQuestionPage(ctx context.Context, questionPage models.CreateQuestionPage) (int64, error)
+	// GetImagePageByID(ctx context.Context, pageID int64) (models.ImagePage, error)
+	// GetVideoPageByID(ctx context.Context, pageID int64) (models.VideoPage, error)
+	// GetPDFPageByID(ctx context.Context, pageID int64) (models.PDFPage, error)
+	// GetQuestionPageByID(ctx context.Context, pageID int64) (models.QuestionPage, error)
+	// GetPages(ctx context.Context, lessonID int64, limit, offset int64) ([]models.Page, error)
+	// UpdateImagePage(ctx context.Context, updPage models.UpdateImagePage) (int64, error)
+	// UpdateVideoPage(ctx context.Context, updPage models.UpdateVideoPage) (int64, error)
+	// UpdatePDFPage(ctx context.Context, updPage models.UpdatePDFPage) (int64, error)
+	// UpdateQuestionPage(ctx context.Context, updPage models.UpdateQuestionPage) (int64, error)
+	// DeletePage(ctx context.Context, pageID int64) error
+}
+
+type QuestionHandlers interface {
+	CreateQuestionPage(ctx context.Context, questionPage questions.CreateQuestionPage) (int64, error)
+	GetQuestionPageByID(ctx context.Context, pageID int64) (questions.QuestionPage, error)
+	UpdateQuestionPage(ctx context.Context, updPage questions.UpdateQuestionPage) (int64, error)
+}
+
 type serverAPI struct {
-	channelHandlers ChannelHandlers
-	planHandlers    PlanHandlers
-	lessonHandlers  LessonHandlers
+	channelHandlers  ChannelHandlers
+	planHandlers     PlanHandlers
+	lessonHandlers   LessonHandlers
+	pageHandlers     PageHandlers
+	questionHandlers QuestionHandlers
 
 	lpv1.UnsafeLearningPlatformServer
 }
@@ -51,11 +83,15 @@ func RegisterLPServiceServer(
 	ch ChannelHandlers,
 	ph PlanHandlers,
 	lh LessonHandlers,
+	pgh PageHandlers,
+	qh QuestionHandlers,
 ) {
 	lpv1.RegisterLearningPlatformServer(gRPC, &serverAPI{
-		channelHandlers: ch,
-		planHandlers:    ph,
-		lessonHandlers:  lh,
+		channelHandlers:  ch,
+		planHandlers:     ph,
+		lessonHandlers:   lh,
+		pageHandlers:     pgh,
+		questionHandlers: qh,
 	})
 }
 

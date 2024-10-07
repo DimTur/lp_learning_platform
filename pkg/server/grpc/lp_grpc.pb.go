@@ -19,21 +19,29 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	LearningPlatform_CreateChannel_FullMethodName = "/lp.v1.LearningPlatform/CreateChannel"
-	LearningPlatform_GetChannel_FullMethodName    = "/lp.v1.LearningPlatform/GetChannel"
-	LearningPlatform_GetChannels_FullMethodName   = "/lp.v1.LearningPlatform/GetChannels"
-	LearningPlatform_UpdateChannel_FullMethodName = "/lp.v1.LearningPlatform/UpdateChannel"
-	LearningPlatform_DeleteChannel_FullMethodName = "/lp.v1.LearningPlatform/DeleteChannel"
-	LearningPlatform_CreatePlan_FullMethodName    = "/lp.v1.LearningPlatform/CreatePlan"
-	LearningPlatform_GetPlan_FullMethodName       = "/lp.v1.LearningPlatform/GetPlan"
-	LearningPlatform_GetPlans_FullMethodName      = "/lp.v1.LearningPlatform/GetPlans"
-	LearningPlatform_UpdatePlan_FullMethodName    = "/lp.v1.LearningPlatform/UpdatePlan"
-	LearningPlatform_DeletePlan_FullMethodName    = "/lp.v1.LearningPlatform/DeletePlan"
-	LearningPlatform_CreateLesson_FullMethodName  = "/lp.v1.LearningPlatform/CreateLesson"
-	LearningPlatform_GetLesson_FullMethodName     = "/lp.v1.LearningPlatform/GetLesson"
-	LearningPlatform_GetLessons_FullMethodName    = "/lp.v1.LearningPlatform/GetLessons"
-	LearningPlatform_UpdateLesson_FullMethodName  = "/lp.v1.LearningPlatform/UpdateLesson"
-	LearningPlatform_DeleteLesson_FullMethodName  = "/lp.v1.LearningPlatform/DeleteLesson"
+	LearningPlatform_CreateChannel_FullMethodName      = "/lp.v1.LearningPlatform/CreateChannel"
+	LearningPlatform_GetChannel_FullMethodName         = "/lp.v1.LearningPlatform/GetChannel"
+	LearningPlatform_GetChannels_FullMethodName        = "/lp.v1.LearningPlatform/GetChannels"
+	LearningPlatform_UpdateChannel_FullMethodName      = "/lp.v1.LearningPlatform/UpdateChannel"
+	LearningPlatform_DeleteChannel_FullMethodName      = "/lp.v1.LearningPlatform/DeleteChannel"
+	LearningPlatform_CreatePlan_FullMethodName         = "/lp.v1.LearningPlatform/CreatePlan"
+	LearningPlatform_GetPlan_FullMethodName            = "/lp.v1.LearningPlatform/GetPlan"
+	LearningPlatform_GetPlans_FullMethodName           = "/lp.v1.LearningPlatform/GetPlans"
+	LearningPlatform_UpdatePlan_FullMethodName         = "/lp.v1.LearningPlatform/UpdatePlan"
+	LearningPlatform_DeletePlan_FullMethodName         = "/lp.v1.LearningPlatform/DeletePlan"
+	LearningPlatform_CreateLesson_FullMethodName       = "/lp.v1.LearningPlatform/CreateLesson"
+	LearningPlatform_GetLesson_FullMethodName          = "/lp.v1.LearningPlatform/GetLesson"
+	LearningPlatform_GetLessons_FullMethodName         = "/lp.v1.LearningPlatform/GetLessons"
+	LearningPlatform_UpdateLesson_FullMethodName       = "/lp.v1.LearningPlatform/UpdateLesson"
+	LearningPlatform_DeleteLesson_FullMethodName       = "/lp.v1.LearningPlatform/DeleteLesson"
+	LearningPlatform_CreatePage_FullMethodName         = "/lp.v1.LearningPlatform/CreatePage"
+	LearningPlatform_GetPage_FullMethodName            = "/lp.v1.LearningPlatform/GetPage"
+	LearningPlatform_GetPages_FullMethodName           = "/lp.v1.LearningPlatform/GetPages"
+	LearningPlatform_UpdatePage_FullMethodName         = "/lp.v1.LearningPlatform/UpdatePage"
+	LearningPlatform_DeletePage_FullMethodName         = "/lp.v1.LearningPlatform/DeletePage"
+	LearningPlatform_CreateQuestionPage_FullMethodName = "/lp.v1.LearningPlatform/CreateQuestionPage"
+	LearningPlatform_GetQuestionPage_FullMethodName    = "/lp.v1.LearningPlatform/GetQuestionPage"
+	LearningPlatform_UpdateQuestionPage_FullMethodName = "/lp.v1.LearningPlatform/UpdateQuestionPage"
 )
 
 // LearningPlatformClient is the client API for LearningPlatform service.
@@ -55,6 +63,14 @@ type LearningPlatformClient interface {
 	GetLessons(ctx context.Context, in *GetLessonsRequest, opts ...grpc.CallOption) (*GetLessonsResponse, error)
 	UpdateLesson(ctx context.Context, in *UpdateLessonRequest, opts ...grpc.CallOption) (*UpdateLessonResponse, error)
 	DeleteLesson(ctx context.Context, in *DeleteLessonRequest, opts ...grpc.CallOption) (*DeleteLessonResponse, error)
+	CreatePage(ctx context.Context, in *CreatePageRequest, opts ...grpc.CallOption) (*CreatePageResponse, error)
+	GetPage(ctx context.Context, in *GetPageRequest, opts ...grpc.CallOption) (*GetPageResponse, error)
+	GetPages(ctx context.Context, in *GetPagesRequest, opts ...grpc.CallOption) (*GetPagesResponse, error)
+	UpdatePage(ctx context.Context, in *UpdatePageRequest, opts ...grpc.CallOption) (*UpdatePageResponse, error)
+	DeletePage(ctx context.Context, in *DeletePageRequest, opts ...grpc.CallOption) (*DeletePageResponse, error)
+	CreateQuestionPage(ctx context.Context, in *CreateQuestionPageRequest, opts ...grpc.CallOption) (*CreateQuestionPageResponse, error)
+	GetQuestionPage(ctx context.Context, in *GetQuestionPageRequest, opts ...grpc.CallOption) (*GetQuestionPageResponse, error)
+	UpdateQuestionPage(ctx context.Context, in *UpdateQuestionPageRequest, opts ...grpc.CallOption) (*UpdateQuestionPageResponse, error)
 }
 
 type learningPlatformClient struct {
@@ -215,6 +231,86 @@ func (c *learningPlatformClient) DeleteLesson(ctx context.Context, in *DeleteLes
 	return out, nil
 }
 
+func (c *learningPlatformClient) CreatePage(ctx context.Context, in *CreatePageRequest, opts ...grpc.CallOption) (*CreatePageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreatePageResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_CreatePage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) GetPage(ctx context.Context, in *GetPageRequest, opts ...grpc.CallOption) (*GetPageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPageResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_GetPage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) GetPages(ctx context.Context, in *GetPagesRequest, opts ...grpc.CallOption) (*GetPagesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPagesResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_GetPages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) UpdatePage(ctx context.Context, in *UpdatePageRequest, opts ...grpc.CallOption) (*UpdatePageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdatePageResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_UpdatePage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) DeletePage(ctx context.Context, in *DeletePageRequest, opts ...grpc.CallOption) (*DeletePageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeletePageResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_DeletePage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) CreateQuestionPage(ctx context.Context, in *CreateQuestionPageRequest, opts ...grpc.CallOption) (*CreateQuestionPageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateQuestionPageResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_CreateQuestionPage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) GetQuestionPage(ctx context.Context, in *GetQuestionPageRequest, opts ...grpc.CallOption) (*GetQuestionPageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetQuestionPageResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_GetQuestionPage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) UpdateQuestionPage(ctx context.Context, in *UpdateQuestionPageRequest, opts ...grpc.CallOption) (*UpdateQuestionPageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateQuestionPageResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_UpdateQuestionPage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LearningPlatformServer is the server API for LearningPlatform service.
 // All implementations must embed UnimplementedLearningPlatformServer
 // for forward compatibility.
@@ -234,6 +330,14 @@ type LearningPlatformServer interface {
 	GetLessons(context.Context, *GetLessonsRequest) (*GetLessonsResponse, error)
 	UpdateLesson(context.Context, *UpdateLessonRequest) (*UpdateLessonResponse, error)
 	DeleteLesson(context.Context, *DeleteLessonRequest) (*DeleteLessonResponse, error)
+	CreatePage(context.Context, *CreatePageRequest) (*CreatePageResponse, error)
+	GetPage(context.Context, *GetPageRequest) (*GetPageResponse, error)
+	GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error)
+	UpdatePage(context.Context, *UpdatePageRequest) (*UpdatePageResponse, error)
+	DeletePage(context.Context, *DeletePageRequest) (*DeletePageResponse, error)
+	CreateQuestionPage(context.Context, *CreateQuestionPageRequest) (*CreateQuestionPageResponse, error)
+	GetQuestionPage(context.Context, *GetQuestionPageRequest) (*GetQuestionPageResponse, error)
+	UpdateQuestionPage(context.Context, *UpdateQuestionPageRequest) (*UpdateQuestionPageResponse, error)
 	mustEmbedUnimplementedLearningPlatformServer()
 }
 
@@ -288,6 +392,30 @@ func (UnimplementedLearningPlatformServer) UpdateLesson(context.Context, *Update
 }
 func (UnimplementedLearningPlatformServer) DeleteLesson(context.Context, *DeleteLessonRequest) (*DeleteLessonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteLesson not implemented")
+}
+func (UnimplementedLearningPlatformServer) CreatePage(context.Context, *CreatePageRequest) (*CreatePageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreatePage not implemented")
+}
+func (UnimplementedLearningPlatformServer) GetPage(context.Context, *GetPageRequest) (*GetPageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPage not implemented")
+}
+func (UnimplementedLearningPlatformServer) GetPages(context.Context, *GetPagesRequest) (*GetPagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPages not implemented")
+}
+func (UnimplementedLearningPlatformServer) UpdatePage(context.Context, *UpdatePageRequest) (*UpdatePageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePage not implemented")
+}
+func (UnimplementedLearningPlatformServer) DeletePage(context.Context, *DeletePageRequest) (*DeletePageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePage not implemented")
+}
+func (UnimplementedLearningPlatformServer) CreateQuestionPage(context.Context, *CreateQuestionPageRequest) (*CreateQuestionPageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateQuestionPage not implemented")
+}
+func (UnimplementedLearningPlatformServer) GetQuestionPage(context.Context, *GetQuestionPageRequest) (*GetQuestionPageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetQuestionPage not implemented")
+}
+func (UnimplementedLearningPlatformServer) UpdateQuestionPage(context.Context, *UpdateQuestionPageRequest) (*UpdateQuestionPageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateQuestionPage not implemented")
 }
 func (UnimplementedLearningPlatformServer) mustEmbedUnimplementedLearningPlatformServer() {}
 func (UnimplementedLearningPlatformServer) testEmbeddedByValue()                          {}
@@ -580,6 +708,150 @@ func _LearningPlatform_DeleteLesson_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LearningPlatform_CreatePage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreatePageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).CreatePage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_CreatePage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).CreatePage(ctx, req.(*CreatePageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_GetPage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).GetPage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_GetPage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).GetPage(ctx, req.(*GetPageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_GetPages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).GetPages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_GetPages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).GetPages(ctx, req.(*GetPagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_UpdatePage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdatePageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).UpdatePage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_UpdatePage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).UpdatePage(ctx, req.(*UpdatePageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_DeletePage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).DeletePage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_DeletePage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).DeletePage(ctx, req.(*DeletePageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_CreateQuestionPage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateQuestionPageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).CreateQuestionPage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_CreateQuestionPage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).CreateQuestionPage(ctx, req.(*CreateQuestionPageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_GetQuestionPage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetQuestionPageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).GetQuestionPage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_GetQuestionPage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).GetQuestionPage(ctx, req.(*GetQuestionPageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_UpdateQuestionPage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateQuestionPageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).UpdateQuestionPage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_UpdateQuestionPage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).UpdateQuestionPage(ctx, req.(*UpdateQuestionPageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LearningPlatform_ServiceDesc is the grpc.ServiceDesc for LearningPlatform service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -646,6 +918,38 @@ var LearningPlatform_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteLesson",
 			Handler:    _LearningPlatform_DeleteLesson_Handler,
+		},
+		{
+			MethodName: "CreatePage",
+			Handler:    _LearningPlatform_CreatePage_Handler,
+		},
+		{
+			MethodName: "GetPage",
+			Handler:    _LearningPlatform_GetPage_Handler,
+		},
+		{
+			MethodName: "GetPages",
+			Handler:    _LearningPlatform_GetPages_Handler,
+		},
+		{
+			MethodName: "UpdatePage",
+			Handler:    _LearningPlatform_UpdatePage_Handler,
+		},
+		{
+			MethodName: "DeletePage",
+			Handler:    _LearningPlatform_DeletePage_Handler,
+		},
+		{
+			MethodName: "CreateQuestionPage",
+			Handler:    _LearningPlatform_CreateQuestionPage_Handler,
+		},
+		{
+			MethodName: "GetQuestionPage",
+			Handler:    _LearningPlatform_GetQuestionPage_Handler,
+		},
+		{
+			MethodName: "UpdateQuestionPage",
+			Handler:    _LearningPlatform_UpdateQuestionPage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

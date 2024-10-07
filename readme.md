@@ -10,7 +10,7 @@ Start docker container with postgresql
 
 Start APP
 
-    go run cmd/main.go serve --config=./config/config.yaml
+    go run cmd/main.go serve --config=./config/config.yml
 
 Stop docker container with postgresql if you needed
 

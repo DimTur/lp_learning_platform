@@ -21,6 +21,1591 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type ContentType int32
+
+const (
+	ContentType_CONTENT_TYPE_UNSPECIFIED ContentType = 0
+	ContentType_IMAGE                    ContentType = 1
+	ContentType_VIDEO                    ContentType = 2
+	ContentType_PDF                      ContentType = 3
+	ContentType_QUESTION                 ContentType = 4
+)
+
+// Enum value maps for ContentType.
+var (
+	ContentType_name = map[int32]string{
+		0: "CONTENT_TYPE_UNSPECIFIED",
+		1: "IMAGE",
+		2: "VIDEO",
+		3: "PDF",
+		4: "QUESTION",
+	}
+	ContentType_value = map[string]int32{
+		"CONTENT_TYPE_UNSPECIFIED": 0,
+		"IMAGE":                    1,
+		"VIDEO":                    2,
+		"PDF":                      3,
+		"QUESTION":                 4,
+	}
+)
+
+func (x ContentType) Enum() *ContentType {
+	p := new(ContentType)
+	*p = x
+	return p
+}
+
+func (x ContentType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ContentType) Descriptor() protoreflect.EnumDescriptor {
+	return file_lp_proto_enumTypes[0].Descriptor()
+}
+
+func (ContentType) Type() protoreflect.EnumType {
+	return &file_lp_proto_enumTypes[0]
+}
+
+func (x ContentType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ContentType.Descriptor instead.
+func (ContentType) EnumDescriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{0}
+}
+
+type QuestionType int32
+
+const (
+	QuestionType_QUESTION_TYPE_UNSPECIFIED QuestionType = 0
+	QuestionType_MULTICHOICE               QuestionType = 1
+)
+
+// Enum value maps for QuestionType.
+var (
+	QuestionType_name = map[int32]string{
+		0: "QUESTION_TYPE_UNSPECIFIED",
+		1: "MULTICHOICE",
+	}
+	QuestionType_value = map[string]int32{
+		"QUESTION_TYPE_UNSPECIFIED": 0,
+		"MULTICHOICE":               1,
+	}
+)
+
+func (x QuestionType) Enum() *QuestionType {
+	p := new(QuestionType)
+	*p = x
+	return p
+}
+
+func (x QuestionType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (QuestionType) Descriptor() protoreflect.EnumDescriptor {
+	return file_lp_proto_enumTypes[1].Descriptor()
+}
+
+func (QuestionType) Type() protoreflect.EnumType {
+	return &file_lp_proto_enumTypes[1]
+}
+
+func (x QuestionType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use QuestionType.Descriptor instead.
+func (QuestionType) EnumDescriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{1}
+}
+
+type Answer int32
+
+const (
+	Answer_ANSWER_UNSPECIFIED Answer = 0
+	Answer_OPTION_A           Answer = 1
+	Answer_OPTION_B           Answer = 2
+	Answer_OPTION_C           Answer = 3
+	Answer_OPTION_D           Answer = 4
+	Answer_OPTION_E           Answer = 5
+)
+
+// Enum value maps for Answer.
+var (
+	Answer_name = map[int32]string{
+		0: "ANSWER_UNSPECIFIED",
+		1: "OPTION_A",
+		2: "OPTION_B",
+		3: "OPTION_C",
+		4: "OPTION_D",
+		5: "OPTION_E",
+	}
+	Answer_value = map[string]int32{
+		"ANSWER_UNSPECIFIED": 0,
+		"OPTION_A":           1,
+		"OPTION_B":           2,
+		"OPTION_C":           3,
+		"OPTION_D":           4,
+		"OPTION_E":           5,
+	}
+)
+
+func (x Answer) Enum() *Answer {
+	p := new(Answer)
+	*p = x
+	return p
+}
+
+func (x Answer) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Answer) Descriptor() protoreflect.EnumDescriptor {
+	return file_lp_proto_enumTypes[2].Descriptor()
+}
+
+func (Answer) Type() protoreflect.EnumType {
+	return &file_lp_proto_enumTypes[2]
+}
+
+func (x Answer) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Answer.Descriptor instead.
+func (Answer) EnumDescriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{2}
+}
+
+type BasePage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id             int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	LessonId       int64                  `protobuf:"varint,2,opt,name=lesson_id,json=lessonId,proto3" json:"lesson_id,omitempty"`
+	CreatedBy      int64                  `protobuf:"varint,3,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
+	LastModifiedBy int64                  `protobuf:"varint,4,opt,name=last_modified_by,json=lastModifiedBy,proto3" json:"last_modified_by,omitempty"`
+	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Modified       *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=modified,proto3" json:"modified,omitempty"`
+	ContentType    ContentType            `protobuf:"varint,7,opt,name=content_type,json=contentType,proto3,enum=lp.v1.ContentType" json:"content_type,omitempty"`
+}
+
+func (x *BasePage) Reset() {
+	*x = BasePage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BasePage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BasePage) ProtoMessage() {}
+
+func (x *BasePage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BasePage.ProtoReflect.Descriptor instead.
+func (*BasePage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *BasePage) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *BasePage) GetLessonId() int64 {
+	if x != nil {
+		return x.LessonId
+	}
+	return 0
+}
+
+func (x *BasePage) GetCreatedBy() int64 {
+	if x != nil {
+		return x.CreatedBy
+	}
+	return 0
+}
+
+func (x *BasePage) GetLastModifiedBy() int64 {
+	if x != nil {
+		return x.LastModifiedBy
+	}
+	return 0
+}
+
+func (x *BasePage) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *BasePage) GetModified() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Modified
+	}
+	return nil
+}
+
+func (x *BasePage) GetContentType() ContentType {
+	if x != nil {
+		return x.ContentType
+	}
+	return ContentType_CONTENT_TYPE_UNSPECIFIED
+}
+
+type CreateBasePage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	LessonId       int64 `protobuf:"varint,1,opt,name=lesson_id,json=lessonId,proto3" json:"lesson_id,omitempty"`
+	CreatedBy      int64 `protobuf:"varint,2,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
+	LastModifiedBy int64 `protobuf:"varint,3,opt,name=last_modified_by,json=lastModifiedBy,proto3" json:"last_modified_by,omitempty"`
+}
+
+func (x *CreateBasePage) Reset() {
+	*x = CreateBasePage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateBasePage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateBasePage) ProtoMessage() {}
+
+func (x *CreateBasePage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateBasePage.ProtoReflect.Descriptor instead.
+func (*CreateBasePage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *CreateBasePage) GetLessonId() int64 {
+	if x != nil {
+		return x.LessonId
+	}
+	return 0
+}
+
+func (x *CreateBasePage) GetCreatedBy() int64 {
+	if x != nil {
+		return x.CreatedBy
+	}
+	return 0
+}
+
+func (x *CreateBasePage) GetLastModifiedBy() int64 {
+	if x != nil {
+		return x.LastModifiedBy
+	}
+	return 0
+}
+
+type UpdateBasePage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id             int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	LastModifiedBy int64 `protobuf:"varint,2,opt,name=last_modified_by,json=lastModifiedBy,proto3" json:"last_modified_by,omitempty"`
+}
+
+func (x *UpdateBasePage) Reset() {
+	*x = UpdateBasePage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateBasePage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateBasePage) ProtoMessage() {}
+
+func (x *UpdateBasePage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateBasePage.ProtoReflect.Descriptor instead.
+func (*UpdateBasePage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *UpdateBasePage) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateBasePage) GetLastModifiedBy() int64 {
+	if x != nil {
+		return x.LastModifiedBy
+	}
+	return 0
+}
+
+type ImagePage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Base         *BasePage `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	ImageFileUrl string    `protobuf:"bytes,2,opt,name=image_file_url,json=imageFileUrl,proto3" json:"image_file_url,omitempty"`
+	ImageName    string    `protobuf:"bytes,3,opt,name=image_name,json=imageName,proto3" json:"image_name,omitempty"`
+}
+
+func (x *ImagePage) Reset() {
+	*x = ImagePage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ImagePage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImagePage) ProtoMessage() {}
+
+func (x *ImagePage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImagePage.ProtoReflect.Descriptor instead.
+func (*ImagePage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ImagePage) GetBase() *BasePage {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *ImagePage) GetImageFileUrl() string {
+	if x != nil {
+		return x.ImageFileUrl
+	}
+	return ""
+}
+
+func (x *ImagePage) GetImageName() string {
+	if x != nil {
+		return x.ImageName
+	}
+	return ""
+}
+
+type CreateImagePage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Base         *CreateBasePage `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	ImageFileUrl string          `protobuf:"bytes,2,opt,name=image_file_url,json=imageFileUrl,proto3" json:"image_file_url,omitempty"`
+	ImageName    string          `protobuf:"bytes,3,opt,name=image_name,json=imageName,proto3" json:"image_name,omitempty"`
+}
+
+func (x *CreateImagePage) Reset() {
+	*x = CreateImagePage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateImagePage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateImagePage) ProtoMessage() {}
+
+func (x *CreateImagePage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateImagePage.ProtoReflect.Descriptor instead.
+func (*CreateImagePage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CreateImagePage) GetBase() *CreateBasePage {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreateImagePage) GetImageFileUrl() string {
+	if x != nil {
+		return x.ImageFileUrl
+	}
+	return ""
+}
+
+func (x *CreateImagePage) GetImageName() string {
+	if x != nil {
+		return x.ImageName
+	}
+	return ""
+}
+
+type UpdateImagePage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Base         *UpdateBasePage `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	ImageFileUrl string          `protobuf:"bytes,2,opt,name=image_file_url,json=imageFileUrl,proto3" json:"image_file_url,omitempty"`
+	ImageName    string          `protobuf:"bytes,3,opt,name=image_name,json=imageName,proto3" json:"image_name,omitempty"`
+}
+
+func (x *UpdateImagePage) Reset() {
+	*x = UpdateImagePage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateImagePage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateImagePage) ProtoMessage() {}
+
+func (x *UpdateImagePage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateImagePage.ProtoReflect.Descriptor instead.
+func (*UpdateImagePage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *UpdateImagePage) GetBase() *UpdateBasePage {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpdateImagePage) GetImageFileUrl() string {
+	if x != nil {
+		return x.ImageFileUrl
+	}
+	return ""
+}
+
+func (x *UpdateImagePage) GetImageName() string {
+	if x != nil {
+		return x.ImageName
+	}
+	return ""
+}
+
+type VideoPage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Base         *BasePage `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	VideoFileUrl string    `protobuf:"bytes,2,opt,name=video_file_url,json=videoFileUrl,proto3" json:"video_file_url,omitempty"`
+	VideoName    string    `protobuf:"bytes,3,opt,name=video_name,json=videoName,proto3" json:"video_name,omitempty"`
+}
+
+func (x *VideoPage) Reset() {
+	*x = VideoPage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *VideoPage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VideoPage) ProtoMessage() {}
+
+func (x *VideoPage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VideoPage.ProtoReflect.Descriptor instead.
+func (*VideoPage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *VideoPage) GetBase() *BasePage {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *VideoPage) GetVideoFileUrl() string {
+	if x != nil {
+		return x.VideoFileUrl
+	}
+	return ""
+}
+
+func (x *VideoPage) GetVideoName() string {
+	if x != nil {
+		return x.VideoName
+	}
+	return ""
+}
+
+type CreateVideoPage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Base         *CreateBasePage `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	VideoFileUrl string          `protobuf:"bytes,2,opt,name=video_file_url,json=videoFileUrl,proto3" json:"video_file_url,omitempty"`
+	VideoName    string          `protobuf:"bytes,3,opt,name=video_name,json=videoName,proto3" json:"video_name,omitempty"`
+}
+
+func (x *CreateVideoPage) Reset() {
+	*x = CreateVideoPage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateVideoPage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateVideoPage) ProtoMessage() {}
+
+func (x *CreateVideoPage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateVideoPage.ProtoReflect.Descriptor instead.
+func (*CreateVideoPage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *CreateVideoPage) GetBase() *CreateBasePage {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreateVideoPage) GetVideoFileUrl() string {
+	if x != nil {
+		return x.VideoFileUrl
+	}
+	return ""
+}
+
+func (x *CreateVideoPage) GetVideoName() string {
+	if x != nil {
+		return x.VideoName
+	}
+	return ""
+}
+
+type UpdateVideoPage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Base         *UpdateBasePage `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	VideoFileUrl string          `protobuf:"bytes,2,opt,name=video_file_url,json=videoFileUrl,proto3" json:"video_file_url,omitempty"`
+	VideoName    string          `protobuf:"bytes,3,opt,name=video_name,json=videoName,proto3" json:"video_name,omitempty"`
+}
+
+func (x *UpdateVideoPage) Reset() {
+	*x = UpdateVideoPage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateVideoPage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateVideoPage) ProtoMessage() {}
+
+func (x *UpdateVideoPage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateVideoPage.ProtoReflect.Descriptor instead.
+func (*UpdateVideoPage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpdateVideoPage) GetBase() *UpdateBasePage {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpdateVideoPage) GetVideoFileUrl() string {
+	if x != nil {
+		return x.VideoFileUrl
+	}
+	return ""
+}
+
+func (x *UpdateVideoPage) GetVideoName() string {
+	if x != nil {
+		return x.VideoName
+	}
+	return ""
+}
+
+type PDFPage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Base       *BasePage `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	PdfFileUrl string    `protobuf:"bytes,2,opt,name=pdf_file_url,json=pdfFileUrl,proto3" json:"pdf_file_url,omitempty"`
+	PdfName    string    `protobuf:"bytes,3,opt,name=pdf_name,json=pdfName,proto3" json:"pdf_name,omitempty"`
+}
+
+func (x *PDFPage) Reset() {
+	*x = PDFPage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PDFPage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PDFPage) ProtoMessage() {}
+
+func (x *PDFPage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PDFPage.ProtoReflect.Descriptor instead.
+func (*PDFPage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *PDFPage) GetBase() *BasePage {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *PDFPage) GetPdfFileUrl() string {
+	if x != nil {
+		return x.PdfFileUrl
+	}
+	return ""
+}
+
+func (x *PDFPage) GetPdfName() string {
+	if x != nil {
+		return x.PdfName
+	}
+	return ""
+}
+
+type CreatePDFPage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Base       *CreateBasePage `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	PdfFileUrl string          `protobuf:"bytes,2,opt,name=pdf_file_url,json=pdfFileUrl,proto3" json:"pdf_file_url,omitempty"`
+	PdfName    string          `protobuf:"bytes,3,opt,name=pdf_name,json=pdfName,proto3" json:"pdf_name,omitempty"`
+}
+
+func (x *CreatePDFPage) Reset() {
+	*x = CreatePDFPage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreatePDFPage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePDFPage) ProtoMessage() {}
+
+func (x *CreatePDFPage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePDFPage.ProtoReflect.Descriptor instead.
+func (*CreatePDFPage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CreatePDFPage) GetBase() *CreateBasePage {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *CreatePDFPage) GetPdfFileUrl() string {
+	if x != nil {
+		return x.PdfFileUrl
+	}
+	return ""
+}
+
+func (x *CreatePDFPage) GetPdfName() string {
+	if x != nil {
+		return x.PdfName
+	}
+	return ""
+}
+
+type UpdatePDFPage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Base       *UpdateBasePage `protobuf:"bytes,1,opt,name=base,proto3" json:"base,omitempty"`
+	PdfFileUrl string          `protobuf:"bytes,2,opt,name=pdf_file_url,json=pdfFileUrl,proto3" json:"pdf_file_url,omitempty"`
+	PdfName    string          `protobuf:"bytes,3,opt,name=pdf_name,json=pdfName,proto3" json:"pdf_name,omitempty"`
+}
+
+func (x *UpdatePDFPage) Reset() {
+	*x = UpdatePDFPage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdatePDFPage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePDFPage) ProtoMessage() {}
+
+func (x *UpdatePDFPage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePDFPage.ProtoReflect.Descriptor instead.
+func (*UpdatePDFPage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *UpdatePDFPage) GetBase() *UpdateBasePage {
+	if x != nil {
+		return x.Base
+	}
+	return nil
+}
+
+func (x *UpdatePDFPage) GetPdfFileUrl() string {
+	if x != nil {
+		return x.PdfFileUrl
+	}
+	return ""
+}
+
+func (x *UpdatePDFPage) GetPdfName() string {
+	if x != nil {
+		return x.PdfName
+	}
+	return ""
+}
+
+type CreatePageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Page:
+	//
+	//	*CreatePageRequest_ImagePage
+	//	*CreatePageRequest_VideoPage
+	//	*CreatePageRequest_PdfPage
+	Page isCreatePageRequest_Page `protobuf_oneof:"page"`
+}
+
+func (x *CreatePageRequest) Reset() {
+	*x = CreatePageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreatePageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePageRequest) ProtoMessage() {}
+
+func (x *CreatePageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePageRequest.ProtoReflect.Descriptor instead.
+func (*CreatePageRequest) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{12}
+}
+
+func (m *CreatePageRequest) GetPage() isCreatePageRequest_Page {
+	if m != nil {
+		return m.Page
+	}
+	return nil
+}
+
+func (x *CreatePageRequest) GetImagePage() *CreateImagePage {
+	if x, ok := x.GetPage().(*CreatePageRequest_ImagePage); ok {
+		return x.ImagePage
+	}
+	return nil
+}
+
+func (x *CreatePageRequest) GetVideoPage() *CreateVideoPage {
+	if x, ok := x.GetPage().(*CreatePageRequest_VideoPage); ok {
+		return x.VideoPage
+	}
+	return nil
+}
+
+func (x *CreatePageRequest) GetPdfPage() *CreatePDFPage {
+	if x, ok := x.GetPage().(*CreatePageRequest_PdfPage); ok {
+		return x.PdfPage
+	}
+	return nil
+}
+
+type isCreatePageRequest_Page interface {
+	isCreatePageRequest_Page()
+}
+
+type CreatePageRequest_ImagePage struct {
+	ImagePage *CreateImagePage `protobuf:"bytes,1,opt,name=image_page,json=imagePage,proto3,oneof"`
+}
+
+type CreatePageRequest_VideoPage struct {
+	VideoPage *CreateVideoPage `protobuf:"bytes,2,opt,name=video_page,json=videoPage,proto3,oneof"`
+}
+
+type CreatePageRequest_PdfPage struct {
+	PdfPage *CreatePDFPage `protobuf:"bytes,3,opt,name=pdf_page,json=pdfPage,proto3,oneof"`
+}
+
+func (*CreatePageRequest_ImagePage) isCreatePageRequest_Page() {}
+
+func (*CreatePageRequest_VideoPage) isCreatePageRequest_Page() {}
+
+func (*CreatePageRequest_PdfPage) isCreatePageRequest_Page() {}
+
+type CreatePageResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *CreatePageResponse) Reset() {
+	*x = CreatePageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreatePageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePageResponse) ProtoMessage() {}
+
+func (x *CreatePageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePageResponse.ProtoReflect.Descriptor instead.
+func (*CreatePageResponse) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CreatePageResponse) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type GetPageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id          int64       `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ContentType ContentType `protobuf:"varint,2,opt,name=content_type,json=contentType,proto3,enum=lp.v1.ContentType" json:"content_type,omitempty"`
+}
+
+func (x *GetPageRequest) Reset() {
+	*x = GetPageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetPageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPageRequest) ProtoMessage() {}
+
+func (x *GetPageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPageRequest.ProtoReflect.Descriptor instead.
+func (*GetPageRequest) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetPageRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *GetPageRequest) GetContentType() ContentType {
+	if x != nil {
+		return x.ContentType
+	}
+	return ContentType_CONTENT_TYPE_UNSPECIFIED
+}
+
+type GetPageResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Page:
+	//
+	//	*GetPageResponse_ImagePage
+	//	*GetPageResponse_VideoPage
+	//	*GetPageResponse_PdfPage
+	Page isGetPageResponse_Page `protobuf_oneof:"page"`
+}
+
+func (x *GetPageResponse) Reset() {
+	*x = GetPageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetPageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPageResponse) ProtoMessage() {}
+
+func (x *GetPageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPageResponse.ProtoReflect.Descriptor instead.
+func (*GetPageResponse) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{15}
+}
+
+func (m *GetPageResponse) GetPage() isGetPageResponse_Page {
+	if m != nil {
+		return m.Page
+	}
+	return nil
+}
+
+func (x *GetPageResponse) GetImagePage() *ImagePage {
+	if x, ok := x.GetPage().(*GetPageResponse_ImagePage); ok {
+		return x.ImagePage
+	}
+	return nil
+}
+
+func (x *GetPageResponse) GetVideoPage() *VideoPage {
+	if x, ok := x.GetPage().(*GetPageResponse_VideoPage); ok {
+		return x.VideoPage
+	}
+	return nil
+}
+
+func (x *GetPageResponse) GetPdfPage() *PDFPage {
+	if x, ok := x.GetPage().(*GetPageResponse_PdfPage); ok {
+		return x.PdfPage
+	}
+	return nil
+}
+
+type isGetPageResponse_Page interface {
+	isGetPageResponse_Page()
+}
+
+type GetPageResponse_ImagePage struct {
+	ImagePage *ImagePage `protobuf:"bytes,1,opt,name=image_page,json=imagePage,proto3,oneof"`
+}
+
+type GetPageResponse_VideoPage struct {
+	VideoPage *VideoPage `protobuf:"bytes,2,opt,name=video_page,json=videoPage,proto3,oneof"`
+}
+
+type GetPageResponse_PdfPage struct {
+	PdfPage *PDFPage `protobuf:"bytes,3,opt,name=pdf_page,json=pdfPage,proto3,oneof"`
+}
+
+func (*GetPageResponse_ImagePage) isGetPageResponse_Page() {}
+
+func (*GetPageResponse_VideoPage) isGetPageResponse_Page() {}
+
+func (*GetPageResponse_PdfPage) isGetPageResponse_Page() {}
+
+type GetPagesRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	LessonId int64 `protobuf:"varint,1,opt,name=lesson_id,json=lessonId,proto3" json:"lesson_id,omitempty"` // ID of the lesson that includes the pages.
+	Limit    int64 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`                       // Limit for pagination.
+	Offset   int64 `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`                     // Offset for pagination.
+}
+
+func (x *GetPagesRequest) Reset() {
+	*x = GetPagesRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetPagesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPagesRequest) ProtoMessage() {}
+
+func (x *GetPagesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPagesRequest.ProtoReflect.Descriptor instead.
+func (*GetPagesRequest) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetPagesRequest) GetLessonId() int64 {
+	if x != nil {
+		return x.LessonId
+	}
+	return 0
+}
+
+func (x *GetPagesRequest) GetLimit() int64 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *GetPagesRequest) GetOffset() int64 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+type GetPagesResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Pages []*BasePage `protobuf:"bytes,1,rep,name=pages,proto3" json:"pages,omitempty"` // The retrieved list of pages in the lesson.
+}
+
+func (x *GetPagesResponse) Reset() {
+	*x = GetPagesResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetPagesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPagesResponse) ProtoMessage() {}
+
+func (x *GetPagesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPagesResponse.ProtoReflect.Descriptor instead.
+func (*GetPagesResponse) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *GetPagesResponse) GetPages() []*BasePage {
+	if x != nil {
+		return x.Pages
+	}
+	return nil
+}
+
+type UpdatePageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Page:
+	//
+	//	*UpdatePageRequest_ImagePage
+	//	*UpdatePageRequest_VideoPage
+	//	*UpdatePageRequest_PdfPage
+	Page isUpdatePageRequest_Page `protobuf_oneof:"page"`
+}
+
+func (x *UpdatePageRequest) Reset() {
+	*x = UpdatePageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdatePageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePageRequest) ProtoMessage() {}
+
+func (x *UpdatePageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePageRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePageRequest) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{18}
+}
+
+func (m *UpdatePageRequest) GetPage() isUpdatePageRequest_Page {
+	if m != nil {
+		return m.Page
+	}
+	return nil
+}
+
+func (x *UpdatePageRequest) GetImagePage() *UpdateImagePage {
+	if x, ok := x.GetPage().(*UpdatePageRequest_ImagePage); ok {
+		return x.ImagePage
+	}
+	return nil
+}
+
+func (x *UpdatePageRequest) GetVideoPage() *UpdateVideoPage {
+	if x, ok := x.GetPage().(*UpdatePageRequest_VideoPage); ok {
+		return x.VideoPage
+	}
+	return nil
+}
+
+func (x *UpdatePageRequest) GetPdfPage() *UpdatePDFPage {
+	if x, ok := x.GetPage().(*UpdatePageRequest_PdfPage); ok {
+		return x.PdfPage
+	}
+	return nil
+}
+
+type isUpdatePageRequest_Page interface {
+	isUpdatePageRequest_Page()
+}
+
+type UpdatePageRequest_ImagePage struct {
+	ImagePage *UpdateImagePage `protobuf:"bytes,1,opt,name=image_page,json=imagePage,proto3,oneof"`
+}
+
+type UpdatePageRequest_VideoPage struct {
+	VideoPage *UpdateVideoPage `protobuf:"bytes,2,opt,name=video_page,json=videoPage,proto3,oneof"`
+}
+
+type UpdatePageRequest_PdfPage struct {
+	PdfPage *UpdatePDFPage `protobuf:"bytes,3,opt,name=pdf_page,json=pdfPage,proto3,oneof"`
+}
+
+func (*UpdatePageRequest_ImagePage) isUpdatePageRequest_Page() {}
+
+func (*UpdatePageRequest_VideoPage) isUpdatePageRequest_Page() {}
+
+func (*UpdatePageRequest_PdfPage) isUpdatePageRequest_Page() {}
+
+type UpdatePageResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id      int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // ID of the updated page.
+	Success bool  `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+}
+
+func (x *UpdatePageResponse) Reset() {
+	*x = UpdatePageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdatePageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePageResponse) ProtoMessage() {}
+
+func (x *UpdatePageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePageResponse.ProtoReflect.Descriptor instead.
+func (*UpdatePageResponse) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UpdatePageResponse) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdatePageResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+type DeletePageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // ID of the page to delete.
+}
+
+func (x *DeletePageRequest) Reset() {
+	*x = DeletePageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeletePageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeletePageRequest) ProtoMessage() {}
+
+func (x *DeletePageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeletePageRequest.ProtoReflect.Descriptor instead.
+func (*DeletePageRequest) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *DeletePageRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type DeletePageResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Success bool `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"` // Indicates if the page was successfully deleted.
+}
+
+func (x *DeletePageResponse) Reset() {
+	*x = DeletePageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeletePageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeletePageResponse) ProtoMessage() {}
+
+func (x *DeletePageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeletePageResponse.ProtoReflect.Descriptor instead.
+func (*DeletePageResponse) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *DeletePageResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 type Channel struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -38,7 +1623,7 @@ type Channel struct {
 func (x *Channel) Reset() {
 	*x = Channel{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[0]
+		mi := &file_lp_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -51,7 +1636,7 @@ func (x *Channel) String() string {
 func (*Channel) ProtoMessage() {}
 
 func (x *Channel) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[0]
+	mi := &file_lp_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -64,7 +1649,7 @@ func (x *Channel) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Channel.ProtoReflect.Descriptor instead.
 func (*Channel) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{0}
+	return file_lp_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *Channel) GetId() int64 {
@@ -134,7 +1719,7 @@ type ChannelWithPlans struct {
 func (x *ChannelWithPlans) Reset() {
 	*x = ChannelWithPlans{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[1]
+		mi := &file_lp_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -147,7 +1732,7 @@ func (x *ChannelWithPlans) String() string {
 func (*ChannelWithPlans) ProtoMessage() {}
 
 func (x *ChannelWithPlans) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[1]
+	mi := &file_lp_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -160,7 +1745,7 @@ func (x *ChannelWithPlans) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChannelWithPlans.ProtoReflect.Descriptor instead.
 func (*ChannelWithPlans) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{1}
+	return file_lp_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ChannelWithPlans) GetId() int64 {
@@ -233,7 +1818,7 @@ type CreateChannelRequest struct {
 func (x *CreateChannelRequest) Reset() {
 	*x = CreateChannelRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[2]
+		mi := &file_lp_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -246,7 +1831,7 @@ func (x *CreateChannelRequest) String() string {
 func (*CreateChannelRequest) ProtoMessage() {}
 
 func (x *CreateChannelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[2]
+	mi := &file_lp_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -259,7 +1844,7 @@ func (x *CreateChannelRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateChannelRequest.ProtoReflect.Descriptor instead.
 func (*CreateChannelRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{2}
+	return file_lp_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *CreateChannelRequest) GetName() string {
@@ -301,7 +1886,7 @@ type CreateChannelResponse struct {
 func (x *CreateChannelResponse) Reset() {
 	*x = CreateChannelResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[3]
+		mi := &file_lp_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -314,7 +1899,7 @@ func (x *CreateChannelResponse) String() string {
 func (*CreateChannelResponse) ProtoMessage() {}
 
 func (x *CreateChannelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[3]
+	mi := &file_lp_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -327,7 +1912,7 @@ func (x *CreateChannelResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateChannelResponse.ProtoReflect.Descriptor instead.
 func (*CreateChannelResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{3}
+	return file_lp_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *CreateChannelResponse) GetId() int64 {
@@ -348,7 +1933,7 @@ type GetChannelRequest struct {
 func (x *GetChannelRequest) Reset() {
 	*x = GetChannelRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[4]
+		mi := &file_lp_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -361,7 +1946,7 @@ func (x *GetChannelRequest) String() string {
 func (*GetChannelRequest) ProtoMessage() {}
 
 func (x *GetChannelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[4]
+	mi := &file_lp_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -374,7 +1959,7 @@ func (x *GetChannelRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetChannelRequest.ProtoReflect.Descriptor instead.
 func (*GetChannelRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{4}
+	return file_lp_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *GetChannelRequest) GetId() int64 {
@@ -395,7 +1980,7 @@ type GetChannelResponse struct {
 func (x *GetChannelResponse) Reset() {
 	*x = GetChannelResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[5]
+		mi := &file_lp_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -408,7 +1993,7 @@ func (x *GetChannelResponse) String() string {
 func (*GetChannelResponse) ProtoMessage() {}
 
 func (x *GetChannelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[5]
+	mi := &file_lp_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -421,7 +2006,7 @@ func (x *GetChannelResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetChannelResponse.ProtoReflect.Descriptor instead.
 func (*GetChannelResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{5}
+	return file_lp_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *GetChannelResponse) GetChannel() *ChannelWithPlans {
@@ -443,7 +2028,7 @@ type GetChannelsRequest struct {
 func (x *GetChannelsRequest) Reset() {
 	*x = GetChannelsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[6]
+		mi := &file_lp_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -456,7 +2041,7 @@ func (x *GetChannelsRequest) String() string {
 func (*GetChannelsRequest) ProtoMessage() {}
 
 func (x *GetChannelsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[6]
+	mi := &file_lp_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -469,7 +2054,7 @@ func (x *GetChannelsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetChannelsRequest.ProtoReflect.Descriptor instead.
 func (*GetChannelsRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{6}
+	return file_lp_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *GetChannelsRequest) GetLimit() int64 {
@@ -497,7 +2082,7 @@ type GetChannelsResponse struct {
 func (x *GetChannelsResponse) Reset() {
 	*x = GetChannelsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[7]
+		mi := &file_lp_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -510,7 +2095,7 @@ func (x *GetChannelsResponse) String() string {
 func (*GetChannelsResponse) ProtoMessage() {}
 
 func (x *GetChannelsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[7]
+	mi := &file_lp_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -523,7 +2108,7 @@ func (x *GetChannelsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetChannelsResponse.ProtoReflect.Descriptor instead.
 func (*GetChannelsResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{7}
+	return file_lp_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *GetChannelsResponse) GetChannels() []*Channel {
@@ -547,7 +2132,7 @@ type UpdateChannelRequest struct {
 func (x *UpdateChannelRequest) Reset() {
 	*x = UpdateChannelRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[8]
+		mi := &file_lp_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -560,7 +2145,7 @@ func (x *UpdateChannelRequest) String() string {
 func (*UpdateChannelRequest) ProtoMessage() {}
 
 func (x *UpdateChannelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[8]
+	mi := &file_lp_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -573,7 +2158,7 @@ func (x *UpdateChannelRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateChannelRequest.ProtoReflect.Descriptor instead.
 func (*UpdateChannelRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{8}
+	return file_lp_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *UpdateChannelRequest) GetId() int64 {
@@ -615,7 +2200,7 @@ type UpdateChannelResponse struct {
 func (x *UpdateChannelResponse) Reset() {
 	*x = UpdateChannelResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[9]
+		mi := &file_lp_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -628,7 +2213,7 @@ func (x *UpdateChannelResponse) String() string {
 func (*UpdateChannelResponse) ProtoMessage() {}
 
 func (x *UpdateChannelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[9]
+	mi := &file_lp_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -641,7 +2226,7 @@ func (x *UpdateChannelResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateChannelResponse.ProtoReflect.Descriptor instead.
 func (*UpdateChannelResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{9}
+	return file_lp_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *UpdateChannelResponse) GetId() int64 {
@@ -662,7 +2247,7 @@ type DeleteChannelRequest struct {
 func (x *DeleteChannelRequest) Reset() {
 	*x = DeleteChannelRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[10]
+		mi := &file_lp_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -675,7 +2260,7 @@ func (x *DeleteChannelRequest) String() string {
 func (*DeleteChannelRequest) ProtoMessage() {}
 
 func (x *DeleteChannelRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[10]
+	mi := &file_lp_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -688,7 +2273,7 @@ func (x *DeleteChannelRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteChannelRequest.ProtoReflect.Descriptor instead.
 func (*DeleteChannelRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{10}
+	return file_lp_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *DeleteChannelRequest) GetId() int64 {
@@ -709,7 +2294,7 @@ type DeleteChannelResponse struct {
 func (x *DeleteChannelResponse) Reset() {
 	*x = DeleteChannelResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[11]
+		mi := &file_lp_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -722,7 +2307,7 @@ func (x *DeleteChannelResponse) String() string {
 func (*DeleteChannelResponse) ProtoMessage() {}
 
 func (x *DeleteChannelResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[11]
+	mi := &file_lp_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -735,7 +2320,7 @@ func (x *DeleteChannelResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteChannelResponse.ProtoReflect.Descriptor instead.
 func (*DeleteChannelResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{11}
+	return file_lp_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *DeleteChannelResponse) GetSuccess() bool {
@@ -764,7 +2349,7 @@ type Plan struct {
 func (x *Plan) Reset() {
 	*x = Plan{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[12]
+		mi := &file_lp_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -777,7 +2362,7 @@ func (x *Plan) String() string {
 func (*Plan) ProtoMessage() {}
 
 func (x *Plan) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[12]
+	mi := &file_lp_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -790,7 +2375,7 @@ func (x *Plan) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Plan.ProtoReflect.Descriptor instead.
 func (*Plan) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{12}
+	return file_lp_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *Plan) GetId() int64 {
@@ -871,7 +2456,7 @@ type CreatePlanRequest struct {
 func (x *CreatePlanRequest) Reset() {
 	*x = CreatePlanRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[13]
+		mi := &file_lp_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -884,7 +2469,7 @@ func (x *CreatePlanRequest) String() string {
 func (*CreatePlanRequest) ProtoMessage() {}
 
 func (x *CreatePlanRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[13]
+	mi := &file_lp_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -897,7 +2482,7 @@ func (x *CreatePlanRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePlanRequest.ProtoReflect.Descriptor instead.
 func (*CreatePlanRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{13}
+	return file_lp_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *CreatePlanRequest) GetName() string {
@@ -946,7 +2531,7 @@ type CreatePlanResponse struct {
 func (x *CreatePlanResponse) Reset() {
 	*x = CreatePlanResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[14]
+		mi := &file_lp_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -959,7 +2544,7 @@ func (x *CreatePlanResponse) String() string {
 func (*CreatePlanResponse) ProtoMessage() {}
 
 func (x *CreatePlanResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[14]
+	mi := &file_lp_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -972,7 +2557,7 @@ func (x *CreatePlanResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePlanResponse.ProtoReflect.Descriptor instead.
 func (*CreatePlanResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{14}
+	return file_lp_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *CreatePlanResponse) GetId() int64 {
@@ -993,7 +2578,7 @@ type GetPlanRequest struct {
 func (x *GetPlanRequest) Reset() {
 	*x = GetPlanRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[15]
+		mi := &file_lp_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1006,7 +2591,7 @@ func (x *GetPlanRequest) String() string {
 func (*GetPlanRequest) ProtoMessage() {}
 
 func (x *GetPlanRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[15]
+	mi := &file_lp_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1019,7 +2604,7 @@ func (x *GetPlanRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPlanRequest.ProtoReflect.Descriptor instead.
 func (*GetPlanRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{15}
+	return file_lp_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *GetPlanRequest) GetId() int64 {
@@ -1040,7 +2625,7 @@ type GetPlanResponse struct {
 func (x *GetPlanResponse) Reset() {
 	*x = GetPlanResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[16]
+		mi := &file_lp_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1053,7 +2638,7 @@ func (x *GetPlanResponse) String() string {
 func (*GetPlanResponse) ProtoMessage() {}
 
 func (x *GetPlanResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[16]
+	mi := &file_lp_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1066,7 +2651,7 @@ func (x *GetPlanResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPlanResponse.ProtoReflect.Descriptor instead.
 func (*GetPlanResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{16}
+	return file_lp_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *GetPlanResponse) GetPlan() *Plan {
@@ -1089,7 +2674,7 @@ type GetPlansRequest struct {
 func (x *GetPlansRequest) Reset() {
 	*x = GetPlansRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[17]
+		mi := &file_lp_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1102,7 +2687,7 @@ func (x *GetPlansRequest) String() string {
 func (*GetPlansRequest) ProtoMessage() {}
 
 func (x *GetPlansRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[17]
+	mi := &file_lp_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1115,7 +2700,7 @@ func (x *GetPlansRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPlansRequest.ProtoReflect.Descriptor instead.
 func (*GetPlansRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{17}
+	return file_lp_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *GetPlansRequest) GetChannelId() int64 {
@@ -1150,7 +2735,7 @@ type GetPlansResponse struct {
 func (x *GetPlansResponse) Reset() {
 	*x = GetPlansResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[18]
+		mi := &file_lp_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1163,7 +2748,7 @@ func (x *GetPlansResponse) String() string {
 func (*GetPlansResponse) ProtoMessage() {}
 
 func (x *GetPlansResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[18]
+	mi := &file_lp_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1176,7 +2761,7 @@ func (x *GetPlansResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPlansResponse.ProtoReflect.Descriptor instead.
 func (*GetPlansResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{18}
+	return file_lp_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *GetPlansResponse) GetPlans() []*Plan {
@@ -1202,7 +2787,7 @@ type UpdatePlanRequest struct {
 func (x *UpdatePlanRequest) Reset() {
 	*x = UpdatePlanRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[19]
+		mi := &file_lp_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1215,7 +2800,7 @@ func (x *UpdatePlanRequest) String() string {
 func (*UpdatePlanRequest) ProtoMessage() {}
 
 func (x *UpdatePlanRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[19]
+	mi := &file_lp_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1228,7 +2813,7 @@ func (x *UpdatePlanRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePlanRequest.ProtoReflect.Descriptor instead.
 func (*UpdatePlanRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{19}
+	return file_lp_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *UpdatePlanRequest) GetId() int64 {
@@ -1284,7 +2869,7 @@ type UpdatePlanResponse struct {
 func (x *UpdatePlanResponse) Reset() {
 	*x = UpdatePlanResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[20]
+		mi := &file_lp_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1297,7 +2882,7 @@ func (x *UpdatePlanResponse) String() string {
 func (*UpdatePlanResponse) ProtoMessage() {}
 
 func (x *UpdatePlanResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[20]
+	mi := &file_lp_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1310,7 +2895,7 @@ func (x *UpdatePlanResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePlanResponse.ProtoReflect.Descriptor instead.
 func (*UpdatePlanResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{20}
+	return file_lp_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *UpdatePlanResponse) GetId() int64 {
@@ -1331,7 +2916,7 @@ type DeletePlanRequest struct {
 func (x *DeletePlanRequest) Reset() {
 	*x = DeletePlanRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[21]
+		mi := &file_lp_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1344,7 +2929,7 @@ func (x *DeletePlanRequest) String() string {
 func (*DeletePlanRequest) ProtoMessage() {}
 
 func (x *DeletePlanRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[21]
+	mi := &file_lp_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1357,7 +2942,7 @@ func (x *DeletePlanRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeletePlanRequest.ProtoReflect.Descriptor instead.
 func (*DeletePlanRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{21}
+	return file_lp_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *DeletePlanRequest) GetId() int64 {
@@ -1378,7 +2963,7 @@ type DeletePlanResponse struct {
 func (x *DeletePlanResponse) Reset() {
 	*x = DeletePlanResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[22]
+		mi := &file_lp_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1391,7 +2976,7 @@ func (x *DeletePlanResponse) String() string {
 func (*DeletePlanResponse) ProtoMessage() {}
 
 func (x *DeletePlanResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[22]
+	mi := &file_lp_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1404,7 +2989,7 @@ func (x *DeletePlanResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeletePlanResponse.ProtoReflect.Descriptor instead.
 func (*DeletePlanResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{22}
+	return file_lp_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *DeletePlanResponse) GetSuccess() bool {
@@ -1430,7 +3015,7 @@ type Lesson struct {
 func (x *Lesson) Reset() {
 	*x = Lesson{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[23]
+		mi := &file_lp_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1443,7 +3028,7 @@ func (x *Lesson) String() string {
 func (*Lesson) ProtoMessage() {}
 
 func (x *Lesson) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[23]
+	mi := &file_lp_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1456,7 +3041,7 @@ func (x *Lesson) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Lesson.ProtoReflect.Descriptor instead.
 func (*Lesson) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{23}
+	return file_lp_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *Lesson) GetId() int64 {
@@ -1516,7 +3101,7 @@ type CreateLessonRequest struct {
 func (x *CreateLessonRequest) Reset() {
 	*x = CreateLessonRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[24]
+		mi := &file_lp_proto_msgTypes[46]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1529,7 +3114,7 @@ func (x *CreateLessonRequest) String() string {
 func (*CreateLessonRequest) ProtoMessage() {}
 
 func (x *CreateLessonRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[24]
+	mi := &file_lp_proto_msgTypes[46]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1542,7 +3127,7 @@ func (x *CreateLessonRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateLessonRequest.ProtoReflect.Descriptor instead.
 func (*CreateLessonRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{24}
+	return file_lp_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *CreateLessonRequest) GetName() string {
@@ -1591,7 +3176,7 @@ type CreateLessonResponse struct {
 func (x *CreateLessonResponse) Reset() {
 	*x = CreateLessonResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[25]
+		mi := &file_lp_proto_msgTypes[47]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1604,7 +3189,7 @@ func (x *CreateLessonResponse) String() string {
 func (*CreateLessonResponse) ProtoMessage() {}
 
 func (x *CreateLessonResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[25]
+	mi := &file_lp_proto_msgTypes[47]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1617,7 +3202,7 @@ func (x *CreateLessonResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateLessonResponse.ProtoReflect.Descriptor instead.
 func (*CreateLessonResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{25}
+	return file_lp_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *CreateLessonResponse) GetId() int64 {
@@ -1638,7 +3223,7 @@ type GetLessonRequest struct {
 func (x *GetLessonRequest) Reset() {
 	*x = GetLessonRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[26]
+		mi := &file_lp_proto_msgTypes[48]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1651,7 +3236,7 @@ func (x *GetLessonRequest) String() string {
 func (*GetLessonRequest) ProtoMessage() {}
 
 func (x *GetLessonRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[26]
+	mi := &file_lp_proto_msgTypes[48]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1664,7 +3249,7 @@ func (x *GetLessonRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLessonRequest.ProtoReflect.Descriptor instead.
 func (*GetLessonRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{26}
+	return file_lp_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *GetLessonRequest) GetId() int64 {
@@ -1685,7 +3270,7 @@ type GetLessonResponse struct {
 func (x *GetLessonResponse) Reset() {
 	*x = GetLessonResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[27]
+		mi := &file_lp_proto_msgTypes[49]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1698,7 +3283,7 @@ func (x *GetLessonResponse) String() string {
 func (*GetLessonResponse) ProtoMessage() {}
 
 func (x *GetLessonResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[27]
+	mi := &file_lp_proto_msgTypes[49]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1711,7 +3296,7 @@ func (x *GetLessonResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLessonResponse.ProtoReflect.Descriptor instead.
 func (*GetLessonResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{27}
+	return file_lp_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *GetLessonResponse) GetLesson() *Lesson {
@@ -1734,7 +3319,7 @@ type GetLessonsRequest struct {
 func (x *GetLessonsRequest) Reset() {
 	*x = GetLessonsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[28]
+		mi := &file_lp_proto_msgTypes[50]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1747,7 +3332,7 @@ func (x *GetLessonsRequest) String() string {
 func (*GetLessonsRequest) ProtoMessage() {}
 
 func (x *GetLessonsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[28]
+	mi := &file_lp_proto_msgTypes[50]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1760,7 +3345,7 @@ func (x *GetLessonsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLessonsRequest.ProtoReflect.Descriptor instead.
 func (*GetLessonsRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{28}
+	return file_lp_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *GetLessonsRequest) GetPlanId() int64 {
@@ -1795,7 +3380,7 @@ type GetLessonsResponse struct {
 func (x *GetLessonsResponse) Reset() {
 	*x = GetLessonsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[29]
+		mi := &file_lp_proto_msgTypes[51]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1808,7 +3393,7 @@ func (x *GetLessonsResponse) String() string {
 func (*GetLessonsResponse) ProtoMessage() {}
 
 func (x *GetLessonsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[29]
+	mi := &file_lp_proto_msgTypes[51]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1821,7 +3406,7 @@ func (x *GetLessonsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLessonsResponse.ProtoReflect.Descriptor instead.
 func (*GetLessonsResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{29}
+	return file_lp_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *GetLessonsResponse) GetLessons() []*Lesson {
@@ -1844,7 +3429,7 @@ type UpdateLessonRequest struct {
 func (x *UpdateLessonRequest) Reset() {
 	*x = UpdateLessonRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[30]
+		mi := &file_lp_proto_msgTypes[52]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1857,7 +3442,7 @@ func (x *UpdateLessonRequest) String() string {
 func (*UpdateLessonRequest) ProtoMessage() {}
 
 func (x *UpdateLessonRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[30]
+	mi := &file_lp_proto_msgTypes[52]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1870,7 +3455,7 @@ func (x *UpdateLessonRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateLessonRequest.ProtoReflect.Descriptor instead.
 func (*UpdateLessonRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{30}
+	return file_lp_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *UpdateLessonRequest) GetId() int64 {
@@ -1905,7 +3490,7 @@ type UpdateLessonResponse struct {
 func (x *UpdateLessonResponse) Reset() {
 	*x = UpdateLessonResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[31]
+		mi := &file_lp_proto_msgTypes[53]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1918,7 +3503,7 @@ func (x *UpdateLessonResponse) String() string {
 func (*UpdateLessonResponse) ProtoMessage() {}
 
 func (x *UpdateLessonResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[31]
+	mi := &file_lp_proto_msgTypes[53]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1931,7 +3516,7 @@ func (x *UpdateLessonResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateLessonResponse.ProtoReflect.Descriptor instead.
 func (*UpdateLessonResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{31}
+	return file_lp_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *UpdateLessonResponse) GetId() int64 {
@@ -1952,7 +3537,7 @@ type DeleteLessonRequest struct {
 func (x *DeleteLessonRequest) Reset() {
 	*x = DeleteLessonRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[32]
+		mi := &file_lp_proto_msgTypes[54]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1965,7 +3550,7 @@ func (x *DeleteLessonRequest) String() string {
 func (*DeleteLessonRequest) ProtoMessage() {}
 
 func (x *DeleteLessonRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[32]
+	mi := &file_lp_proto_msgTypes[54]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1978,7 +3563,7 @@ func (x *DeleteLessonRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteLessonRequest.ProtoReflect.Descriptor instead.
 func (*DeleteLessonRequest) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{32}
+	return file_lp_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *DeleteLessonRequest) GetId() int64 {
@@ -1999,7 +3584,7 @@ type DeleteLessonResponse struct {
 func (x *DeleteLessonResponse) Reset() {
 	*x = DeleteLessonResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_lp_proto_msgTypes[33]
+		mi := &file_lp_proto_msgTypes[55]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2012,7 +3597,7 @@ func (x *DeleteLessonResponse) String() string {
 func (*DeleteLessonResponse) ProtoMessage() {}
 
 func (x *DeleteLessonResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_lp_proto_msgTypes[33]
+	mi := &file_lp_proto_msgTypes[55]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2025,7 +3610,7 @@ func (x *DeleteLessonResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteLessonResponse.ProtoReflect.Descriptor instead.
 func (*DeleteLessonResponse) Descriptor() ([]byte, []int) {
-	return file_lp_proto_rawDescGZIP(), []int{33}
+	return file_lp_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *DeleteLessonResponse) GetSuccess() bool {
@@ -2035,13 +3620,753 @@ func (x *DeleteLessonResponse) GetSuccess() bool {
 	return false
 }
 
+type QuestionPage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id             int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                                 // ID of the page.
+	LessonId       int64                  `protobuf:"varint,2,opt,name=lesson_id,json=lessonId,proto3" json:"lesson_id,omitempty"`                                     // Lesson ID within which the page is created.
+	CreatedBy      int64                  `protobuf:"varint,3,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`                                  // User ID who creates the page.
+	LastModifiedBy int64                  `protobuf:"varint,4,opt,name=last_modified_by,json=lastModifiedBy,proto3" json:"last_modified_by,omitempty"`                 // ID of the user who modified the page.
+	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`                                   // Timestamp when the page was created.
+	Modified       *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=modified,proto3" json:"modified,omitempty"`                                                      // Timestamp when the page was last modified.
+	ContentType    ContentType            `protobuf:"varint,7,opt,name=content_type,json=contentType,proto3,enum=lp.v1.ContentType" json:"content_type,omitempty"`     // Сontent type of page
+	QuestionType   QuestionType           `protobuf:"varint,8,opt,name=question_type,json=questionType,proto3,enum=lp.v1.QuestionType" json:"question_type,omitempty"` // Question type for question
+	Question       string                 `protobuf:"bytes,9,opt,name=question,proto3" json:"question,omitempty"`                                                      // Question.
+	OptionA        string                 `protobuf:"bytes,10,opt,name=option_a,json=optionA,proto3" json:"option_a,omitempty"`                                        // Option answer.
+	OptionB        string                 `protobuf:"bytes,11,opt,name=option_b,json=optionB,proto3" json:"option_b,omitempty"`                                        // Option answer.
+	OptionC        string                 `protobuf:"bytes,12,opt,name=option_c,json=optionC,proto3" json:"option_c,omitempty"`                                        // Option answer.
+	OptionD        string                 `protobuf:"bytes,13,opt,name=option_d,json=optionD,proto3" json:"option_d,omitempty"`                                        // Option answer.
+	OptionE        string                 `protobuf:"bytes,14,opt,name=option_e,json=optionE,proto3" json:"option_e,omitempty"`                                        // Option answer.
+	Answer         string                 `protobuf:"bytes,15,opt,name=answer,proto3" json:"answer,omitempty"`                                                         // Answer for question.
+}
+
+func (x *QuestionPage) Reset() {
+	*x = QuestionPage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[56]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QuestionPage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QuestionPage) ProtoMessage() {}
+
+func (x *QuestionPage) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[56]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QuestionPage.ProtoReflect.Descriptor instead.
+func (*QuestionPage) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{56}
+}
+
+func (x *QuestionPage) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *QuestionPage) GetLessonId() int64 {
+	if x != nil {
+		return x.LessonId
+	}
+	return 0
+}
+
+func (x *QuestionPage) GetCreatedBy() int64 {
+	if x != nil {
+		return x.CreatedBy
+	}
+	return 0
+}
+
+func (x *QuestionPage) GetLastModifiedBy() int64 {
+	if x != nil {
+		return x.LastModifiedBy
+	}
+	return 0
+}
+
+func (x *QuestionPage) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *QuestionPage) GetModified() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Modified
+	}
+	return nil
+}
+
+func (x *QuestionPage) GetContentType() ContentType {
+	if x != nil {
+		return x.ContentType
+	}
+	return ContentType_CONTENT_TYPE_UNSPECIFIED
+}
+
+func (x *QuestionPage) GetQuestionType() QuestionType {
+	if x != nil {
+		return x.QuestionType
+	}
+	return QuestionType_QUESTION_TYPE_UNSPECIFIED
+}
+
+func (x *QuestionPage) GetQuestion() string {
+	if x != nil {
+		return x.Question
+	}
+	return ""
+}
+
+func (x *QuestionPage) GetOptionA() string {
+	if x != nil {
+		return x.OptionA
+	}
+	return ""
+}
+
+func (x *QuestionPage) GetOptionB() string {
+	if x != nil {
+		return x.OptionB
+	}
+	return ""
+}
+
+func (x *QuestionPage) GetOptionC() string {
+	if x != nil {
+		return x.OptionC
+	}
+	return ""
+}
+
+func (x *QuestionPage) GetOptionD() string {
+	if x != nil {
+		return x.OptionD
+	}
+	return ""
+}
+
+func (x *QuestionPage) GetOptionE() string {
+	if x != nil {
+		return x.OptionE
+	}
+	return ""
+}
+
+func (x *QuestionPage) GetAnswer() string {
+	if x != nil {
+		return x.Answer
+	}
+	return ""
+}
+
+type CreateQuestionPageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	LessonId       int64   `protobuf:"varint,1,opt,name=lesson_id,json=lessonId,proto3" json:"lesson_id,omitempty"`                     // Lesson ID within which the page is created.
+	CreatedBy      int64   `protobuf:"varint,2,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`                  // User ID who creates the lesson.
+	LastModifiedBy int64   `protobuf:"varint,3,opt,name=last_modified_by,json=lastModifiedBy,proto3" json:"last_modified_by,omitempty"` // ID of the user who modified the page.
+	Question       string  `protobuf:"bytes,6,opt,name=question,proto3" json:"question,omitempty"`                                      // Question.
+	OptionA        string  `protobuf:"bytes,7,opt,name=option_a,json=optionA,proto3" json:"option_a,omitempty"`                         // Option answer.
+	OptionB        string  `protobuf:"bytes,8,opt,name=option_b,json=optionB,proto3" json:"option_b,omitempty"`                         // Option answer.
+	OptionC        *string `protobuf:"bytes,9,opt,name=option_c,json=optionC,proto3,oneof" json:"option_c,omitempty"`                   // Option answer.
+	OptionD        *string `protobuf:"bytes,10,opt,name=option_d,json=optionD,proto3,oneof" json:"option_d,omitempty"`                  // Option answer.
+	OptionE        *string `protobuf:"bytes,11,opt,name=option_e,json=optionE,proto3,oneof" json:"option_e,omitempty"`                  // Option answer.
+	Answer         Answer  `protobuf:"varint,12,opt,name=answer,proto3,enum=lp.v1.Answer" json:"answer,omitempty"`                      // Answer for question.
+}
+
+func (x *CreateQuestionPageRequest) Reset() {
+	*x = CreateQuestionPageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[57]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateQuestionPageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateQuestionPageRequest) ProtoMessage() {}
+
+func (x *CreateQuestionPageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[57]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateQuestionPageRequest.ProtoReflect.Descriptor instead.
+func (*CreateQuestionPageRequest) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{57}
+}
+
+func (x *CreateQuestionPageRequest) GetLessonId() int64 {
+	if x != nil {
+		return x.LessonId
+	}
+	return 0
+}
+
+func (x *CreateQuestionPageRequest) GetCreatedBy() int64 {
+	if x != nil {
+		return x.CreatedBy
+	}
+	return 0
+}
+
+func (x *CreateQuestionPageRequest) GetLastModifiedBy() int64 {
+	if x != nil {
+		return x.LastModifiedBy
+	}
+	return 0
+}
+
+func (x *CreateQuestionPageRequest) GetQuestion() string {
+	if x != nil {
+		return x.Question
+	}
+	return ""
+}
+
+func (x *CreateQuestionPageRequest) GetOptionA() string {
+	if x != nil {
+		return x.OptionA
+	}
+	return ""
+}
+
+func (x *CreateQuestionPageRequest) GetOptionB() string {
+	if x != nil {
+		return x.OptionB
+	}
+	return ""
+}
+
+func (x *CreateQuestionPageRequest) GetOptionC() string {
+	if x != nil && x.OptionC != nil {
+		return *x.OptionC
+	}
+	return ""
+}
+
+func (x *CreateQuestionPageRequest) GetOptionD() string {
+	if x != nil && x.OptionD != nil {
+		return *x.OptionD
+	}
+	return ""
+}
+
+func (x *CreateQuestionPageRequest) GetOptionE() string {
+	if x != nil && x.OptionE != nil {
+		return *x.OptionE
+	}
+	return ""
+}
+
+func (x *CreateQuestionPageRequest) GetAnswer() Answer {
+	if x != nil {
+		return x.Answer
+	}
+	return Answer_ANSWER_UNSPECIFIED
+}
+
+type CreateQuestionPageResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // ID of the new question page.
+}
+
+func (x *CreateQuestionPageResponse) Reset() {
+	*x = CreateQuestionPageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[58]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateQuestionPageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateQuestionPageResponse) ProtoMessage() {}
+
+func (x *CreateQuestionPageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[58]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateQuestionPageResponse.ProtoReflect.Descriptor instead.
+func (*CreateQuestionPageResponse) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{58}
+}
+
+func (x *CreateQuestionPageResponse) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type GetQuestionPageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // ID of the question page to retrieve.
+}
+
+func (x *GetQuestionPageRequest) Reset() {
+	*x = GetQuestionPageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[59]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetQuestionPageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetQuestionPageRequest) ProtoMessage() {}
+
+func (x *GetQuestionPageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[59]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetQuestionPageRequest.ProtoReflect.Descriptor instead.
+func (*GetQuestionPageRequest) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{59}
+}
+
+func (x *GetQuestionPageRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+type GetQuestionPageResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	QuestionPage *QuestionPage `protobuf:"bytes,1,opt,name=question_page,json=questionPage,proto3" json:"question_page,omitempty"` // The retrieved question page.
+}
+
+func (x *GetQuestionPageResponse) Reset() {
+	*x = GetQuestionPageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[60]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetQuestionPageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetQuestionPageResponse) ProtoMessage() {}
+
+func (x *GetQuestionPageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[60]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetQuestionPageResponse.ProtoReflect.Descriptor instead.
+func (*GetQuestionPageResponse) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{60}
+}
+
+func (x *GetQuestionPageResponse) GetQuestionPage() *QuestionPage {
+	if x != nil {
+		return x.QuestionPage
+	}
+	return nil
+}
+
+type UpdateQuestionPageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id             int64   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                 // ID of the lesson.
+	LastModifiedBy int64   `protobuf:"varint,2,opt,name=last_modified_by,json=lastModifiedBy,proto3" json:"last_modified_by,omitempty"` // ID of the user who modified the lesson.
+	Question       *string `protobuf:"bytes,3,opt,name=Question,proto3,oneof" json:"Question,omitempty"`
+	OptionA        *string `protobuf:"bytes,4,opt,name=OptionA,proto3,oneof" json:"OptionA,omitempty"`
+	OptionB        *string `protobuf:"bytes,5,opt,name=OptionB,proto3,oneof" json:"OptionB,omitempty"`
+	OptionC        *string `protobuf:"bytes,6,opt,name=OptionC,proto3,oneof" json:"OptionC,omitempty"`
+	OptionD        *string `protobuf:"bytes,7,opt,name=OptionD,proto3,oneof" json:"OptionD,omitempty"`
+	OptionE        *string `protobuf:"bytes,8,opt,name=OptionE,proto3,oneof" json:"OptionE,omitempty"`
+	Answer         *Answer `protobuf:"varint,9,opt,name=Answer,proto3,enum=lp.v1.Answer,oneof" json:"Answer,omitempty"`
+}
+
+func (x *UpdateQuestionPageRequest) Reset() {
+	*x = UpdateQuestionPageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[61]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateQuestionPageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateQuestionPageRequest) ProtoMessage() {}
+
+func (x *UpdateQuestionPageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[61]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateQuestionPageRequest.ProtoReflect.Descriptor instead.
+func (*UpdateQuestionPageRequest) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{61}
+}
+
+func (x *UpdateQuestionPageRequest) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UpdateQuestionPageRequest) GetLastModifiedBy() int64 {
+	if x != nil {
+		return x.LastModifiedBy
+	}
+	return 0
+}
+
+func (x *UpdateQuestionPageRequest) GetQuestion() string {
+	if x != nil && x.Question != nil {
+		return *x.Question
+	}
+	return ""
+}
+
+func (x *UpdateQuestionPageRequest) GetOptionA() string {
+	if x != nil && x.OptionA != nil {
+		return *x.OptionA
+	}
+	return ""
+}
+
+func (x *UpdateQuestionPageRequest) GetOptionB() string {
+	if x != nil && x.OptionB != nil {
+		return *x.OptionB
+	}
+	return ""
+}
+
+func (x *UpdateQuestionPageRequest) GetOptionC() string {
+	if x != nil && x.OptionC != nil {
+		return *x.OptionC
+	}
+	return ""
+}
+
+func (x *UpdateQuestionPageRequest) GetOptionD() string {
+	if x != nil && x.OptionD != nil {
+		return *x.OptionD
+	}
+	return ""
+}
+
+func (x *UpdateQuestionPageRequest) GetOptionE() string {
+	if x != nil && x.OptionE != nil {
+		return *x.OptionE
+	}
+	return ""
+}
+
+func (x *UpdateQuestionPageRequest) GetAnswer() Answer {
+	if x != nil && x.Answer != nil {
+		return *x.Answer
+	}
+	return Answer_ANSWER_UNSPECIFIED
+}
+
+type UpdateQuestionPageResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // ID of the updated pdf page.
+}
+
+func (x *UpdateQuestionPageResponse) Reset() {
+	*x = UpdateQuestionPageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_lp_proto_msgTypes[62]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateQuestionPageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateQuestionPageResponse) ProtoMessage() {}
+
+func (x *UpdateQuestionPageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_lp_proto_msgTypes[62]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateQuestionPageResponse.ProtoReflect.Descriptor instead.
+func (*UpdateQuestionPageResponse) Descriptor() ([]byte, []int) {
+	return file_lp_proto_rawDescGZIP(), []int{62}
+}
+
+func (x *UpdateQuestionPageResponse) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 var File_lp_proto protoreflect.FileDescriptor
 
 var file_lp_proto_rawDesc = []byte{
 	0x0a, 0x08, 0x6c, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x05, 0x6c, 0x70, 0x2e, 0x76,
 	0x31, 0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
 	0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x22, 0x8b, 0x02, 0x0a, 0x07, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x0e,
+	0x74, 0x6f, 0x22, 0xaa, 0x02, 0x0a, 0x08, 0x42, 0x61, 0x73, 0x65, 0x50, 0x61, 0x67, 0x65, 0x12,
+	0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12,
+	0x1b, 0x0a, 0x09, 0x6c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x08, 0x6c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x1d, 0x0a, 0x0a,
+	0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x62, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03,
+	0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x42, 0x79, 0x12, 0x28, 0x0a, 0x10, 0x6c,
+	0x61, 0x73, 0x74, 0x5f, 0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x5f, 0x62, 0x79, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0e, 0x6c, 0x61, 0x73, 0x74, 0x4d, 0x6f, 0x64, 0x69, 0x66,
+	0x69, 0x65, 0x64, 0x42, 0x79, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64,
+	0x5f, 0x61, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67,
+	0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65,
+	0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74,
+	0x12, 0x36, 0x0a, 0x08, 0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x18, 0x06, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x08,
+	0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x12, 0x35, 0x0a, 0x0c, 0x63, 0x6f, 0x6e, 0x74,
+	0x65, 0x6e, 0x74, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x12,
+	0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x54, 0x79,
+	0x70, 0x65, 0x52, 0x0b, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x22,
+	0x76, 0x0a, 0x0e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x61, 0x73, 0x65, 0x50, 0x61, 0x67,
+	0x65, 0x12, 0x1b, 0x0a, 0x09, 0x6c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x6c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x1d,
+	0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x62, 0x79, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x42, 0x79, 0x12, 0x28, 0x0a,
+	0x10, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x5f, 0x62,
+	0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0e, 0x6c, 0x61, 0x73, 0x74, 0x4d, 0x6f, 0x64,
+	0x69, 0x66, 0x69, 0x65, 0x64, 0x42, 0x79, 0x22, 0x4a, 0x0a, 0x0e, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x42, 0x61, 0x73, 0x65, 0x50, 0x61, 0x67, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x28, 0x0a, 0x10, 0x6c, 0x61, 0x73,
+	0x74, 0x5f, 0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x5f, 0x62, 0x79, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x0e, 0x6c, 0x61, 0x73, 0x74, 0x4d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65,
+	0x64, 0x42, 0x79, 0x22, 0x75, 0x0a, 0x09, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x50, 0x61, 0x67, 0x65,
+	0x12, 0x23, 0x0a, 0x04, 0x62, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f,
+	0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x42, 0x61, 0x73, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52,
+	0x04, 0x62, 0x61, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x0e, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x5f, 0x66,
+	0x69, 0x6c, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x69,
+	0x6d, 0x61, 0x67, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x55, 0x72, 0x6c, 0x12, 0x1d, 0x0a, 0x0a, 0x69,
+	0x6d, 0x61, 0x67, 0x65, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x09, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x81, 0x01, 0x0a, 0x0f, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x50, 0x61, 0x67, 0x65, 0x12, 0x29,
+	0x0a, 0x04, 0x62, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x6c,
+	0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x61, 0x73, 0x65, 0x50,
+	0x61, 0x67, 0x65, 0x52, 0x04, 0x62, 0x61, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x0e, 0x69, 0x6d, 0x61,
+	0x67, 0x65, 0x5f, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0c, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x55, 0x72, 0x6c, 0x12,
+	0x1d, 0x0a, 0x0a, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x09, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x81,
+	0x01, 0x0a, 0x0f, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x50, 0x61,
+	0x67, 0x65, 0x12, 0x29, 0x0a, 0x04, 0x62, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x15, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42,
+	0x61, 0x73, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x04, 0x62, 0x61, 0x73, 0x65, 0x12, 0x24, 0x0a,
+	0x0e, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x5f, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x46, 0x69, 0x6c, 0x65,
+	0x55, 0x72, 0x6c, 0x12, 0x1d, 0x0a, 0x0a, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x5f, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x4e, 0x61,
+	0x6d, 0x65, 0x22, 0x75, 0x0a, 0x09, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x50, 0x61, 0x67, 0x65, 0x12,
+	0x23, 0x0a, 0x04, 0x62, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e,
+	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x42, 0x61, 0x73, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x04,
+	0x62, 0x61, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x0e, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x66, 0x69,
+	0x6c, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x76, 0x69,
+	0x64, 0x65, 0x6f, 0x46, 0x69, 0x6c, 0x65, 0x55, 0x72, 0x6c, 0x12, 0x1d, 0x0a, 0x0a, 0x76, 0x69,
+	0x64, 0x65, 0x6f, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09,
+	0x76, 0x69, 0x64, 0x65, 0x6f, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x81, 0x01, 0x0a, 0x0f, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x50, 0x61, 0x67, 0x65, 0x12, 0x29, 0x0a,
+	0x04, 0x62, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x6c, 0x70,
+	0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x61, 0x73, 0x65, 0x50, 0x61,
+	0x67, 0x65, 0x52, 0x04, 0x62, 0x61, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x0e, 0x76, 0x69, 0x64, 0x65,
+	0x6f, 0x5f, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0c, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x46, 0x69, 0x6c, 0x65, 0x55, 0x72, 0x6c, 0x12, 0x1d,
+	0x0a, 0x0a, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x09, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x81, 0x01,
+	0x0a, 0x0f, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x50, 0x61, 0x67,
+	0x65, 0x12, 0x29, 0x0a, 0x04, 0x62, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x15, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x61,
+	0x73, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x04, 0x62, 0x61, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x0e,
+	0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x46, 0x69, 0x6c, 0x65, 0x55,
+	0x72, 0x6c, 0x12, 0x1d, 0x0a, 0x0a, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x4e, 0x61, 0x6d,
+	0x65, 0x22, 0x6b, 0x0a, 0x07, 0x50, 0x44, 0x46, 0x50, 0x61, 0x67, 0x65, 0x12, 0x23, 0x0a, 0x04,
+	0x62, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x6c, 0x70, 0x2e,
+	0x76, 0x31, 0x2e, 0x42, 0x61, 0x73, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x04, 0x62, 0x61, 0x73,
+	0x65, 0x12, 0x20, 0x0a, 0x0c, 0x70, 0x64, 0x66, 0x5f, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x75, 0x72,
+	0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x64, 0x66, 0x46, 0x69, 0x6c, 0x65,
+	0x55, 0x72, 0x6c, 0x12, 0x19, 0x0a, 0x08, 0x70, 0x64, 0x66, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x70, 0x64, 0x66, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x77,
+	0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x44, 0x46, 0x50, 0x61, 0x67, 0x65, 0x12,
+	0x29, 0x0a, 0x04, 0x62, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e,
+	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x42, 0x61, 0x73, 0x65,
+	0x50, 0x61, 0x67, 0x65, 0x52, 0x04, 0x62, 0x61, 0x73, 0x65, 0x12, 0x20, 0x0a, 0x0c, 0x70, 0x64,
+	0x66, 0x5f, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0a, 0x70, 0x64, 0x66, 0x46, 0x69, 0x6c, 0x65, 0x55, 0x72, 0x6c, 0x12, 0x19, 0x0a, 0x08,
+	0x70, 0x64, 0x66, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x70, 0x64, 0x66, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x77, 0x0a, 0x0d, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x50, 0x44, 0x46, 0x50, 0x61, 0x67, 0x65, 0x12, 0x29, 0x0a, 0x04, 0x62, 0x61, 0x73, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x61, 0x73, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x04, 0x62,
+	0x61, 0x73, 0x65, 0x12, 0x20, 0x0a, 0x0c, 0x70, 0x64, 0x66, 0x5f, 0x66, 0x69, 0x6c, 0x65, 0x5f,
+	0x75, 0x72, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x64, 0x66, 0x46, 0x69,
+	0x6c, 0x65, 0x55, 0x72, 0x6c, 0x12, 0x19, 0x0a, 0x08, 0x70, 0x64, 0x66, 0x5f, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x70, 0x64, 0x66, 0x4e, 0x61, 0x6d, 0x65,
+	0x22, 0xc0, 0x01, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x37, 0x0a, 0x0a, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x5f,
+	0x70, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x6c, 0x70, 0x2e,
+	0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x50, 0x61,
+	0x67, 0x65, 0x48, 0x00, 0x52, 0x09, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x50, 0x61, 0x67, 0x65, 0x12,
+	0x37, 0x0a, 0x0a, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x50, 0x61, 0x67, 0x65, 0x48, 0x00, 0x52, 0x09, 0x76,
+	0x69, 0x64, 0x65, 0x6f, 0x50, 0x61, 0x67, 0x65, 0x12, 0x31, 0x0a, 0x08, 0x70, 0x64, 0x66, 0x5f,
+	0x70, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x6c, 0x70, 0x2e,
+	0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x44, 0x46, 0x50, 0x61, 0x67, 0x65,
+	0x48, 0x00, 0x52, 0x07, 0x70, 0x64, 0x66, 0x50, 0x61, 0x67, 0x65, 0x42, 0x06, 0x0a, 0x04, 0x70,
+	0x61, 0x67, 0x65, 0x22, 0x24, 0x0a, 0x12, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x61, 0x67,
+	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x22, 0x57, 0x0a, 0x0e, 0x47, 0x65, 0x74,
+	0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x35, 0x0a, 0x0c, 0x63,
+	0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x0e, 0x32, 0x12, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x54, 0x79, 0x70, 0x65, 0x52, 0x0b, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x54, 0x79,
+	0x70, 0x65, 0x22, 0xac, 0x01, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x31, 0x0a, 0x0a, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x5f,
+	0x70, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x6c, 0x70, 0x2e,
+	0x76, 0x31, 0x2e, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x50, 0x61, 0x67, 0x65, 0x48, 0x00, 0x52, 0x09,
+	0x69, 0x6d, 0x61, 0x67, 0x65, 0x50, 0x61, 0x67, 0x65, 0x12, 0x31, 0x0a, 0x0a, 0x76, 0x69, 0x64,
+	0x65, 0x6f, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e,
+	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x50, 0x61, 0x67, 0x65, 0x48,
+	0x00, 0x52, 0x09, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x50, 0x61, 0x67, 0x65, 0x12, 0x2b, 0x0a, 0x08,
+	0x70, 0x64, 0x66, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0e,
+	0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x44, 0x46, 0x50, 0x61, 0x67, 0x65, 0x48, 0x00,
+	0x52, 0x07, 0x70, 0x64, 0x66, 0x50, 0x61, 0x67, 0x65, 0x42, 0x06, 0x0a, 0x04, 0x70, 0x61, 0x67,
+	0x65, 0x22, 0x5c, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x50, 0x61, 0x67, 0x65, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x6c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x6c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x49,
+	0x64, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03,
+	0x52, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65,
+	0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x22,
+	0x39, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x50, 0x61, 0x67, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a, 0x05, 0x70, 0x61, 0x67, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x42, 0x61, 0x73, 0x65, 0x50,
+	0x61, 0x67, 0x65, 0x52, 0x05, 0x70, 0x61, 0x67, 0x65, 0x73, 0x22, 0xc0, 0x01, 0x0a, 0x11, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x37, 0x0a, 0x0a, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x50, 0x61, 0x67, 0x65, 0x48, 0x00, 0x52, 0x09,
+	0x69, 0x6d, 0x61, 0x67, 0x65, 0x50, 0x61, 0x67, 0x65, 0x12, 0x37, 0x0a, 0x0a, 0x76, 0x69, 0x64,
+	0x65, 0x6f, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x16, 0x2e,
+	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x56, 0x69, 0x64, 0x65,
+	0x6f, 0x50, 0x61, 0x67, 0x65, 0x48, 0x00, 0x52, 0x09, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x50, 0x61,
+	0x67, 0x65, 0x12, 0x31, 0x0a, 0x08, 0x70, 0x64, 0x66, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x50, 0x44, 0x46, 0x50, 0x61, 0x67, 0x65, 0x48, 0x00, 0x52, 0x07, 0x70, 0x64,
+	0x66, 0x50, 0x61, 0x67, 0x65, 0x42, 0x06, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65, 0x22, 0x3e, 0x0a,
+	0x12, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x22, 0x23, 0x0a,
+	0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02,
+	0x69, 0x64, 0x22, 0x2e, 0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x63, 0x63,
+	0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65,
+	0x73, 0x73, 0x22, 0x8b, 0x02, 0x0a, 0x07, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x0e,
 	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12,
 	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61,
 	0x6d, 0x65, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f,
@@ -2256,74 +4581,224 @@ var file_lp_proto_rawDesc = []byte{
 	0x69, 0x64, 0x22, 0x30, 0x0a, 0x14, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73,
 	0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75,
 	0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x73, 0x75, 0x63,
-	0x63, 0x65, 0x73, 0x73, 0x32, 0x9d, 0x08, 0x0a, 0x10, 0x4c, 0x65, 0x61, 0x72, 0x6e, 0x69, 0x6e,
-	0x67, 0x50, 0x6c, 0x61, 0x74, 0x66, 0x6f, 0x72, 0x6d, 0x12, 0x4a, 0x0a, 0x0d, 0x43, 0x72, 0x65,
-	0x61, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x1b, 0x2e, 0x6c, 0x70, 0x2e,
-	0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e,
-	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x6e,
-	0x6e, 0x65, 0x6c, 0x12, 0x18, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x43,
-	0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e,
+	0x63, 0x65, 0x73, 0x73, 0x22, 0xa3, 0x04, 0x0a, 0x0c, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f,
+	0x6e, 0x50, 0x61, 0x67, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x6c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x5f,
+	0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x6c, 0x65, 0x73, 0x73, 0x6f, 0x6e,
+	0x49, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x62, 0x79,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x42,
+	0x79, 0x12, 0x28, 0x0a, 0x10, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69,
+	0x65, 0x64, 0x5f, 0x62, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0e, 0x6c, 0x61, 0x73,
+	0x74, 0x4d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x42, 0x79, 0x12, 0x39, 0x0a, 0x0a, 0x63,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65,
+	0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x36, 0x0a, 0x08, 0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69,
+	0x65, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73,
+	0x74, 0x61, 0x6d, 0x70, 0x52, 0x08, 0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x12, 0x35,
+	0x0a, 0x0c, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x07,
+	0x20, 0x01, 0x28, 0x0e, 0x32, 0x12, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x6f, 0x6e,
+	0x74, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x52, 0x0b, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x54, 0x79, 0x70, 0x65, 0x12, 0x38, 0x0a, 0x0d, 0x71, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f,
+	0x6e, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x13, 0x2e, 0x6c,
+	0x70, 0x2e, 0x76, 0x31, 0x2e, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70,
+	0x65, 0x52, 0x0c, 0x71, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x12,
+	0x1a, 0x0a, 0x08, 0x71, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x09, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x08, 0x71, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x19, 0x0a, 0x08, 0x6f,
+	0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x61, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f,
+	0x70, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x12, 0x19, 0x0a, 0x08, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e,
+	0x5f, 0x62, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e,
+	0x42, 0x12, 0x19, 0x0a, 0x08, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x18, 0x0c, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x12, 0x19, 0x0a, 0x08,
+	0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x64, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x12, 0x19, 0x0a, 0x08, 0x6f, 0x70, 0x74, 0x69, 0x6f,
+	0x6e, 0x5f, 0x65, 0x18, 0x0e, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f,
+	0x6e, 0x45, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x0f, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0x81, 0x03, 0x0a, 0x19, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x67,
+	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x6c, 0x65, 0x73, 0x73,
+	0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x6c, 0x65, 0x73,
+	0x73, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64,
+	0x5f, 0x62, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x64, 0x42, 0x79, 0x12, 0x28, 0x0a, 0x10, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x6d, 0x6f, 0x64,
+	0x69, 0x66, 0x69, 0x65, 0x64, 0x5f, 0x62, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0e,
+	0x6c, 0x61, 0x73, 0x74, 0x4d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x42, 0x79, 0x12, 0x1a,
+	0x0a, 0x08, 0x71, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x71, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x19, 0x0a, 0x08, 0x6f, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x61, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x41, 0x12, 0x19, 0x0a, 0x08, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
+	0x62, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42,
+	0x12, 0x1e, 0x0a, 0x08, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x18, 0x09, 0x20, 0x01,
+	0x28, 0x09, 0x48, 0x00, 0x52, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x88, 0x01, 0x01,
+	0x12, 0x1e, 0x0a, 0x08, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x64, 0x18, 0x0a, 0x20, 0x01,
+	0x28, 0x09, 0x48, 0x01, 0x52, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x88, 0x01, 0x01,
+	0x12, 0x1e, 0x0a, 0x08, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x65, 0x18, 0x0b, 0x20, 0x01,
+	0x28, 0x09, 0x48, 0x02, 0x52, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x88, 0x01, 0x01,
+	0x12, 0x25, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x0e,
+	0x32, 0x0d, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52,
+	0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x42, 0x0b, 0x0a, 0x09, 0x5f, 0x6f, 0x70, 0x74, 0x69,
+	0x6f, 0x6e, 0x5f, 0x63, 0x42, 0x0b, 0x0a, 0x09, 0x5f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
+	0x64, 0x42, 0x0b, 0x0a, 0x09, 0x5f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x65, 0x22, 0x2c,
+	0x0a, 0x1a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e,
+	0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x22, 0x28, 0x0a, 0x16,
+	0x47, 0x65, 0x74, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x67, 0x65, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x22, 0x53, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x51, 0x75, 0x65,
+	0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x38, 0x0a, 0x0d, 0x71, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x70, 0x61,
+	0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31,
+	0x2e, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x67, 0x65, 0x52, 0x0c, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x67, 0x65, 0x22, 0x91, 0x03, 0x0a, 0x19,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61,
+	0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x28, 0x0a, 0x10, 0x6c, 0x61, 0x73,
+	0x74, 0x5f, 0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x5f, 0x62, 0x79, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x0e, 0x6c, 0x61, 0x73, 0x74, 0x4d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65,
+	0x64, 0x42, 0x79, 0x12, 0x1f, 0x0a, 0x08, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x08, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f,
+	0x6e, 0x88, 0x01, 0x01, 0x12, 0x1d, 0x0a, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x41, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x09, 0x48, 0x01, 0x52, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x41,
+	0x88, 0x01, 0x01, 0x12, 0x1d, 0x0a, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x18, 0x05,
+	0x20, 0x01, 0x28, 0x09, 0x48, 0x02, 0x52, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x88,
+	0x01, 0x01, 0x12, 0x1d, 0x0a, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x18, 0x06, 0x20,
+	0x01, 0x28, 0x09, 0x48, 0x03, 0x52, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x88, 0x01,
+	0x01, 0x12, 0x1d, 0x0a, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x18, 0x07, 0x20, 0x01,
+	0x28, 0x09, 0x48, 0x04, 0x52, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x88, 0x01, 0x01,
+	0x12, 0x1d, 0x0a, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x18, 0x08, 0x20, 0x01, 0x28,
+	0x09, 0x48, 0x05, 0x52, 0x07, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x88, 0x01, 0x01, 0x12,
+	0x2a, 0x0a, 0x06, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x09, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x0d, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x48, 0x06,
+	0x52, 0x06, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x88, 0x01, 0x01, 0x42, 0x0b, 0x0a, 0x09, 0x5f,
+	0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x0a, 0x0a, 0x08, 0x5f, 0x4f, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x41, 0x42, 0x0a, 0x0a, 0x08, 0x5f, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x42,
+	0x42, 0x0a, 0x0a, 0x08, 0x5f, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x42, 0x0a, 0x0a, 0x08,
+	0x5f, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x42, 0x0a, 0x0a, 0x08, 0x5f, 0x4f, 0x70, 0x74,
+	0x69, 0x6f, 0x6e, 0x45, 0x42, 0x09, 0x0a, 0x07, 0x5f, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22,
+	0x2c, 0x0a, 0x1a, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f,
+	0x6e, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a,
+	0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x2a, 0x58, 0x0a,
+	0x0b, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1c, 0x0a, 0x18,
+	0x43, 0x4f, 0x4e, 0x54, 0x45, 0x4e, 0x54, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e, 0x53,
+	0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x09, 0x0a, 0x05, 0x49, 0x4d,
+	0x41, 0x47, 0x45, 0x10, 0x01, 0x12, 0x09, 0x0a, 0x05, 0x56, 0x49, 0x44, 0x45, 0x4f, 0x10, 0x02,
+	0x12, 0x07, 0x0a, 0x03, 0x50, 0x44, 0x46, 0x10, 0x03, 0x12, 0x0c, 0x0a, 0x08, 0x51, 0x55, 0x45,
+	0x53, 0x54, 0x49, 0x4f, 0x4e, 0x10, 0x04, 0x2a, 0x3e, 0x0a, 0x0c, 0x51, 0x75, 0x65, 0x73, 0x74,
+	0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1d, 0x0a, 0x19, 0x51, 0x55, 0x45, 0x53, 0x54,
+	0x49, 0x4f, 0x4e, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49,
+	0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x0f, 0x0a, 0x0b, 0x4d, 0x55, 0x4c, 0x54, 0x49, 0x43,
+	0x48, 0x4f, 0x49, 0x43, 0x45, 0x10, 0x01, 0x2a, 0x66, 0x0a, 0x06, 0x41, 0x6e, 0x73, 0x77, 0x65,
+	0x72, 0x12, 0x16, 0x0a, 0x12, 0x41, 0x4e, 0x53, 0x57, 0x45, 0x52, 0x5f, 0x55, 0x4e, 0x53, 0x50,
+	0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x0c, 0x0a, 0x08, 0x4f, 0x50, 0x54,
+	0x49, 0x4f, 0x4e, 0x5f, 0x41, 0x10, 0x01, 0x12, 0x0c, 0x0a, 0x08, 0x4f, 0x50, 0x54, 0x49, 0x4f,
+	0x4e, 0x5f, 0x42, 0x10, 0x02, 0x12, 0x0c, 0x0a, 0x08, 0x4f, 0x50, 0x54, 0x49, 0x4f, 0x4e, 0x5f,
+	0x43, 0x10, 0x03, 0x12, 0x0c, 0x0a, 0x08, 0x4f, 0x50, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x44, 0x10,
+	0x04, 0x12, 0x0c, 0x0a, 0x08, 0x4f, 0x50, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x45, 0x10, 0x05, 0x32,
+	0xe5, 0x0c, 0x0a, 0x10, 0x4c, 0x65, 0x61, 0x72, 0x6e, 0x69, 0x6e, 0x67, 0x50, 0x6c, 0x61, 0x74,
+	0x66, 0x6f, 0x72, 0x6d, 0x12, 0x4a, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x68,
+	0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x1b, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x41, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x18,
+	0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65,
+	0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31,
+	0x2e, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x44, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65,
+	0x6c, 0x73, 0x12, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x68,
+	0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e,
 	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x44, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x43,
-	0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x73, 0x12, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e,
-	0x47, 0x65, 0x74, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x68,
-	0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4a,
-	0x0a, 0x0d, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12,
-	0x1b, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x68,
-	0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6c,
-	0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e,
-	0x65, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4a, 0x0a, 0x0d, 0x44, 0x65,
-	0x6c, 0x65, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x1b, 0x2e, 0x6c, 0x70,
-	0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65,
-	0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31,
-	0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
-	0x50, 0x6c, 0x61, 0x6e, 0x12, 0x18, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65,
-	0x61, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19,
-	0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6c, 0x61,
-	0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x07, 0x47, 0x65, 0x74,
-	0x50, 0x6c, 0x61, 0x6e, 0x12, 0x15, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74,
-	0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x6c, 0x70,
-	0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x3b, 0x0a, 0x08, 0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x6e, 0x73, 0x12,
-	0x16, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x6e, 0x73,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e,
-	0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x41, 0x0a, 0x0a, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x12, 0x18,
-	0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6c, 0x61,
-	0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31,
-	0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x12, 0x41, 0x0a, 0x0a, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x6c, 0x61,
-	0x6e, 0x12, 0x18, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65,
-	0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70,
-	0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47, 0x0a, 0x0c, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
-	0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x12, 0x1a, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4a, 0x0a, 0x0d, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x1b, 0x2e, 0x6c, 0x70, 0x2e,
+	0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4a, 0x0a, 0x0d, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43,
+	0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x12, 0x1b, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x44,
+	0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x41, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x12,
+	0x18, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6c,
+	0x61, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76,
+	0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x38, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x6e, 0x12,
+	0x15, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x6e, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47,
+	0x65, 0x74, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3b,
+	0x0a, 0x08, 0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x6e, 0x73, 0x12, 0x16, 0x2e, 0x6c, 0x70, 0x2e,
+	0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x6c, 0x61, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x17, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x6c,
+	0x61, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41, 0x0a, 0x0a, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x12, 0x18, 0x2e, 0x6c, 0x70, 0x2e, 0x76,
+	0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41,
+	0x0a, 0x0a, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x12, 0x18, 0x2e, 0x6c,
+	0x70, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x44,
+	0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x6c, 0x61, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x47, 0x0a, 0x0c, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f,
+	0x6e, 0x12, 0x1a, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e,
+	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73,
+	0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3e, 0x0a, 0x09, 0x47, 0x65,
+	0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x12, 0x17, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e,
+	0x47, 0x65, 0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x18, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x4c, 0x65, 0x73, 0x73,
+	0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41, 0x0a, 0x0a, 0x47, 0x65,
+	0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x73, 0x12, 0x18, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31,
+	0x2e, 0x47, 0x65, 0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x4c, 0x65,
+	0x73, 0x73, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47, 0x0a,
+	0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x12, 0x1a, 0x2e,
+	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73,
+	0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x6c, 0x70, 0x2e, 0x76,
+	0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47, 0x0a, 0x0c, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65,
+	0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x12, 0x1a, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x44,
+	0x65, 0x6c, 0x65, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74,
 	0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x3e, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x12, 0x17, 0x2e, 0x6c,
-	0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65,
-	0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x41, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x73, 0x12, 0x18, 0x2e,
-	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x73,
+	0x41, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x12, 0x18, 0x2e,
+	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65,
 	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e,
-	0x47, 0x65, 0x74, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x12, 0x47, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73,
-	0x6f, 0x6e, 0x12, 0x1a, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74,
-	0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b,
-	0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x4c, 0x65, 0x73,
-	0x73, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47, 0x0a, 0x0c, 0x44,
-	0x65, 0x6c, 0x65, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x12, 0x1a, 0x2e, 0x6c, 0x70,
-	0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e,
-	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4c, 0x65, 0x73, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x42, 0x0e, 0x5a, 0x0c, 0x6c, 0x70, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31,
-	0x3b, 0x6c, 0x70, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x38, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x50, 0x61, 0x67, 0x65, 0x12, 0x15, 0x2e,
+	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74,
+	0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3b, 0x0a, 0x08,
+	0x47, 0x65, 0x74, 0x50, 0x61, 0x67, 0x65, 0x73, 0x12, 0x16, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31,
+	0x2e, 0x47, 0x65, 0x74, 0x50, 0x61, 0x67, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x17, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x61, 0x67, 0x65,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41, 0x0a, 0x0a, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x12, 0x18, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x41, 0x0a, 0x0a,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x12, 0x18, 0x2e, 0x6c, 0x70, 0x2e,
+	0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x59, 0x0a, 0x12, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f,
+	0x6e, 0x50, 0x61, 0x67, 0x65, 0x12, 0x20, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x67, 0x65,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61,
+	0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x50, 0x0a, 0x0f, 0x47, 0x65,
+	0x74, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x67, 0x65, 0x12, 0x1d, 0x2e,
+	0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f,
+	0x6e, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x6c,
+	0x70, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e,
+	0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x59, 0x0a, 0x12,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61,
+	0x67, 0x65, 0x12, 0x20, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x6c, 0x70, 0x2e, 0x76, 0x31, 0x2e, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x51, 0x75, 0x65, 0x73, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x67, 0x65, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x0e, 0x5a, 0x0c, 0x6c, 0x70, 0x2e, 0x6c, 0x70,
+	0x2e, 0x76, 0x31, 0x3b, 0x6c, 0x70, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2338,95 +4813,174 @@ func file_lp_proto_rawDescGZIP() []byte {
 	return file_lp_proto_rawDescData
 }
 
-var file_lp_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
+var file_lp_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_lp_proto_msgTypes = make([]protoimpl.MessageInfo, 63)
 var file_lp_proto_goTypes = []any{
-	(*Channel)(nil),               // 0: lp.v1.Channel
-	(*ChannelWithPlans)(nil),      // 1: lp.v1.ChannelWithPlans
-	(*CreateChannelRequest)(nil),  // 2: lp.v1.CreateChannelRequest
-	(*CreateChannelResponse)(nil), // 3: lp.v1.CreateChannelResponse
-	(*GetChannelRequest)(nil),     // 4: lp.v1.GetChannelRequest
-	(*GetChannelResponse)(nil),    // 5: lp.v1.GetChannelResponse
-	(*GetChannelsRequest)(nil),    // 6: lp.v1.GetChannelsRequest
-	(*GetChannelsResponse)(nil),   // 7: lp.v1.GetChannelsResponse
-	(*UpdateChannelRequest)(nil),  // 8: lp.v1.UpdateChannelRequest
-	(*UpdateChannelResponse)(nil), // 9: lp.v1.UpdateChannelResponse
-	(*DeleteChannelRequest)(nil),  // 10: lp.v1.DeleteChannelRequest
-	(*DeleteChannelResponse)(nil), // 11: lp.v1.DeleteChannelResponse
-	(*Plan)(nil),                  // 12: lp.v1.Plan
-	(*CreatePlanRequest)(nil),     // 13: lp.v1.CreatePlanRequest
-	(*CreatePlanResponse)(nil),    // 14: lp.v1.CreatePlanResponse
-	(*GetPlanRequest)(nil),        // 15: lp.v1.GetPlanRequest
-	(*GetPlanResponse)(nil),       // 16: lp.v1.GetPlanResponse
-	(*GetPlansRequest)(nil),       // 17: lp.v1.GetPlansRequest
-	(*GetPlansResponse)(nil),      // 18: lp.v1.GetPlansResponse
-	(*UpdatePlanRequest)(nil),     // 19: lp.v1.UpdatePlanRequest
-	(*UpdatePlanResponse)(nil),    // 20: lp.v1.UpdatePlanResponse
-	(*DeletePlanRequest)(nil),     // 21: lp.v1.DeletePlanRequest
-	(*DeletePlanResponse)(nil),    // 22: lp.v1.DeletePlanResponse
-	(*Lesson)(nil),                // 23: lp.v1.Lesson
-	(*CreateLessonRequest)(nil),   // 24: lp.v1.CreateLessonRequest
-	(*CreateLessonResponse)(nil),  // 25: lp.v1.CreateLessonResponse
-	(*GetLessonRequest)(nil),      // 26: lp.v1.GetLessonRequest
-	(*GetLessonResponse)(nil),     // 27: lp.v1.GetLessonResponse
-	(*GetLessonsRequest)(nil),     // 28: lp.v1.GetLessonsRequest
-	(*GetLessonsResponse)(nil),    // 29: lp.v1.GetLessonsResponse
-	(*UpdateLessonRequest)(nil),   // 30: lp.v1.UpdateLessonRequest
-	(*UpdateLessonResponse)(nil),  // 31: lp.v1.UpdateLessonResponse
-	(*DeleteLessonRequest)(nil),   // 32: lp.v1.DeleteLessonRequest
-	(*DeleteLessonResponse)(nil),  // 33: lp.v1.DeleteLessonResponse
-	(*timestamppb.Timestamp)(nil), // 34: google.protobuf.Timestamp
+	(ContentType)(0),                   // 0: lp.v1.ContentType
+	(QuestionType)(0),                  // 1: lp.v1.QuestionType
+	(Answer)(0),                        // 2: lp.v1.Answer
+	(*BasePage)(nil),                   // 3: lp.v1.BasePage
+	(*CreateBasePage)(nil),             // 4: lp.v1.CreateBasePage
+	(*UpdateBasePage)(nil),             // 5: lp.v1.UpdateBasePage
+	(*ImagePage)(nil),                  // 6: lp.v1.ImagePage
+	(*CreateImagePage)(nil),            // 7: lp.v1.CreateImagePage
+	(*UpdateImagePage)(nil),            // 8: lp.v1.UpdateImagePage
+	(*VideoPage)(nil),                  // 9: lp.v1.VideoPage
+	(*CreateVideoPage)(nil),            // 10: lp.v1.CreateVideoPage
+	(*UpdateVideoPage)(nil),            // 11: lp.v1.UpdateVideoPage
+	(*PDFPage)(nil),                    // 12: lp.v1.PDFPage
+	(*CreatePDFPage)(nil),              // 13: lp.v1.CreatePDFPage
+	(*UpdatePDFPage)(nil),              // 14: lp.v1.UpdatePDFPage
+	(*CreatePageRequest)(nil),          // 15: lp.v1.CreatePageRequest
+	(*CreatePageResponse)(nil),         // 16: lp.v1.CreatePageResponse
+	(*GetPageRequest)(nil),             // 17: lp.v1.GetPageRequest
+	(*GetPageResponse)(nil),            // 18: lp.v1.GetPageResponse
+	(*GetPagesRequest)(nil),            // 19: lp.v1.GetPagesRequest
+	(*GetPagesResponse)(nil),           // 20: lp.v1.GetPagesResponse
+	(*UpdatePageRequest)(nil),          // 21: lp.v1.UpdatePageRequest
+	(*UpdatePageResponse)(nil),         // 22: lp.v1.UpdatePageResponse
+	(*DeletePageRequest)(nil),          // 23: lp.v1.DeletePageRequest
+	(*DeletePageResponse)(nil),         // 24: lp.v1.DeletePageResponse
+	(*Channel)(nil),                    // 25: lp.v1.Channel
+	(*ChannelWithPlans)(nil),           // 26: lp.v1.ChannelWithPlans
+	(*CreateChannelRequest)(nil),       // 27: lp.v1.CreateChannelRequest
+	(*CreateChannelResponse)(nil),      // 28: lp.v1.CreateChannelResponse
+	(*GetChannelRequest)(nil),          // 29: lp.v1.GetChannelRequest
+	(*GetChannelResponse)(nil),         // 30: lp.v1.GetChannelResponse
+	(*GetChannelsRequest)(nil),         // 31: lp.v1.GetChannelsRequest
+	(*GetChannelsResponse)(nil),        // 32: lp.v1.GetChannelsResponse
+	(*UpdateChannelRequest)(nil),       // 33: lp.v1.UpdateChannelRequest
+	(*UpdateChannelResponse)(nil),      // 34: lp.v1.UpdateChannelResponse
+	(*DeleteChannelRequest)(nil),       // 35: lp.v1.DeleteChannelRequest
+	(*DeleteChannelResponse)(nil),      // 36: lp.v1.DeleteChannelResponse
+	(*Plan)(nil),                       // 37: lp.v1.Plan
+	(*CreatePlanRequest)(nil),          // 38: lp.v1.CreatePlanRequest
+	(*CreatePlanResponse)(nil),         // 39: lp.v1.CreatePlanResponse
+	(*GetPlanRequest)(nil),             // 40: lp.v1.GetPlanRequest
+	(*GetPlanResponse)(nil),            // 41: lp.v1.GetPlanResponse
+	(*GetPlansRequest)(nil),            // 42: lp.v1.GetPlansRequest
+	(*GetPlansResponse)(nil),           // 43: lp.v1.GetPlansResponse
+	(*UpdatePlanRequest)(nil),          // 44: lp.v1.UpdatePlanRequest
+	(*UpdatePlanResponse)(nil),         // 45: lp.v1.UpdatePlanResponse
+	(*DeletePlanRequest)(nil),          // 46: lp.v1.DeletePlanRequest
+	(*DeletePlanResponse)(nil),         // 47: lp.v1.DeletePlanResponse
+	(*Lesson)(nil),                     // 48: lp.v1.Lesson
+	(*CreateLessonRequest)(nil),        // 49: lp.v1.CreateLessonRequest
+	(*CreateLessonResponse)(nil),       // 50: lp.v1.CreateLessonResponse
+	(*GetLessonRequest)(nil),           // 51: lp.v1.GetLessonRequest
+	(*GetLessonResponse)(nil),          // 52: lp.v1.GetLessonResponse
+	(*GetLessonsRequest)(nil),          // 53: lp.v1.GetLessonsRequest
+	(*GetLessonsResponse)(nil),         // 54: lp.v1.GetLessonsResponse
+	(*UpdateLessonRequest)(nil),        // 55: lp.v1.UpdateLessonRequest
+	(*UpdateLessonResponse)(nil),       // 56: lp.v1.UpdateLessonResponse
+	(*DeleteLessonRequest)(nil),        // 57: lp.v1.DeleteLessonRequest
+	(*DeleteLessonResponse)(nil),       // 58: lp.v1.DeleteLessonResponse
+	(*QuestionPage)(nil),               // 59: lp.v1.QuestionPage
+	(*CreateQuestionPageRequest)(nil),  // 60: lp.v1.CreateQuestionPageRequest
+	(*CreateQuestionPageResponse)(nil), // 61: lp.v1.CreateQuestionPageResponse
+	(*GetQuestionPageRequest)(nil),     // 62: lp.v1.GetQuestionPageRequest
+	(*GetQuestionPageResponse)(nil),    // 63: lp.v1.GetQuestionPageResponse
+	(*UpdateQuestionPageRequest)(nil),  // 64: lp.v1.UpdateQuestionPageRequest
+	(*UpdateQuestionPageResponse)(nil), // 65: lp.v1.UpdateQuestionPageResponse
+	(*timestamppb.Timestamp)(nil),      // 66: google.protobuf.Timestamp
 }
 var file_lp_proto_depIdxs = []int32{
-	34, // 0: lp.v1.Channel.created_at:type_name -> google.protobuf.Timestamp
-	34, // 1: lp.v1.Channel.modified:type_name -> google.protobuf.Timestamp
-	34, // 2: lp.v1.ChannelWithPlans.created_at:type_name -> google.protobuf.Timestamp
-	34, // 3: lp.v1.ChannelWithPlans.modified:type_name -> google.protobuf.Timestamp
-	12, // 4: lp.v1.ChannelWithPlans.plans:type_name -> lp.v1.Plan
-	1,  // 5: lp.v1.GetChannelResponse.channel:type_name -> lp.v1.ChannelWithPlans
-	0,  // 6: lp.v1.GetChannelsResponse.channels:type_name -> lp.v1.Channel
-	34, // 7: lp.v1.Plan.created_at:type_name -> google.protobuf.Timestamp
-	34, // 8: lp.v1.Plan.modified:type_name -> google.protobuf.Timestamp
-	12, // 9: lp.v1.GetPlanResponse.plan:type_name -> lp.v1.Plan
-	12, // 10: lp.v1.GetPlansResponse.plans:type_name -> lp.v1.Plan
-	34, // 11: lp.v1.Lesson.created_at:type_name -> google.protobuf.Timestamp
-	34, // 12: lp.v1.Lesson.modified:type_name -> google.protobuf.Timestamp
-	23, // 13: lp.v1.GetLessonResponse.lesson:type_name -> lp.v1.Lesson
-	23, // 14: lp.v1.GetLessonsResponse.lessons:type_name -> lp.v1.Lesson
-	2,  // 15: lp.v1.LearningPlatform.CreateChannel:input_type -> lp.v1.CreateChannelRequest
-	4,  // 16: lp.v1.LearningPlatform.GetChannel:input_type -> lp.v1.GetChannelRequest
-	6,  // 17: lp.v1.LearningPlatform.GetChannels:input_type -> lp.v1.GetChannelsRequest
-	8,  // 18: lp.v1.LearningPlatform.UpdateChannel:input_type -> lp.v1.UpdateChannelRequest
-	10, // 19: lp.v1.LearningPlatform.DeleteChannel:input_type -> lp.v1.DeleteChannelRequest
-	13, // 20: lp.v1.LearningPlatform.CreatePlan:input_type -> lp.v1.CreatePlanRequest
-	15, // 21: lp.v1.LearningPlatform.GetPlan:input_type -> lp.v1.GetPlanRequest
-	17, // 22: lp.v1.LearningPlatform.GetPlans:input_type -> lp.v1.GetPlansRequest
-	19, // 23: lp.v1.LearningPlatform.UpdatePlan:input_type -> lp.v1.UpdatePlanRequest
-	21, // 24: lp.v1.LearningPlatform.DeletePlan:input_type -> lp.v1.DeletePlanRequest
-	24, // 25: lp.v1.LearningPlatform.CreateLesson:input_type -> lp.v1.CreateLessonRequest
-	26, // 26: lp.v1.LearningPlatform.GetLesson:input_type -> lp.v1.GetLessonRequest
-	28, // 27: lp.v1.LearningPlatform.GetLessons:input_type -> lp.v1.GetLessonsRequest
-	30, // 28: lp.v1.LearningPlatform.UpdateLesson:input_type -> lp.v1.UpdateLessonRequest
-	32, // 29: lp.v1.LearningPlatform.DeleteLesson:input_type -> lp.v1.DeleteLessonRequest
-	3,  // 30: lp.v1.LearningPlatform.CreateChannel:output_type -> lp.v1.CreateChannelResponse
-	5,  // 31: lp.v1.LearningPlatform.GetChannel:output_type -> lp.v1.GetChannelResponse
-	7,  // 32: lp.v1.LearningPlatform.GetChannels:output_type -> lp.v1.GetChannelsResponse
-	9,  // 33: lp.v1.LearningPlatform.UpdateChannel:output_type -> lp.v1.UpdateChannelResponse
-	11, // 34: lp.v1.LearningPlatform.DeleteChannel:output_type -> lp.v1.DeleteChannelResponse
-	14, // 35: lp.v1.LearningPlatform.CreatePlan:output_type -> lp.v1.CreatePlanResponse
-	16, // 36: lp.v1.LearningPlatform.GetPlan:output_type -> lp.v1.GetPlanResponse
-	18, // 37: lp.v1.LearningPlatform.GetPlans:output_type -> lp.v1.GetPlansResponse
-	20, // 38: lp.v1.LearningPlatform.UpdatePlan:output_type -> lp.v1.UpdatePlanResponse
-	22, // 39: lp.v1.LearningPlatform.DeletePlan:output_type -> lp.v1.DeletePlanResponse
-	25, // 40: lp.v1.LearningPlatform.CreateLesson:output_type -> lp.v1.CreateLessonResponse
-	27, // 41: lp.v1.LearningPlatform.GetLesson:output_type -> lp.v1.GetLessonResponse
-	29, // 42: lp.v1.LearningPlatform.GetLessons:output_type -> lp.v1.GetLessonsResponse
-	31, // 43: lp.v1.LearningPlatform.UpdateLesson:output_type -> lp.v1.UpdateLessonResponse
-	33, // 44: lp.v1.LearningPlatform.DeleteLesson:output_type -> lp.v1.DeleteLessonResponse
-	30, // [30:45] is the sub-list for method output_type
-	15, // [15:30] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	66, // 0: lp.v1.BasePage.created_at:type_name -> google.protobuf.Timestamp
+	66, // 1: lp.v1.BasePage.modified:type_name -> google.protobuf.Timestamp
+	0,  // 2: lp.v1.BasePage.content_type:type_name -> lp.v1.ContentType
+	3,  // 3: lp.v1.ImagePage.base:type_name -> lp.v1.BasePage
+	4,  // 4: lp.v1.CreateImagePage.base:type_name -> lp.v1.CreateBasePage
+	5,  // 5: lp.v1.UpdateImagePage.base:type_name -> lp.v1.UpdateBasePage
+	3,  // 6: lp.v1.VideoPage.base:type_name -> lp.v1.BasePage
+	4,  // 7: lp.v1.CreateVideoPage.base:type_name -> lp.v1.CreateBasePage
+	5,  // 8: lp.v1.UpdateVideoPage.base:type_name -> lp.v1.UpdateBasePage
+	3,  // 9: lp.v1.PDFPage.base:type_name -> lp.v1.BasePage
+	4,  // 10: lp.v1.CreatePDFPage.base:type_name -> lp.v1.CreateBasePage
+	5,  // 11: lp.v1.UpdatePDFPage.base:type_name -> lp.v1.UpdateBasePage
+	7,  // 12: lp.v1.CreatePageRequest.image_page:type_name -> lp.v1.CreateImagePage
+	10, // 13: lp.v1.CreatePageRequest.video_page:type_name -> lp.v1.CreateVideoPage
+	13, // 14: lp.v1.CreatePageRequest.pdf_page:type_name -> lp.v1.CreatePDFPage
+	0,  // 15: lp.v1.GetPageRequest.content_type:type_name -> lp.v1.ContentType
+	6,  // 16: lp.v1.GetPageResponse.image_page:type_name -> lp.v1.ImagePage
+	9,  // 17: lp.v1.GetPageResponse.video_page:type_name -> lp.v1.VideoPage
+	12, // 18: lp.v1.GetPageResponse.pdf_page:type_name -> lp.v1.PDFPage
+	3,  // 19: lp.v1.GetPagesResponse.pages:type_name -> lp.v1.BasePage
+	8,  // 20: lp.v1.UpdatePageRequest.image_page:type_name -> lp.v1.UpdateImagePage
+	11, // 21: lp.v1.UpdatePageRequest.video_page:type_name -> lp.v1.UpdateVideoPage
+	14, // 22: lp.v1.UpdatePageRequest.pdf_page:type_name -> lp.v1.UpdatePDFPage
+	66, // 23: lp.v1.Channel.created_at:type_name -> google.protobuf.Timestamp
+	66, // 24: lp.v1.Channel.modified:type_name -> google.protobuf.Timestamp
+	66, // 25: lp.v1.ChannelWithPlans.created_at:type_name -> google.protobuf.Timestamp
+	66, // 26: lp.v1.ChannelWithPlans.modified:type_name -> google.protobuf.Timestamp
+	37, // 27: lp.v1.ChannelWithPlans.plans:type_name -> lp.v1.Plan
+	26, // 28: lp.v1.GetChannelResponse.channel:type_name -> lp.v1.ChannelWithPlans
+	25, // 29: lp.v1.GetChannelsResponse.channels:type_name -> lp.v1.Channel
+	66, // 30: lp.v1.Plan.created_at:type_name -> google.protobuf.Timestamp
+	66, // 31: lp.v1.Plan.modified:type_name -> google.protobuf.Timestamp
+	37, // 32: lp.v1.GetPlanResponse.plan:type_name -> lp.v1.Plan
+	37, // 33: lp.v1.GetPlansResponse.plans:type_name -> lp.v1.Plan
+	66, // 34: lp.v1.Lesson.created_at:type_name -> google.protobuf.Timestamp
+	66, // 35: lp.v1.Lesson.modified:type_name -> google.protobuf.Timestamp
+	48, // 36: lp.v1.GetLessonResponse.lesson:type_name -> lp.v1.Lesson
+	48, // 37: lp.v1.GetLessonsResponse.lessons:type_name -> lp.v1.Lesson
+	66, // 38: lp.v1.QuestionPage.created_at:type_name -> google.protobuf.Timestamp
+	66, // 39: lp.v1.QuestionPage.modified:type_name -> google.protobuf.Timestamp
+	0,  // 40: lp.v1.QuestionPage.content_type:type_name -> lp.v1.ContentType
+	1,  // 41: lp.v1.QuestionPage.question_type:type_name -> lp.v1.QuestionType
+	2,  // 42: lp.v1.CreateQuestionPageRequest.answer:type_name -> lp.v1.Answer
+	59, // 43: lp.v1.GetQuestionPageResponse.question_page:type_name -> lp.v1.QuestionPage
+	2,  // 44: lp.v1.UpdateQuestionPageRequest.Answer:type_name -> lp.v1.Answer
+	27, // 45: lp.v1.LearningPlatform.CreateChannel:input_type -> lp.v1.CreateChannelRequest
+	29, // 46: lp.v1.LearningPlatform.GetChannel:input_type -> lp.v1.GetChannelRequest
+	31, // 47: lp.v1.LearningPlatform.GetChannels:input_type -> lp.v1.GetChannelsRequest
+	33, // 48: lp.v1.LearningPlatform.UpdateChannel:input_type -> lp.v1.UpdateChannelRequest
+	35, // 49: lp.v1.LearningPlatform.DeleteChannel:input_type -> lp.v1.DeleteChannelRequest
+	38, // 50: lp.v1.LearningPlatform.CreatePlan:input_type -> lp.v1.CreatePlanRequest
+	40, // 51: lp.v1.LearningPlatform.GetPlan:input_type -> lp.v1.GetPlanRequest
+	42, // 52: lp.v1.LearningPlatform.GetPlans:input_type -> lp.v1.GetPlansRequest
+	44, // 53: lp.v1.LearningPlatform.UpdatePlan:input_type -> lp.v1.UpdatePlanRequest
+	46, // 54: lp.v1.LearningPlatform.DeletePlan:input_type -> lp.v1.DeletePlanRequest
+	49, // 55: lp.v1.LearningPlatform.CreateLesson:input_type -> lp.v1.CreateLessonRequest
+	51, // 56: lp.v1.LearningPlatform.GetLesson:input_type -> lp.v1.GetLessonRequest
+	53, // 57: lp.v1.LearningPlatform.GetLessons:input_type -> lp.v1.GetLessonsRequest
+	55, // 58: lp.v1.LearningPlatform.UpdateLesson:input_type -> lp.v1.UpdateLessonRequest
+	57, // 59: lp.v1.LearningPlatform.DeleteLesson:input_type -> lp.v1.DeleteLessonRequest
+	15, // 60: lp.v1.LearningPlatform.CreatePage:input_type -> lp.v1.CreatePageRequest
+	17, // 61: lp.v1.LearningPlatform.GetPage:input_type -> lp.v1.GetPageRequest
+	19, // 62: lp.v1.LearningPlatform.GetPages:input_type -> lp.v1.GetPagesRequest
+	21, // 63: lp.v1.LearningPlatform.UpdatePage:input_type -> lp.v1.UpdatePageRequest
+	23, // 64: lp.v1.LearningPlatform.DeletePage:input_type -> lp.v1.DeletePageRequest
+	60, // 65: lp.v1.LearningPlatform.CreateQuestionPage:input_type -> lp.v1.CreateQuestionPageRequest
+	62, // 66: lp.v1.LearningPlatform.GetQuestionPage:input_type -> lp.v1.GetQuestionPageRequest
+	64, // 67: lp.v1.LearningPlatform.UpdateQuestionPage:input_type -> lp.v1.UpdateQuestionPageRequest
+	28, // 68: lp.v1.LearningPlatform.CreateChannel:output_type -> lp.v1.CreateChannelResponse
+	30, // 69: lp.v1.LearningPlatform.GetChannel:output_type -> lp.v1.GetChannelResponse
+	32, // 70: lp.v1.LearningPlatform.GetChannels:output_type -> lp.v1.GetChannelsResponse
+	34, // 71: lp.v1.LearningPlatform.UpdateChannel:output_type -> lp.v1.UpdateChannelResponse
+	36, // 72: lp.v1.LearningPlatform.DeleteChannel:output_type -> lp.v1.DeleteChannelResponse
+	39, // 73: lp.v1.LearningPlatform.CreatePlan:output_type -> lp.v1.CreatePlanResponse
+	41, // 74: lp.v1.LearningPlatform.GetPlan:output_type -> lp.v1.GetPlanResponse
+	43, // 75: lp.v1.LearningPlatform.GetPlans:output_type -> lp.v1.GetPlansResponse
+	45, // 76: lp.v1.LearningPlatform.UpdatePlan:output_type -> lp.v1.UpdatePlanResponse
+	47, // 77: lp.v1.LearningPlatform.DeletePlan:output_type -> lp.v1.DeletePlanResponse
+	50, // 78: lp.v1.LearningPlatform.CreateLesson:output_type -> lp.v1.CreateLessonResponse
+	52, // 79: lp.v1.LearningPlatform.GetLesson:output_type -> lp.v1.GetLessonResponse
+	54, // 80: lp.v1.LearningPlatform.GetLessons:output_type -> lp.v1.GetLessonsResponse
+	56, // 81: lp.v1.LearningPlatform.UpdateLesson:output_type -> lp.v1.UpdateLessonResponse
+	58, // 82: lp.v1.LearningPlatform.DeleteLesson:output_type -> lp.v1.DeleteLessonResponse
+	16, // 83: lp.v1.LearningPlatform.CreatePage:output_type -> lp.v1.CreatePageResponse
+	18, // 84: lp.v1.LearningPlatform.GetPage:output_type -> lp.v1.GetPageResponse
+	20, // 85: lp.v1.LearningPlatform.GetPages:output_type -> lp.v1.GetPagesResponse
+	22, // 86: lp.v1.LearningPlatform.UpdatePage:output_type -> lp.v1.UpdatePageResponse
+	24, // 87: lp.v1.LearningPlatform.DeletePage:output_type -> lp.v1.DeletePageResponse
+	61, // 88: lp.v1.LearningPlatform.CreateQuestionPage:output_type -> lp.v1.CreateQuestionPageResponse
+	63, // 89: lp.v1.LearningPlatform.GetQuestionPage:output_type -> lp.v1.GetQuestionPageResponse
+	65, // 90: lp.v1.LearningPlatform.UpdateQuestionPage:output_type -> lp.v1.UpdateQuestionPageResponse
+	68, // [68:91] is the sub-list for method output_type
+	45, // [45:68] is the sub-list for method input_type
+	45, // [45:45] is the sub-list for extension type_name
+	45, // [45:45] is the sub-list for extension extendee
+	0,  // [0:45] is the sub-list for field type_name
 }
 
 func init() { file_lp_proto_init() }
@@ -2436,7 +4990,7 @@ func file_lp_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_lp_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*Channel); i {
+			switch v := v.(*BasePage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2448,7 +5002,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*ChannelWithPlans); i {
+			switch v := v.(*CreateBasePage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2460,7 +5014,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*CreateChannelRequest); i {
+			switch v := v.(*UpdateBasePage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2472,7 +5026,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[3].Exporter = func(v any, i int) any {
-			switch v := v.(*CreateChannelResponse); i {
+			switch v := v.(*ImagePage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2484,7 +5038,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[4].Exporter = func(v any, i int) any {
-			switch v := v.(*GetChannelRequest); i {
+			switch v := v.(*CreateImagePage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2496,7 +5050,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[5].Exporter = func(v any, i int) any {
-			switch v := v.(*GetChannelResponse); i {
+			switch v := v.(*UpdateImagePage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2508,7 +5062,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[6].Exporter = func(v any, i int) any {
-			switch v := v.(*GetChannelsRequest); i {
+			switch v := v.(*VideoPage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2520,7 +5074,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[7].Exporter = func(v any, i int) any {
-			switch v := v.(*GetChannelsResponse); i {
+			switch v := v.(*CreateVideoPage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2532,7 +5086,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[8].Exporter = func(v any, i int) any {
-			switch v := v.(*UpdateChannelRequest); i {
+			switch v := v.(*UpdateVideoPage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2544,7 +5098,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[9].Exporter = func(v any, i int) any {
-			switch v := v.(*UpdateChannelResponse); i {
+			switch v := v.(*PDFPage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2556,7 +5110,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[10].Exporter = func(v any, i int) any {
-			switch v := v.(*DeleteChannelRequest); i {
+			switch v := v.(*CreatePDFPage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2568,7 +5122,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[11].Exporter = func(v any, i int) any {
-			switch v := v.(*DeleteChannelResponse); i {
+			switch v := v.(*UpdatePDFPage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2580,7 +5134,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[12].Exporter = func(v any, i int) any {
-			switch v := v.(*Plan); i {
+			switch v := v.(*CreatePageRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2592,7 +5146,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[13].Exporter = func(v any, i int) any {
-			switch v := v.(*CreatePlanRequest); i {
+			switch v := v.(*CreatePageResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2604,7 +5158,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[14].Exporter = func(v any, i int) any {
-			switch v := v.(*CreatePlanResponse); i {
+			switch v := v.(*GetPageRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2616,7 +5170,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[15].Exporter = func(v any, i int) any {
-			switch v := v.(*GetPlanRequest); i {
+			switch v := v.(*GetPageResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2628,7 +5182,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[16].Exporter = func(v any, i int) any {
-			switch v := v.(*GetPlanResponse); i {
+			switch v := v.(*GetPagesRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2640,7 +5194,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[17].Exporter = func(v any, i int) any {
-			switch v := v.(*GetPlansRequest); i {
+			switch v := v.(*GetPagesResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2652,7 +5206,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[18].Exporter = func(v any, i int) any {
-			switch v := v.(*GetPlansResponse); i {
+			switch v := v.(*UpdatePageRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2664,7 +5218,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[19].Exporter = func(v any, i int) any {
-			switch v := v.(*UpdatePlanRequest); i {
+			switch v := v.(*UpdatePageResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2676,7 +5230,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[20].Exporter = func(v any, i int) any {
-			switch v := v.(*UpdatePlanResponse); i {
+			switch v := v.(*DeletePageRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2688,7 +5242,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[21].Exporter = func(v any, i int) any {
-			switch v := v.(*DeletePlanRequest); i {
+			switch v := v.(*DeletePageResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2700,7 +5254,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[22].Exporter = func(v any, i int) any {
-			switch v := v.(*DeletePlanResponse); i {
+			switch v := v.(*Channel); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2712,7 +5266,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[23].Exporter = func(v any, i int) any {
-			switch v := v.(*Lesson); i {
+			switch v := v.(*ChannelWithPlans); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2724,7 +5278,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[24].Exporter = func(v any, i int) any {
-			switch v := v.(*CreateLessonRequest); i {
+			switch v := v.(*CreateChannelRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2736,7 +5290,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[25].Exporter = func(v any, i int) any {
-			switch v := v.(*CreateLessonResponse); i {
+			switch v := v.(*CreateChannelResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2748,7 +5302,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[26].Exporter = func(v any, i int) any {
-			switch v := v.(*GetLessonRequest); i {
+			switch v := v.(*GetChannelRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2760,7 +5314,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[27].Exporter = func(v any, i int) any {
-			switch v := v.(*GetLessonResponse); i {
+			switch v := v.(*GetChannelResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2772,7 +5326,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[28].Exporter = func(v any, i int) any {
-			switch v := v.(*GetLessonsRequest); i {
+			switch v := v.(*GetChannelsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2784,7 +5338,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[29].Exporter = func(v any, i int) any {
-			switch v := v.(*GetLessonsResponse); i {
+			switch v := v.(*GetChannelsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2796,7 +5350,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[30].Exporter = func(v any, i int) any {
-			switch v := v.(*UpdateLessonRequest); i {
+			switch v := v.(*UpdateChannelRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2808,7 +5362,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[31].Exporter = func(v any, i int) any {
-			switch v := v.(*UpdateLessonResponse); i {
+			switch v := v.(*UpdateChannelResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2820,7 +5374,7 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[32].Exporter = func(v any, i int) any {
-			switch v := v.(*DeleteLessonRequest); i {
+			switch v := v.(*DeleteChannelRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2832,6 +5386,270 @@ func file_lp_proto_init() {
 			}
 		}
 		file_lp_proto_msgTypes[33].Exporter = func(v any, i int) any {
+			switch v := v.(*DeleteChannelResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[34].Exporter = func(v any, i int) any {
+			switch v := v.(*Plan); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[35].Exporter = func(v any, i int) any {
+			switch v := v.(*CreatePlanRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[36].Exporter = func(v any, i int) any {
+			switch v := v.(*CreatePlanResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[37].Exporter = func(v any, i int) any {
+			switch v := v.(*GetPlanRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[38].Exporter = func(v any, i int) any {
+			switch v := v.(*GetPlanResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[39].Exporter = func(v any, i int) any {
+			switch v := v.(*GetPlansRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[40].Exporter = func(v any, i int) any {
+			switch v := v.(*GetPlansResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[41].Exporter = func(v any, i int) any {
+			switch v := v.(*UpdatePlanRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[42].Exporter = func(v any, i int) any {
+			switch v := v.(*UpdatePlanResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[43].Exporter = func(v any, i int) any {
+			switch v := v.(*DeletePlanRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[44].Exporter = func(v any, i int) any {
+			switch v := v.(*DeletePlanResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[45].Exporter = func(v any, i int) any {
+			switch v := v.(*Lesson); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[46].Exporter = func(v any, i int) any {
+			switch v := v.(*CreateLessonRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[47].Exporter = func(v any, i int) any {
+			switch v := v.(*CreateLessonResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[48].Exporter = func(v any, i int) any {
+			switch v := v.(*GetLessonRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[49].Exporter = func(v any, i int) any {
+			switch v := v.(*GetLessonResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[50].Exporter = func(v any, i int) any {
+			switch v := v.(*GetLessonsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[51].Exporter = func(v any, i int) any {
+			switch v := v.(*GetLessonsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[52].Exporter = func(v any, i int) any {
+			switch v := v.(*UpdateLessonRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[53].Exporter = func(v any, i int) any {
+			switch v := v.(*UpdateLessonResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[54].Exporter = func(v any, i int) any {
+			switch v := v.(*DeleteLessonRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[55].Exporter = func(v any, i int) any {
 			switch v := v.(*DeleteLessonResponse); i {
 			case 0:
 				return &v.state
@@ -2843,22 +5661,124 @@ func file_lp_proto_init() {
 				return nil
 			}
 		}
+		file_lp_proto_msgTypes[56].Exporter = func(v any, i int) any {
+			switch v := v.(*QuestionPage); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[57].Exporter = func(v any, i int) any {
+			switch v := v.(*CreateQuestionPageRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[58].Exporter = func(v any, i int) any {
+			switch v := v.(*CreateQuestionPageResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[59].Exporter = func(v any, i int) any {
+			switch v := v.(*GetQuestionPageRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[60].Exporter = func(v any, i int) any {
+			switch v := v.(*GetQuestionPageResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[61].Exporter = func(v any, i int) any {
+			switch v := v.(*UpdateQuestionPageRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_lp_proto_msgTypes[62].Exporter = func(v any, i int) any {
+			switch v := v.(*UpdateQuestionPageResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
-	file_lp_proto_msgTypes[8].OneofWrappers = []any{}
-	file_lp_proto_msgTypes[19].OneofWrappers = []any{}
+	file_lp_proto_msgTypes[12].OneofWrappers = []any{
+		(*CreatePageRequest_ImagePage)(nil),
+		(*CreatePageRequest_VideoPage)(nil),
+		(*CreatePageRequest_PdfPage)(nil),
+	}
+	file_lp_proto_msgTypes[15].OneofWrappers = []any{
+		(*GetPageResponse_ImagePage)(nil),
+		(*GetPageResponse_VideoPage)(nil),
+		(*GetPageResponse_PdfPage)(nil),
+	}
+	file_lp_proto_msgTypes[18].OneofWrappers = []any{
+		(*UpdatePageRequest_ImagePage)(nil),
+		(*UpdatePageRequest_VideoPage)(nil),
+		(*UpdatePageRequest_PdfPage)(nil),
+	}
 	file_lp_proto_msgTypes[30].OneofWrappers = []any{}
+	file_lp_proto_msgTypes[41].OneofWrappers = []any{}
+	file_lp_proto_msgTypes[52].OneofWrappers = []any{}
+	file_lp_proto_msgTypes[57].OneofWrappers = []any{}
+	file_lp_proto_msgTypes[61].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_lp_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   34,
+			NumEnums:      3,
+			NumMessages:   63,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_lp_proto_goTypes,
 		DependencyIndexes: file_lp_proto_depIdxs,
+		EnumInfos:         file_lp_proto_enumTypes,
 		MessageInfos:      file_lp_proto_msgTypes,
 	}.Build()
 	File_lp_proto = out.File

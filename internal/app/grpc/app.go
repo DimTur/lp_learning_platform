@@ -37,6 +37,8 @@ func NewGRPCServer(
 	channelHandlers lp_handlers.ChannelHandlers,
 	planHandlers lp_handlers.PlanHandlers,
 	lessonHandlers lp_handlers.LessonHandlers,
+	pageHandlers lp_handlers.PageHandlers,
+	questionHandlers lp_handlers.QuestionHandlers,
 	logger *slog.Logger,
 	validator *validator.Validate,
 ) (*Server, error) {
@@ -70,6 +72,8 @@ func NewGRPCServer(
 		channelHandlers,
 		planHandlers,
 		lessonHandlers,
+		pageHandlers,
+		questionHandlers,
 	)
 
 	// register health check service
