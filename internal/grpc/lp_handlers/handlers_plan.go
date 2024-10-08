@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	planserv "github.com/DimTur/lp_learning_platform/internal/services/plan"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
 	lpv1 "github.com/DimTur/lp_learning_platform/pkg/server/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -14,7 +14,7 @@ import (
 )
 
 func (s *serverAPI) CreatePlan(ctx context.Context, req *lpv1.CreatePlanRequest) (*lpv1.CreatePlanResponse, error) {
-	plan := models.CreatePlan{
+	plan := plans.CreatePlan{
 		Name:           req.GetName(),
 		Description:    req.GetDescription(),
 		CreatedBy:      req.GetCreatedBy(),
@@ -115,7 +115,7 @@ func (s *serverAPI) UpdatePlan(ctx context.Context, req *lpv1.UpdatePlanRequest)
 		public = proto.Bool(req.GetPublic())
 	}
 
-	updPlan := models.UpdatePlanRequest{
+	updPlan := plans.UpdatePlanRequest{
 		ID:             req.GetId(),
 		Name:           name,
 		Description:    description,

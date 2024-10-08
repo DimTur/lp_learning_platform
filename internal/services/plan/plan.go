@@ -7,23 +7,23 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
 	"github.com/DimTur/lp_learning_platform/internal/utils"
 	"github.com/go-playground/validator/v10"
 )
 
 type PlanSaver interface {
-	CreatePlan(ctx context.Context, plan models.CreatePlan) (id int64, err error)
-	UpdatePlan(ctx context.Context, updPlan models.UpdatePlanRequest) (id int64, err error)
+	CreatePlan(ctx context.Context, plan plans.CreatePlan) (int64, error)
+	UpdatePlan(ctx context.Context, updPlan plans.UpdatePlanRequest) (int64, error)
 }
 
 type PlanProvider interface {
-	GetPlanByID(ctx context.Context, planID int64) (plan models.Plan, err error)
-	GetPlans(ctx context.Context, channel_id int64, limit, offset int64) (plans []models.Plan, err error)
+	GetPlanByID(ctx context.Context, planID int64) (plans.Plan, error)
+	GetPlans(ctx context.Context, channel_id int64, limit, offset int64) ([]plans.Plan, error)
 }
 type PlanDel interface {
-	DeletePlan(ctx context.Context, id int64) (err error)
+	DeletePlan(ctx context.Context, id int64) error
 }
 
 var (
@@ -58,7 +58,7 @@ func New(
 }
 
 // CreatePlan creats new plan in the system and returns plan ID.
-func (ph *PlanHandlers) CreatePlan(ctx context.Context, plan models.CreatePlan) (int64, error) {
+func (ph *PlanHandlers) CreatePlan(ctx context.Context, plan plans.CreatePlan) (int64, error) {
 	const op = "plan.CreatePlan"
 
 	log := ph.log.With(
@@ -96,7 +96,7 @@ func (ph *PlanHandlers) CreatePlan(ctx context.Context, plan models.CreatePlan) 
 }
 
 // GetPlan gets plan by ID and returns it.
-func (ph *PlanHandlers) GetPlan(ctx context.Context, planID int64) (models.Plan, error) {
+func (ph *PlanHandlers) GetPlan(ctx context.Context, planID int64) (plans.Plan, error) {
 	const op = "plans.GetPlan"
 
 	log := ph.log.With(
@@ -106,7 +106,7 @@ func (ph *PlanHandlers) GetPlan(ctx context.Context, planID int64) (models.Plan,
 
 	log.Info("getting plan")
 
-	var plan models.Plan
+	var plan plans.Plan
 	plan, err := ph.planProvider.GetPlanByID(ctx, planID)
 	if err != nil {
 		if errors.Is(err, storage.ErrPlanNotFound) {
@@ -122,7 +122,7 @@ func (ph *PlanHandlers) GetPlan(ctx context.Context, planID int64) (models.Plan,
 }
 
 // GetPlans gets plans and returns them.
-func (ph *PlanHandlers) GetPlans(ctx context.Context, channel_id int64, limit, offset int64) ([]models.Plan, error) {
+func (ph *PlanHandlers) GetPlans(ctx context.Context, channel_id int64, limit, offset int64) ([]plans.Plan, error) {
 	const op = "plans.GetPlans"
 
 	log := ph.log.With(
@@ -143,7 +143,7 @@ func (ph *PlanHandlers) GetPlans(ctx context.Context, channel_id int64, limit, o
 		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	var plans []models.Plan
+	var plans []plans.Plan
 	plans, err := ph.planProvider.GetPlans(ctx, channel_id, limit, offset)
 	if err != nil {
 		if errors.Is(err, storage.ErrPlanNotFound) {
@@ -159,7 +159,7 @@ func (ph *PlanHandlers) GetPlans(ctx context.Context, channel_id int64, limit, o
 }
 
 // UpdatePlan performs a partial update
-func (ph *PlanHandlers) UpdatePlan(ctx context.Context, updPlan models.UpdatePlanRequest) (int64, error) {
+func (ph *PlanHandlers) UpdatePlan(ctx context.Context, updPlan plans.UpdatePlanRequest) (int64, error) {
 	const op = "plans.UpdatePlan"
 
 	log := ph.log.With(

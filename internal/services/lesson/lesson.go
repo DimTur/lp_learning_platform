@@ -7,23 +7,23 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
 	"github.com/DimTur/lp_learning_platform/internal/utils"
 	"github.com/go-playground/validator/v10"
 )
 
 type LessonSaver interface {
-	CreateLesson(ctx context.Context, lesson models.CreateLesson) (id int64, err error)
-	UpdateLesson(ctx context.Context, updLesson models.UpdateLessonRequest) (id int64, err error)
+	CreateLesson(ctx context.Context, lesson lessons.CreateLesson) (int64, error)
+	UpdateLesson(ctx context.Context, updLesson lessons.UpdateLessonRequest) (int64, error)
 }
 
 type LessonProvider interface {
-	GetLessonByID(ctx context.Context, lessonID int64) (lesson models.Lesson, err error)
-	GetLessons(ctx context.Context, plan_id int64, limit, offset int64) (lessons []models.Lesson, err error)
+	GetLessonByID(ctx context.Context, lessonID int64) (lessons.Lesson, error)
+	GetLessons(ctx context.Context, plan_id int64, limit, offset int64) ([]lessons.Lesson, error)
 }
 type LessonDel interface {
-	DeleteLesson(ctx context.Context, id int64) (err error)
+	DeleteLesson(ctx context.Context, id int64) error
 }
 
 var (
@@ -58,7 +58,7 @@ func New(
 }
 
 // CreateLesson creats new lesson in the system and returns lesson ID.
-func (lh *LessonHandlers) CreateLesson(ctx context.Context, lesson models.CreateLesson) (int64, error) {
+func (lh *LessonHandlers) CreateLesson(ctx context.Context, lesson lessons.CreateLesson) (int64, error) {
 	const op = "lesson.CreateLesson"
 
 	log := lh.log.With(
@@ -94,7 +94,7 @@ func (lh *LessonHandlers) CreateLesson(ctx context.Context, lesson models.Create
 }
 
 // GetLesson gets lesson by ID and returns it.
-func (lh *LessonHandlers) GetLesson(ctx context.Context, lessonID int64) (models.Lesson, error) {
+func (lh *LessonHandlers) GetLesson(ctx context.Context, lessonID int64) (lessons.Lesson, error) {
 	const op = "lessons.GetLesson"
 
 	log := lh.log.With(
@@ -104,7 +104,7 @@ func (lh *LessonHandlers) GetLesson(ctx context.Context, lessonID int64) (models
 
 	log.Info("getting lesson")
 
-	var lesson models.Lesson
+	var lesson lessons.Lesson
 	lesson, err := lh.lessonProvider.GetLessonByID(ctx, lessonID)
 	if err != nil {
 		if errors.Is(err, storage.ErrLessonNotFound) {
@@ -120,7 +120,7 @@ func (lh *LessonHandlers) GetLesson(ctx context.Context, lessonID int64) (models
 }
 
 // GetLessons gets lessons and returns them.
-func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, offset int64) ([]models.Lesson, error) {
+func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, offset int64) ([]lessons.Lesson, error) {
 	const op = "lessons.GetLessons"
 
 	log := lh.log.With(
@@ -141,7 +141,7 @@ func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, o
 		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	var lessons []models.Lesson
+	var lessons []lessons.Lesson
 	lessons, err := lh.lessonProvider.GetLessons(ctx, planID, limit, offset)
 	if err != nil {
 		if errors.Is(err, storage.ErrLessonNotFound) {
@@ -157,7 +157,7 @@ func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, o
 }
 
 // UpdateLesson performs a partial update
-func (lh *LessonHandlers) UpdateLesson(ctx context.Context, updLesson models.UpdateLessonRequest) (int64, error) {
+func (lh *LessonHandlers) UpdateLesson(ctx context.Context, updLesson lessons.UpdateLessonRequest) (int64, error) {
 	const op = "lessons.UpdateLesson"
 
 	log := lh.log.With(

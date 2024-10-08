@@ -7,24 +7,24 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
 	"github.com/DimTur/lp_learning_platform/internal/utils"
 	"github.com/go-playground/validator/v10"
 )
 
 type ChannelSaver interface {
-	CreateChannel(ctx context.Context, channel models.CreateChannel) (id int64, err error)
-	UpdateChannel(ctx context.Context, updChannel models.UpdateChannelRequest) (id int64, err error)
+	CreateChannel(ctx context.Context, channel channels.CreateChannel) (int64, error)
+	UpdateChannel(ctx context.Context, updChannel channels.UpdateChannelRequest) (int64, error)
 }
 
 type ChannelProvider interface {
-	GetChannelByID(ctx context.Context, channelID int64) (channel models.ChannelWithPlans, err error)
-	GetChannels(ctx context.Context, limit, offset int64) (channels []models.Channel, err error)
+	GetChannelByID(ctx context.Context, channelID int64) (channels.ChannelWithPlans, error)
+	GetChannels(ctx context.Context, limit, offset int64) ([]channels.Channel, error)
 }
 
 type ChannelDel interface {
-	DeleteChannel(ctx context.Context, channelID int64) (err error)
+	DeleteChannel(ctx context.Context, channelID int64) error
 }
 
 var (
@@ -59,7 +59,7 @@ func New(
 }
 
 // CreateChannel creats new channel in the system and returns channel ID.
-func (chh *ChannelHandlers) CreateChannel(ctx context.Context, channel models.CreateChannel) (int64, error) {
+func (chh *ChannelHandlers) CreateChannel(ctx context.Context, channel channels.CreateChannel) (int64, error) {
 	const op = "channel.CreateChannel"
 
 	log := chh.log.With(
@@ -95,7 +95,7 @@ func (chh *ChannelHandlers) CreateChannel(ctx context.Context, channel models.Cr
 }
 
 // GetChannelByID gets channel by ID and returns it.
-func (chh *ChannelHandlers) GetChannel(ctx context.Context, channelID int64) (models.ChannelWithPlans, error) {
+func (chh *ChannelHandlers) GetChannel(ctx context.Context, channelID int64) (channels.ChannelWithPlans, error) {
 	const op = "channel.GetChannelByID"
 
 	log := chh.log.With(
@@ -105,7 +105,7 @@ func (chh *ChannelHandlers) GetChannel(ctx context.Context, channelID int64) (mo
 
 	log.Info("getting channel")
 
-	var channel models.ChannelWithPlans
+	var channel channels.ChannelWithPlans
 	channel, err := chh.channelProvider.GetChannelByID(ctx, channelID)
 	if err != nil {
 		if errors.Is(err, storage.ErrChannelNotFound) {
@@ -121,7 +121,7 @@ func (chh *ChannelHandlers) GetChannel(ctx context.Context, channelID int64) (mo
 }
 
 // GetChannels gets channels and returns them.
-func (chh *ChannelHandlers) GetChannels(ctx context.Context, limit, offset int64) ([]models.Channel, error) {
+func (chh *ChannelHandlers) GetChannels(ctx context.Context, limit, offset int64) ([]channels.Channel, error) {
 	const op = "channel.GetChannels"
 
 	log := chh.log.With(
@@ -141,7 +141,7 @@ func (chh *ChannelHandlers) GetChannels(ctx context.Context, limit, offset int64
 		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	var channels []models.Channel
+	var channels []channels.Channel
 	channels, err := chh.channelProvider.GetChannels(ctx, limit, offset)
 	if err != nil {
 		if errors.Is(err, storage.ErrChannelNotFound) {
@@ -157,7 +157,7 @@ func (chh *ChannelHandlers) GetChannels(ctx context.Context, limit, offset int64
 }
 
 // UpdateChannel performs a partial update
-func (chh *ChannelHandlers) UpdateChannel(ctx context.Context, updChannel models.UpdateChannelRequest) (int64, error) {
+func (chh *ChannelHandlers) UpdateChannel(ctx context.Context, updChannel channels.UpdateChannelRequest) (int64, error) {
 	const op = "channel.UpdateChannel"
 
 	log := chh.log.With(

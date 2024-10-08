@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -30,7 +29,7 @@ const (
 	VALUES ($1, $2)`
 )
 
-func (l *LessonsPostgresStorage) CreateLesson(ctx context.Context, lesson models.CreateLesson) (int64, error) {
+func (l *LessonsPostgresStorage) CreateLesson(ctx context.Context, lesson CreateLesson) (int64, error) {
 	const op = "storage.postgresql.lessons.lessons.CreateLesson"
 
 	tx, err := l.db.Begin(ctx)
@@ -84,7 +83,7 @@ const getLessonByIDQuery = `
 	FROM lessons 
 	WHERE id = $1`
 
-func (l *LessonsPostgresStorage) GetLessonByID(ctx context.Context, lessonID int64) (models.Lesson, error) {
+func (l *LessonsPostgresStorage) GetLessonByID(ctx context.Context, lessonID int64) (Lesson, error) {
 	const op = "storage.postgresql.lessons.lessons.GetLessonByID"
 
 	var lesson DBLesson
@@ -98,10 +97,10 @@ func (l *LessonsPostgresStorage) GetLessonByID(ctx context.Context, lessonID int
 		&lesson.Modified,
 	)
 	if err != nil {
-		return (models.Lesson)(lesson), fmt.Errorf("%s: %w", op, storage.ErrLessonNotFound)
+		return (Lesson)(lesson), fmt.Errorf("%s: %w", op, storage.ErrLessonNotFound)
 	}
 
-	return (models.Lesson)(lesson), nil
+	return (Lesson)(lesson), nil
 }
 
 const getLessonsQuery = `
@@ -122,7 +121,7 @@ const getLessonsQuery = `
 	ORDER BY l.id
 	LIMIT $2 OFFSET $3`
 
-func (l *LessonsPostgresStorage) GetLessons(ctx context.Context, planID int64, limit, offset int64) ([]models.Lesson, error) {
+func (l *LessonsPostgresStorage) GetLessons(ctx context.Context, planID int64, limit, offset int64) ([]Lesson, error) {
 	const op = "storage.postgresql.lessons.lessons.GetLessons"
 
 	var lessons []DBLesson
@@ -152,9 +151,9 @@ func (l *LessonsPostgresStorage) GetLessons(ctx context.Context, planID int64, l
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var mappedLessons []models.Lesson
+	var mappedLessons []Lesson
 	for _, lesson := range lessons {
-		mappedLessons = append(mappedLessons, models.Lesson(lesson))
+		mappedLessons = append(mappedLessons, Lesson(lesson))
 	}
 
 	return mappedLessons, nil
@@ -168,7 +167,7 @@ const updateLessonQuery = `
 	WHERE id = $1
 	RETURNING id`
 
-func (l *LessonsPostgresStorage) UpdateLesson(ctx context.Context, updLesson models.UpdateLessonRequest) (int64, error) {
+func (l *LessonsPostgresStorage) UpdateLesson(ctx context.Context, updLesson UpdateLessonRequest) (int64, error) {
 	const op = "storage.postgresql.lesson.lesson.UpdateLesson"
 
 	var id int64

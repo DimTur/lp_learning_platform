@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -24,7 +23,7 @@ const createChannelQuery = `
 	VALUES ($1, $2, $3, $4, $5, $6)
 	RETURNING id`
 
-func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel models.CreateChannel) (int64, error) {
+func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel CreateChannel) (int64, error) {
 	const op = "storage.postgresql.channels.channels.CreateChannel"
 
 	var id int64
@@ -77,12 +76,12 @@ const getChannelWithPlansQuery = `
 	WHERE
 		c.id = $1`
 
-func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID int64) (models.ChannelWithPlans, error) {
+func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID int64) (ChannelWithPlans, error) {
 	const op = "storage.postgresql.channels.channels.GetChannelByID"
 
 	rows, err := c.db.Query(ctx, getChannelWithPlansQuery, channelID)
 	if err != nil {
-		return models.ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
+		return ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
 	}
 	defer rows.Close()
 
@@ -110,7 +109,7 @@ func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID i
 			&plan.Modified,
 		)
 		if err != nil {
-			return models.ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
+			return ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
 		}
 
 		if plan.ID.Valid {
@@ -119,10 +118,10 @@ func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID i
 	}
 
 	if err := rows.Err(); err != nil {
-		return models.ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
+		return ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	channel := models.ChannelWithPlans{
+	channel := ChannelWithPlans{
 		ID:             dbChannel.ID,
 		Name:           dbChannel.Name,
 		Description:    dbChannel.Description,
@@ -130,11 +129,11 @@ func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID i
 		LastModifiedBy: dbChannel.LastModifiedBy,
 		CreatedAt:      dbChannel.CreatedAt,
 		Modified:       dbChannel.Modified,
-		Plans:          make([]models.PlanInChannel, 0, len(dbChannel.Plans)),
+		Plans:          make([]PlanInChannel, 0, len(dbChannel.Plans)),
 	}
 
 	for _, dbPlan := range dbChannel.Plans {
-		plan := models.PlanInChannel{
+		plan := PlanInChannel{
 			ID:             dbPlan.ID.Int64,
 			Name:           dbPlan.Name.String,
 			Description:    dbPlan.Description.String,
@@ -157,7 +156,7 @@ const getChannelsQuery = `
 	ORDER BY id
 	LIMIT $1 OFFSET $2`
 
-func (c *ChannelPostgresStorage) GetChannels(ctx context.Context, limit, offset int64) ([]models.Channel, error) {
+func (c *ChannelPostgresStorage) GetChannels(ctx context.Context, limit, offset int64) ([]Channel, error) {
 	const op = "storage.postgresql.channels.channels.GetChannels"
 
 	var channels []DBChannel
@@ -188,9 +187,9 @@ func (c *ChannelPostgresStorage) GetChannels(ctx context.Context, limit, offset 
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var mappedChannels []models.Channel
+	var mappedChannels []Channel
 	for _, channel := range channels {
-		mappedChannels = append(mappedChannels, models.Channel(channel))
+		mappedChannels = append(mappedChannels, Channel(channel))
 	}
 
 	return mappedChannels, nil
@@ -205,7 +204,7 @@ const updateChannelQuery = `
 	WHERE id = $1
 	RETURNING id`
 
-func (c *ChannelPostgresStorage) UpdateChannel(ctx context.Context, updChannel models.UpdateChannelRequest) (int64, error) {
+func (c *ChannelPostgresStorage) UpdateChannel(ctx context.Context, updChannel UpdateChannelRequest) (int64, error) {
 	const op = "storage.postgresql.channels.channels.UpdateChannel"
 
 	var id int64

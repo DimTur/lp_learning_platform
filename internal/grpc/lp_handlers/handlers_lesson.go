@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	lessonserv "github.com/DimTur/lp_learning_platform/internal/services/lesson"
 	planserv "github.com/DimTur/lp_learning_platform/internal/services/plan"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
 	lpv1 "github.com/DimTur/lp_learning_platform/pkg/server/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,7 +15,7 @@ import (
 )
 
 func (s *serverAPI) CreateLesson(ctx context.Context, req *lpv1.CreateLessonRequest) (*lpv1.CreateLessonResponse, error) {
-	lesson := models.CreateLesson{
+	lesson := lessons.CreateLesson{
 		Name:           req.GetName(),
 		CreatedBy:      req.GetCreatedBy(),
 		LastModifiedBy: req.GetCreatedBy(),
@@ -94,7 +94,7 @@ func (s *serverAPI) UpdateLesson(ctx context.Context, req *lpv1.UpdateLessonRequ
 		name = proto.String(req.GetName())
 	}
 
-	updLesson := models.UpdateLessonRequest{
+	updLesson := lessons.UpdateLessonRequest{
 		ID:             req.GetId(),
 		Name:           name,
 		LastModifiedBy: req.GetLastModifiedBy(),

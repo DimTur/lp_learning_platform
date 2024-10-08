@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -30,7 +29,7 @@ const (
 	VALUES ($1, $2)`
 )
 
-func (p *PlansPostgresStorage) CreatePlan(ctx context.Context, plan models.CreatePlan) (int64, error) {
+func (p *PlansPostgresStorage) CreatePlan(ctx context.Context, plan CreatePlan) (int64, error) {
 	const op = "storage.postgresql.plans.plans.CreatePlan"
 
 	tx, err := p.db.Begin(ctx)
@@ -85,7 +84,7 @@ const getPlanByIDQuery = `
 	FROM plans 
 	WHERE id = $1`
 
-func (p *PlansPostgresStorage) GetPlanByID(ctx context.Context, planID int64) (models.Plan, error) {
+func (p *PlansPostgresStorage) GetPlanByID(ctx context.Context, planID int64) (Plan, error) {
 	const op = "storage.postgresql.plans.plans.GetPlanByID"
 
 	var plan DBPlan
@@ -102,10 +101,10 @@ func (p *PlansPostgresStorage) GetPlanByID(ctx context.Context, planID int64) (m
 		&plan.Modified,
 	)
 	if err != nil {
-		return (models.Plan)(plan), fmt.Errorf("%s: %w", op, storage.ErrPlanNotFound)
+		return (Plan)(plan), fmt.Errorf("%s: %w", op, storage.ErrPlanNotFound)
 	}
 
-	return (models.Plan)(plan), nil
+	return (Plan)(plan), nil
 }
 
 const getPlansQuery = `
@@ -129,7 +128,7 @@ const getPlansQuery = `
 	ORDER BY p.id
 	LIMIT $2 OFFSET $3;`
 
-func (p *PlansPostgresStorage) GetPlans(ctx context.Context, channel_id int64, limit, offset int64) ([]models.Plan, error) {
+func (p *PlansPostgresStorage) GetPlans(ctx context.Context, channel_id int64, limit, offset int64) ([]Plan, error) {
 	const op = "storage.postgresql.plans.plans.GetPlans"
 
 	var plans []DBPlan
@@ -162,9 +161,9 @@ func (p *PlansPostgresStorage) GetPlans(ctx context.Context, channel_id int64, l
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var mappedPlans []models.Plan
+	var mappedPlans []Plan
 	for _, plan := range plans {
-		mappedPlans = append(mappedPlans, models.Plan(plan))
+		mappedPlans = append(mappedPlans, Plan(plan))
 	}
 
 	return mappedPlans, nil
@@ -181,7 +180,7 @@ const updatePlanQuery = `
 	WHERE id = $1
 	RETURNING id`
 
-func (p *PlansPostgresStorage) UpdatePlan(ctx context.Context, updPlan models.UpdatePlanRequest) (int64, error) {
+func (p *PlansPostgresStorage) UpdatePlan(ctx context.Context, updPlan UpdatePlanRequest) (int64, error) {
 	const op = "storage.postgresql.plans.plans.UpdatePlan"
 
 	var id int64
