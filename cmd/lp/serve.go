@@ -9,6 +9,7 @@ import (
 
 	"github.com/DimTur/lp_learning_platform/internal/app"
 	"github.com/DimTur/lp_learning_platform/internal/config"
+	attstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
 	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
 	lessonstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
 	pagestorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
@@ -61,6 +62,7 @@ func NewServeCmd() *cobra.Command {
 			lessonStorage := lessonstorage.NewLessonsStorage(storagePool)
 			pageStorage := pagestorage.NewPagesStorage(storagePool)
 			questionStorage := questionstorage.NewQuestionsStorage(storagePool)
+			attemptStorage := attstorage.NewAttemptsStorage(storagePool)
 
 			validate := validator.New()
 
@@ -70,6 +72,7 @@ func NewServeCmd() *cobra.Command {
 				lessonStorage,
 				pageStorage,
 				questionStorage,
+				attemptStorage,
 				cfg.GRPCServer.Address,
 				log,
 				validate,

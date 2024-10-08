@@ -1,8 +1,6 @@
 CREATE TABLE IF NOT EXISTS "question_abstractquestion" (
   "id" SERIAL PRIMARY KEY,
-  "created_at" timestamptz DEFAULT (now()),
-  "modified" timestamptz,
-  "content_type" text NOT NULL CHECK (content_type IN ('multichoice', 'short_answer'))
+  "question_type" text NOT NULL CHECK (question_type IN ('multichoice', 'short_answer'))
 );
 
 CREATE TABLE IF NOT EXISTS "question_questionpage" (
@@ -22,6 +20,6 @@ CREATE TABLE IF NOT EXISTS "question_multichoicequestion" (
   "option_c" varchar(512) NOT NULL,
   "option_d" varchar(512) NOT NULL,
   "option_e" varchar(512) NOT NULL,
-  "answer" varchar(1) NOT NULL,
+  "answer" varchar(8) NOT NULL,
   CONSTRAINT fk_question_abstractquestion FOREIGN KEY ("question_abstractquestion_id") REFERENCES "question_abstractquestion" ("id") ON DELETE CASCADE
 );

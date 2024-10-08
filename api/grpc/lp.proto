@@ -34,6 +34,8 @@ service LearningPlatform {
     rpc CreateQuestionPage (CreateQuestionPageRequest) returns (CreateQuestionPageResponse);
     rpc GetQuestionPage (GetQuestionPageRequest) returns (GetQuestionPageResponse);
     rpc UpdateQuestionPage (UpdateQuestionPageRequest) returns (UpdateQuestionPageResponse);
+
+    rpc CreateAttempt (CreateAttemptRequest) returns (CreateAttemptResponse);
 }
 
 enum ContentType {
@@ -423,15 +425,27 @@ message GetQuestionPageResponse {
 message UpdateQuestionPageRequest {
     int64 id = 1; // ID of the lesson.
     int64 last_modified_by = 2; // ID of the user who modified the lesson.
-    optional string Question = 3;
-    optional string OptionA = 4;
-    optional string OptionB = 5;
-    optional string OptionC = 6;
-    optional string OptionD = 7;
-    optional string OptionE = 8;
-    optional Answer Answer = 9;
+    optional string question = 3;
+    optional string option_a = 4;
+    optional string option_b = 5;
+    optional string option_c = 6;
+    optional string option_d = 7;
+    optional string option_e = 8;
+    optional Answer answer = 9;
 }
 
 message UpdateQuestionPageResponse {
     int64 id = 1; // ID of the updated pdf page.
+}
+
+message CreateAttemptRequest {
+    int64 lesson_id = 1;
+    int64 plan_id = 2;
+    int64 channel_id = 3;
+    int64 user_id = 4;
+}
+
+message CreateAttemptResponse{
+    int64 id = 1; // ID of the created attempt.
+    bool success = 2;
 }

@@ -4,11 +4,13 @@ import (
 	"log/slog"
 
 	grpcapp "github.com/DimTur/lp_learning_platform/internal/app/grpc"
+	"github.com/DimTur/lp_learning_platform/internal/services/attempt"
 	"github.com/DimTur/lp_learning_platform/internal/services/channel"
 	"github.com/DimTur/lp_learning_platform/internal/services/lesson"
 	"github.com/DimTur/lp_learning_platform/internal/services/page"
 	"github.com/DimTur/lp_learning_platform/internal/services/plan"
 	"github.com/DimTur/lp_learning_platform/internal/services/question"
+	attstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
 	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
 	lessonstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
 	pagestorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
@@ -27,6 +29,7 @@ func NewApp(
 	lessonStorage *lessonstorage.LessonsPostgresStorage,
 	pageStorage *pagestorage.PagesPostgresStorage,
 	questionStorage *questiontorage.QuestionsPostgresStorage,
+	attemptStorage *attstorage.AttemptsPostgresStorage,
 	grpcAddr string,
 	logger *slog.Logger,
 	validator *validator.Validate,
@@ -70,6 +73,13 @@ func NewApp(
 		questionStorage,
 	)
 
+	lpGRPCAttemptHandlers := attempt.New(
+		logger,
+		validator,
+		attemptStorage,
+		attemptStorage,
+	)
+
 	grpcServer, err := grpcapp.NewGRPCServer(
 		grpcAddr,
 		lpGRPCChannelHandlers,
@@ -77,6 +87,7 @@ func NewApp(
 		lpGRPCLessonHandlers,
 		lpGRPCPageHandlers,
 		lpGRPCQuestionHandlers,
+		lpGRPCAttemptHandlers,
 		logger,
 		validator,
 	)

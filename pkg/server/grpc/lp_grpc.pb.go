@@ -42,6 +42,7 @@ const (
 	LearningPlatform_CreateQuestionPage_FullMethodName = "/lp.v1.LearningPlatform/CreateQuestionPage"
 	LearningPlatform_GetQuestionPage_FullMethodName    = "/lp.v1.LearningPlatform/GetQuestionPage"
 	LearningPlatform_UpdateQuestionPage_FullMethodName = "/lp.v1.LearningPlatform/UpdateQuestionPage"
+	LearningPlatform_CreateAttempt_FullMethodName      = "/lp.v1.LearningPlatform/CreateAttempt"
 )
 
 // LearningPlatformClient is the client API for LearningPlatform service.
@@ -71,6 +72,7 @@ type LearningPlatformClient interface {
 	CreateQuestionPage(ctx context.Context, in *CreateQuestionPageRequest, opts ...grpc.CallOption) (*CreateQuestionPageResponse, error)
 	GetQuestionPage(ctx context.Context, in *GetQuestionPageRequest, opts ...grpc.CallOption) (*GetQuestionPageResponse, error)
 	UpdateQuestionPage(ctx context.Context, in *UpdateQuestionPageRequest, opts ...grpc.CallOption) (*UpdateQuestionPageResponse, error)
+	CreateAttempt(ctx context.Context, in *CreateAttemptRequest, opts ...grpc.CallOption) (*CreateAttemptResponse, error)
 }
 
 type learningPlatformClient struct {
@@ -311,6 +313,16 @@ func (c *learningPlatformClient) UpdateQuestionPage(ctx context.Context, in *Upd
 	return out, nil
 }
 
+func (c *learningPlatformClient) CreateAttempt(ctx context.Context, in *CreateAttemptRequest, opts ...grpc.CallOption) (*CreateAttemptResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateAttemptResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_CreateAttempt_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LearningPlatformServer is the server API for LearningPlatform service.
 // All implementations must embed UnimplementedLearningPlatformServer
 // for forward compatibility.
@@ -338,6 +350,7 @@ type LearningPlatformServer interface {
 	CreateQuestionPage(context.Context, *CreateQuestionPageRequest) (*CreateQuestionPageResponse, error)
 	GetQuestionPage(context.Context, *GetQuestionPageRequest) (*GetQuestionPageResponse, error)
 	UpdateQuestionPage(context.Context, *UpdateQuestionPageRequest) (*UpdateQuestionPageResponse, error)
+	CreateAttempt(context.Context, *CreateAttemptRequest) (*CreateAttemptResponse, error)
 	mustEmbedUnimplementedLearningPlatformServer()
 }
 
@@ -416,6 +429,9 @@ func (UnimplementedLearningPlatformServer) GetQuestionPage(context.Context, *Get
 }
 func (UnimplementedLearningPlatformServer) UpdateQuestionPage(context.Context, *UpdateQuestionPageRequest) (*UpdateQuestionPageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateQuestionPage not implemented")
+}
+func (UnimplementedLearningPlatformServer) CreateAttempt(context.Context, *CreateAttemptRequest) (*CreateAttemptResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAttempt not implemented")
 }
 func (UnimplementedLearningPlatformServer) mustEmbedUnimplementedLearningPlatformServer() {}
 func (UnimplementedLearningPlatformServer) testEmbeddedByValue()                          {}
@@ -852,6 +868,24 @@ func _LearningPlatform_UpdateQuestionPage_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LearningPlatform_CreateAttempt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAttemptRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).CreateAttempt(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_CreateAttempt_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).CreateAttempt(ctx, req.(*CreateAttemptRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // LearningPlatform_ServiceDesc is the grpc.ServiceDesc for LearningPlatform service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -950,6 +984,10 @@ var LearningPlatform_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateQuestionPage",
 			Handler:    _LearningPlatform_UpdateQuestionPage_Handler,
+		},
+		{
+			MethodName: "CreateAttempt",
+			Handler:    _LearningPlatform_CreateAttempt_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

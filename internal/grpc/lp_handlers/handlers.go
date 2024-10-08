@@ -3,6 +3,7 @@ package lp_handlers
 import (
 	"context"
 
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
@@ -50,12 +51,17 @@ type QuestionHandlers interface {
 	UpdateQuestionPage(ctx context.Context, updPage questions.UpdateQuestionPage) (int64, error)
 }
 
+type AttemptHandlers interface {
+	CreateAttempt(ctx context.Context, attempt attempts.CreateLessonAttempt) (int64, error)
+}
+
 type serverAPI struct {
 	channelHandlers  ChannelHandlers
 	planHandlers     PlanHandlers
 	lessonHandlers   LessonHandlers
 	pageHandlers     PageHandlers
 	questionHandlers QuestionHandlers
+	attemptHandlers  AttemptHandlers
 
 	lpv1.UnsafeLearningPlatformServer
 }
@@ -67,6 +73,7 @@ func RegisterLPServiceServer(
 	lh LessonHandlers,
 	pgh PageHandlers,
 	qh QuestionHandlers,
+	ah AttemptHandlers,
 ) {
 	lpv1.RegisterLearningPlatformServer(gRPC, &serverAPI{
 		channelHandlers:  ch,
@@ -74,5 +81,6 @@ func RegisterLPServiceServer(
 		lessonHandlers:   lh,
 		pageHandlers:     pgh,
 		questionHandlers: qh,
+		attemptHandlers:  ah,
 	})
 }
