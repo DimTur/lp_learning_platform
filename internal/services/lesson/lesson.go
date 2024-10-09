@@ -135,6 +135,7 @@ func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, o
 		Limit:  limit,
 		Offset: offset,
 	}
+	params.SetDefaults()
 
 	if err := lh.validator.Struct(params); err != nil {
 		log.Warn("invalid parameters", slog.String("err", err.Error()))
@@ -142,7 +143,7 @@ func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, o
 	}
 
 	var lessons []lessons.Lesson
-	lessons, err := lh.lessonProvider.GetLessons(ctx, planID, limit, offset)
+	lessons, err := lh.lessonProvider.GetLessons(ctx, planID, params.Limit, params.Offset)
 	if err != nil {
 		if errors.Is(err, storage.ErrLessonNotFound) {
 			lh.log.Warn("lessons not found", slog.String("err", err.Error()))

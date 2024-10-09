@@ -15,21 +15,11 @@ import (
 type PageSaver interface {
 	CreatePage(ctx context.Context, page pages.CreatePage) (int64, error)
 	UpdatePage(ctx context.Context, updPage pages.UpdatePage) (int64, error)
-	// CreateImagePage(ctx context.Context, imagePage models.CreateImagePage) (id int64, err error)
-	// CreateVideoPage(ctx context.Context, videoPage models.CreateVideoPage) (id int64, err error)
-	// CreatePDFPage(ctx context.Context, pdfPage models.CreatePDFPage) (id int64, err error)
-	// UpdateImagePage(ctx context.Context, updPage models.UpdateImagePage) (id int64, err error)
-	// UpdateVideoPage(ctx context.Context, updPage models.UpdateVideoPage) (id int64, err error)
-	// UpdatePDFPage(ctx context.Context, updPage models.UpdatePDFPage) (id int64, err error)
 }
 
 type PageProvider interface {
 	GetPageByID(ctx context.Context, pageID int64, contentType string) (pages.Page, error)
 	GetPages(ctx context.Context, lessonID int64, limit, offset int64) ([]pages.BasePage, error)
-	// GetImagePageByID(ctx context.Context, pageID int64) (imagePage models.ImagePage, err error)
-	// GetVideoPageByID(ctx context.Context, pageID int64) (videoPage models.VideoPage, err error)
-	// GetPDFPageByID(ctx context.Context, pageID int64) (pdfPAge models.PDFPage, err error)
-	// GetPages(ctx context.Context, lessonID int64, limit, offset int64) (pages []models.Page, err error)
 }
 type PageDel interface {
 	DeletePage(ctx context.Context, id int64) error
@@ -144,6 +134,7 @@ func (ph *PageHandlers) GetPages(ctx context.Context, lessonID int64, limit, off
 		Limit:  limit,
 		Offset: offset,
 	}
+	params.SetDefaults()
 
 	if err := ph.validator.Struct(params); err != nil {
 		log.Warn("invalid parameters", slog.String("err", err.Error()))
@@ -151,7 +142,7 @@ func (ph *PageHandlers) GetPages(ctx context.Context, lessonID int64, limit, off
 	}
 
 	var pages []pages.BasePage
-	pages, err := ph.pageProvider.GetPages(ctx, lessonID, limit, offset)
+	pages, err := ph.pageProvider.GetPages(ctx, lessonID, params.Limit, params.Offset)
 	if err != nil {
 		if errors.Is(err, storage.ErrPageNotFound) {
 			ph.log.Warn("pages not found", slog.String("err", err.Error()))

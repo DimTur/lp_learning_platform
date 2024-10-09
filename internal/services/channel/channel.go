@@ -135,6 +135,7 @@ func (chh *ChannelHandlers) GetChannels(ctx context.Context, limit, offset int64
 		Limit:  limit,
 		Offset: offset,
 	}
+	params.SetDefaults()
 
 	if err := chh.validator.Struct(params); err != nil {
 		log.Warn("invalid parameters", slog.String("err", err.Error()))
@@ -142,7 +143,7 @@ func (chh *ChannelHandlers) GetChannels(ctx context.Context, limit, offset int64
 	}
 
 	var channels []channels.Channel
-	channels, err := chh.channelProvider.GetChannels(ctx, limit, offset)
+	channels, err := chh.channelProvider.GetChannels(ctx, params.Limit, params.Offset)
 	if err != nil {
 		if errors.Is(err, storage.ErrChannelNotFound) {
 			chh.log.Warn("channels not found", slog.String("err", err.Error()))
