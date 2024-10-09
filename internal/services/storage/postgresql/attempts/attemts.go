@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -52,72 +53,17 @@ func (a *AttemptsPostgresStorage) CreateLessonAttempt(ctx context.Context, lAtte
 }
 
 const (
-	createAbstractPageAttemptQuery = `
-	INSERT INTO pages_abstractpageattempt(lesson_attempt_id, content_type)
-	VALUES ($1, $2)
-	RETURNING id`
-)
-
-func (a *AttemptsPostgresStorage) CreateAbstractPageAttempt(ctx context.Context, pAttempt CreateAbstractPageAttempt) (int64, error) {
-	const op = "storage.postgresql.attempts.attempts.CreateAbstractPageAttempt"
-
-	var id int64
-
-	err := a.db.QueryRow(
-		ctx,
-		createAbstractPageAttemptQuery,
-		pAttempt.LessonAttemptID,
-		pAttempt.ContentType,
-	).Scan(&id)
-	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			if pgErr.Code == "23505" { // unique violation code
-				return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
-			}
-		}
-		return 0, fmt.Errorf("%s: %w", op, err)
-	}
-
-	return id, nil
-}
-
-const (
 	createAbstractQuestionAttemptQuery = `
 	INSERT INTO question_abstractquestionattempt(question_type, page_attempt_id)
 	VALUES ($1, $2)
 	RETURNING id`
-)
-
-func (a *AttemptsPostgresStorage) CreateAbstractQuestionAttempt(ctx context.Context, qAttempt CreateAbstractQuestionAttempt) (int64, error) {
-	const op = "storage.postgresql.attempts.attempts.CreateAbstractQuestionAttempt"
-
-	var id int64
-
-	err := a.db.QueryRow(
-		ctx,
-		createAbstractQuestionAttemptQuery,
-		qAttempt.QuestionType,
-		qAttempt.PageAttemptID,
-	).Scan(&id)
-	if err != nil {
-		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) {
-			if pgErr.Code == "23505" { // unique violation code
-				return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
-			}
-		}
-		return 0, fmt.Errorf("%s: %w", op, err)
-	}
-
-	return id, nil
-}
-
-const (
-	createQuestionAttemptQuery = `
-	INSERT INTO question_questionpageattempt(page_id, page_attempt_id)
+	createAbstractPageAttemptQuery = `
+	INSERT INTO pages_abstractpageattempt(lesson_attempt_id, content_type)
 	VALUES ($1, $2)
 	RETURNING id`
+	createQuestionAttemptQuery = `
+	INSERT INTO question_questionpageattempt(page_id, question_attempt_id)
+	VALUES ($1, $2)`
 )
 
 func (a *AttemptsPostgresStorage) CreateQuestionAttempt(ctx context.Context, qPageAttempt CreateQuestionPageAttempt) error {
@@ -129,7 +75,7 @@ func (a *AttemptsPostgresStorage) CreateQuestionAttempt(ctx context.Context, qPa
 		ctx,
 		createQuestionAttemptQuery,
 		qPageAttempt.PageID,
-		qPageAttempt.PageAttemptID,
+		qPageAttempt.QuestionAttemptID,
 	).Scan(&id)
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -139,6 +85,60 @@ func (a *AttemptsPostgresStorage) CreateQuestionAttempt(ctx context.Context, qPa
 			}
 		}
 		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+func (a *AttemptsPostgresStorage) CreateQuestionPageAttempts(ctx context.Context, attempt CreateQuestionPageAttemptNew) error {
+	const op = "storage.postgresql.attempts.attempts.CreateQuestionPageAttempts"
+
+	tx, err := a.db.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, storage.ErrFailedTransaction)
+	}
+	defer func() {
+		if err != nil {
+			if rollbackErr := tx.Rollback(ctx); rollbackErr != nil {
+				log.Printf("%s: %v", op, storage.ErrRollBack)
+			}
+		}
+	}()
+
+	var abPageAttID int64
+	err = tx.QueryRow(
+		ctx,
+		createAbstractPageAttemptQuery,
+		attempt.LessonAttemptID,
+		attempt.ContentType,
+	).Scan(&abPageAttID)
+	if err != nil {
+		return a.checkPgError(err, op)
+	}
+
+	var abQAttID int64
+	err = tx.QueryRow(
+		ctx,
+		createAbstractQuestionAttemptQuery,
+		attempt.QuestionType,
+		abPageAttID,
+	).Scan(&abQAttID)
+	if err != nil {
+		return a.checkPgError(err, op)
+	}
+
+	_, err = tx.Exec(
+		ctx,
+		createQuestionAttemptQuery,
+		attempt.PageID,
+		abQAttID,
+	)
+	if err != nil {
+		return a.checkPgError(err, op)
+	}
+
+	if err = tx.Commit(ctx); err != nil {
+		return fmt.Errorf("%s: %w", op, storage.ErrCommitTransaction)
 	}
 
 	return nil
@@ -193,4 +193,12 @@ func (a *AttemptsPostgresStorage) GetQuestionPages(ctx context.Context, lessonID
 	}
 
 	return mappedQPages, nil
+}
+
+func (a *AttemptsPostgresStorage) checkPgError(err error, op string) error {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+		return fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
+	}
+	return fmt.Errorf("%s: %w", op, err)
 }

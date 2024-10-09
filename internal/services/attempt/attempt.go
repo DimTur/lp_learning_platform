@@ -13,9 +13,7 @@ import (
 
 type AttemptSaver interface {
 	CreateLessonAttempt(ctx context.Context, lAttempt attempts.CreateLessonAttempt) (int64, error)
-	CreateAbstractPageAttempt(ctx context.Context, pAttempt attempts.CreateAbstractPageAttempt) (int64, error)
-	CreateAbstractQuestionAttempt(ctx context.Context, qAttempt attempts.CreateAbstractQuestionAttempt) (int64, error)
-	CreateQuestionAttempt(ctx context.Context, qPageAttempt attempts.CreateQuestionPageAttempt) error
+	CreateQuestionPageAttempts(ctx context.Context, attempt attempts.CreateQuestionPageAttemptNew) error
 }
 
 type AttemptProvider interface {
@@ -94,48 +92,30 @@ func (ah *AttemptHandlers) CreateAttempt(ctx context.Context, attempt attempts.C
 	}
 
 	for _, qPage := range qPages {
-		abPageID, err := ah.attemptSaver.CreateAbstractPageAttempt(ctx, attempts.CreateAbstractPageAttempt{
-			LessonAttemptID: lAttemptID,
-			ContentType:     qPage.ContentType,
-		})
+		err := ah.attemptSaver.CreateQuestionPageAttempts(
+			ctx,
+			attempts.CreateQuestionPageAttemptNew{
+				CreateAbstractPageAttempt: attempts.CreateAbstractPageAttempt{
+					LessonAttemptID: lAttemptID,
+					ContentType:     qPage.ContentType,
+				},
+				CreateAbstractQuestionAttempt: attempts.CreateAbstractQuestionAttempt{
+					QuestionType: qPage.QuestionType,
+				},
+				CreateQuestionPageAttempt: attempts.CreateQuestionPageAttempt{
+					PageID: qPage.QuestionPageID,
+				},
+			},
+		)
 		if err != nil {
 			if errors.Is(err, storage.ErrInvalidCredentials) {
 				ah.log.Warn("invalid arguments", slog.String("err", err.Error()))
 				return 0, fmt.Errorf("%s: %w", op, err)
 			}
 
-			log.Error("failed to save abstract page attempt", slog.String("err", err.Error()))
-			return 0, fmt.Errorf("%s: %w", op, err)
-		}
-
-		pageAttemptID, err := ah.attemptSaver.CreateAbstractQuestionAttempt(ctx, attempts.CreateAbstractQuestionAttempt{
-			QuestionType:  qPage.QuestionType,
-			PageAttemptID: abPageID,
-		})
-		if err != nil {
-			if errors.Is(err, storage.ErrInvalidCredentials) {
-				ah.log.Warn("invalid arguments", slog.String("err", err.Error()))
-				return 0, fmt.Errorf("%s: %w", op, err)
-			}
-
-			log.Error("failed to save abstract question attempt", slog.String("err", err.Error()))
-			return 0, fmt.Errorf("%s: %w", op, err)
-		}
-
-		err = ah.attemptSaver.CreateQuestionAttempt(ctx, attempts.CreateQuestionPageAttempt{
-			PageID:        qPage.QuestionPageID,
-			PageAttemptID: pageAttemptID,
-		})
-		if err != nil {
-			if errors.Is(err, storage.ErrInvalidCredentials) {
-				ah.log.Warn("invalid arguments", slog.String("err", err.Error()))
-				return 0, fmt.Errorf("%s: %w", op, err)
-			}
-
-			log.Error("failed to save question page attempt", slog.String("err", err.Error()))
+			log.Error("failed to save attempt", slog.String("err", err.Error()))
 			return 0, fmt.Errorf("%s: %w", op, err)
 		}
 	}
-
 	return lAttemptID, nil
 }

@@ -24,14 +24,20 @@ type CreateAbstractQuestionAttempt struct {
 }
 
 type CreateQuestionPageAttempt struct {
-	PageID        int64 `json:"page_id" validate:"required"`
-	PageAttemptID int64 `json:"page_attempt_id" validate:"required"`
+	PageID            int64 `json:"page_id" validate:"required"`
+	QuestionAttemptID int64 `json:"question_attempt_id" validate:"required"`
 }
 
 type QuestionPage struct {
 	ContentType    string `json:"content_type" validate:"required"`
 	QuestionType   string `json:"question_type" validate:"required"`
 	QuestionPageID int64  `json:"question_questionpage_id" validate:"required"`
+}
+
+type CreateQuestionPageAttemptNew struct {
+	CreateAbstractPageAttempt
+	CreateAbstractQuestionAttempt
+	CreateQuestionPageAttempt
 }
 
 type DBQuestionPage struct {
