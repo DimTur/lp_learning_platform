@@ -4,8 +4,19 @@ import (
 	"log/slog"
 
 	grpcapp "github.com/DimTur/lp_learning_platform/internal/app/grpc"
+	"github.com/DimTur/lp_learning_platform/internal/services/attempt"
 	"github.com/DimTur/lp_learning_platform/internal/services/channel"
-	sqlite "github.com/DimTur/lp_learning_platform/internal/services/storage/sqlite/channel"
+	"github.com/DimTur/lp_learning_platform/internal/services/lesson"
+	"github.com/DimTur/lp_learning_platform/internal/services/page"
+	"github.com/DimTur/lp_learning_platform/internal/services/plan"
+	"github.com/DimTur/lp_learning_platform/internal/services/question"
+	attstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
+	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
+	lessonstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
+	pagestorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
+	planstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
+	questiontorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/questions"
+	"github.com/go-playground/validator/v10"
 )
 
 type App struct {
@@ -13,20 +24,72 @@ type App struct {
 }
 
 func NewApp(
-	storage sqlite.SQLLiteStorage,
+	channelStorage *channelstorage.ChannelPostgresStorage,
+	planStorage *planstorage.PlansPostgresStorage,
+	lessonStorage *lessonstorage.LessonsPostgresStorage,
+	pageStorage *pagestorage.PagesPostgresStorage,
+	questionStorage *questiontorage.QuestionsPostgresStorage,
+	attemptStorage *attstorage.AttemptsPostgresStorage,
 	grpcAddr string,
 	logger *slog.Logger,
+	validator *validator.Validate,
 ) (*App, error) {
-	lpGRPCHandlers := channel.New(
+	lpGRPCChannelHandlers := channel.New(
 		logger,
-		&storage,
-		&storage,
+		validator,
+		channelStorage,
+		channelStorage,
+		channelStorage,
+	)
+
+	lpGRPCPlanHandlers := plan.New(
+		logger,
+		validator,
+		planStorage,
+		planStorage,
+		planStorage,
+	)
+
+	lpGRPCLessonHandlers := lesson.New(
+		logger,
+		validator,
+		lessonStorage,
+		lessonStorage,
+		lessonStorage,
+	)
+
+	lpGRPCPageHandlers := page.New(
+		logger,
+		validator,
+		pageStorage,
+		pageStorage,
+		pageStorage,
+	)
+
+	lpGRPCQuestionHandlers := question.New(
+		logger,
+		validator,
+		questionStorage,
+		questionStorage,
+	)
+
+	lpGRPCAttemptHandlers := attempt.New(
+		logger,
+		validator,
+		attemptStorage,
+		attemptStorage,
 	)
 
 	grpcServer, err := grpcapp.NewGRPCServer(
 		grpcAddr,
-		lpGRPCHandlers,
+		lpGRPCChannelHandlers,
+		lpGRPCPlanHandlers,
+		lpGRPCLessonHandlers,
+		lpGRPCPageHandlers,
+		lpGRPCQuestionHandlers,
+		lpGRPCAttemptHandlers,
 		logger,
+		validator,
 	)
 	if err != nil {
 		return nil, err

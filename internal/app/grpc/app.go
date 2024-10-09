@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/DimTur/lp_learning_platform/internal/grpc/lp_handlers"
+	"github.com/go-playground/validator/v10"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -27,13 +28,20 @@ type Server struct {
 	listener            net.Listener
 	gracefulStopTimeout time.Duration
 
-	logger *slog.Logger
+	logger    *slog.Logger
+	validator *validator.Validate
 }
 
 func NewGRPCServer(
 	gRPCAddr string,
-	lpHandlers lp_handlers.LPHandlers,
+	channelHandlers lp_handlers.ChannelHandlers,
+	planHandlers lp_handlers.PlanHandlers,
+	lessonHandlers lp_handlers.LessonHandlers,
+	pageHandlers lp_handlers.PageHandlers,
+	questionHandlers lp_handlers.QuestionHandlers,
+	attemptHandlers lp_handlers.AttemptHandlers,
 	logger *slog.Logger,
+	validator *validator.Validate,
 ) (*Server, error) {
 	const op = "grpc-server"
 
@@ -60,7 +68,15 @@ func NewGRPCServer(
 			recovery.StreamServerInterceptor(recovery.WithRecoveryHandler(grpcPanicRecoveryHandler)),
 		),
 	)
-	lp_handlers.RegisterLPServiceServer(gRPCSrv, lpHandlers)
+	lp_handlers.RegisterLPServiceServer(
+		gRPCSrv,
+		channelHandlers,
+		planHandlers,
+		lessonHandlers,
+		pageHandlers,
+		questionHandlers,
+		attemptHandlers,
+	)
 
 	// register health check service
 	healthService := NewHealthChecker(logger)
@@ -75,6 +91,7 @@ func NewGRPCServer(
 		gRPCSrv:             gRPCSrv,
 		gracefulStopTimeout: GRPCDefaultGracefulStopTimeout,
 		logger:              logger,
+		validator:           validator,
 	}
 
 	return server, nil
