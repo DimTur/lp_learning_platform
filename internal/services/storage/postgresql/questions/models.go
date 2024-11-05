@@ -7,8 +7,8 @@ import (
 type QuestionPage struct {
 	ID             int64
 	LessonID       int64
-	CreatedBy      int64
-	LastModifiedBy int64
+	CreatedBy      string
+	LastModifiedBy string
 	CreatedAt      time.Time
 	Modified       time.Time
 	ContentType    string
@@ -26,8 +26,8 @@ type QuestionPage struct {
 
 type CreateQuestionPage struct {
 	LessonID       int64  `json:"lesson_id" validate:"required"`
-	CreatedBy      int64  `json:"created_by" validate:"required"`
-	LastModifiedBy int64  `json:"last_modified_by" validate:"required"`
+	CreatedBy      string `json:"created_by" validate:"required"`
+	LastModifiedBy string `json:"last_modified_by" validate:"required"`
 	ContentType    string `json:"content_type" validate:"required"`
 
 	QuestionType string `json:"question_type" validate:"required"`
@@ -42,8 +42,8 @@ type CreateQuestionPage struct {
 }
 
 type UpdateQuestionPage struct {
-	ID             int64 `json:"id" validate:"required"`
-	LastModifiedBy int64 `json:"last_modified_by" validate:"required"`
+	ID             int64  `json:"id" validate:"required"`
+	LastModifiedBy string `json:"last_modified_by" validate:"required"`
 
 	Question *string `json:"question,omitempty"`
 	OptionA  *string `json:"option_a,omitempty"`
@@ -57,8 +57,8 @@ type UpdateQuestionPage struct {
 type DBQuestionPage struct {
 	ID             int64     `db:"id"`
 	LessonID       int64     `db:"lesson_id"`
-	CreatedBy      int64     `db:"created_by"`
-	LastModifiedBy int64     `db:"last_modified_by"`
+	CreatedBy      string    `db:"created_by"`
+	LastModifiedBy string    `db:"last_modified_by"`
 	CreatedAt      time.Time `db:"created_at"`
 	Modified       time.Time `db:"modified"`
 	ContentType    string    `db:"content_type"`

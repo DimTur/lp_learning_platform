@@ -7,6 +7,7 @@ import (
 type Config struct {
 	GRPCServer GRPCServer `yaml:"grpc_server"`
 	Storage    Storage    `yaml:"storage"`
+	RabbitMQ   RabbitMQ   `yaml:"rabbit_mq"`
 }
 
 type GRPCServer struct {

@@ -79,6 +79,7 @@ func (p *PlansPostgresStorage) CreatePlan(ctx context.Context, plan CreatePlan) 
 	return planID, nil
 }
 
+// TODO: if not group admin you didn't see is_published = false
 const getPlanByIDQuery = `
 	SELECT id, name, description, created_by, last_modified_by, is_published, public, created_at, modified 
 	FROM plans 
@@ -107,6 +108,7 @@ func (p *PlansPostgresStorage) GetPlanByID(ctx context.Context, planID int64) (P
 	return (Plan)(plan), nil
 }
 
+// TODO: if not group admin you didn't see is_published = false
 const getPlansQuery = `
 	SELECT
 		p.id AS plan_id,
@@ -213,6 +215,38 @@ func (p *PlansPostgresStorage) DeletePlan(ctx context.Context, id int64) error {
 
 	if res.RowsAffected() == 0 {
 		return fmt.Errorf("%s: %w", op, storage.ErrPlanNotFound)
+	}
+
+	return nil
+}
+
+const charedPlanQuery = `
+	INSERT INTO shared_plans_users(plan_id, user_id, created_by, created_at)
+	VALUES ($1, $2, $3, $4)
+	RETURNING id`
+
+func (c *PlansPostgresStorage) SharePlanWithUser(ctx context.Context, s DBSharePlanForUser) error {
+	const op = "storage.postgresql.plans.plans.SharePlanWithUser"
+
+	var id int64
+
+	err := c.db.QueryRow(ctx, charedPlanQuery,
+		s.PlanID,
+		s.UserID,
+		s.CreatedBy,
+		s.CreatedAt,
+	).Scan(&id)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			fmt.Printf("Postgres error code: %s, message: %s\n", pgErr.Code, pgErr.Message)
+			if pgErr.Code == "23505" { // unique violation code
+				return fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
+			} else if pgErr.Code == "23503" { // foreign key violation code
+				return fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
+			}
+		}
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil

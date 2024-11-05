@@ -7,10 +7,10 @@ type CreateAttempt interface {
 }
 
 type CreateLessonAttempt struct {
-	LessonID  int64 `json:"lesson_id" validate:"required"`
-	PlanId    int64 `json:"plan_id" validate:"required"`
-	ChannelID int64 `json:"channel_id" validate:"required"`
-	UserID    int64 `json:"user_id" validate:"required"`
+	LessonID  int64  `json:"lesson_id" validate:"required"`
+	PlanId    int64  `json:"plan_id" validate:"required"`
+	ChannelID int64  `json:"channel_id" validate:"required"`
+	UserID    string `json:"user_id" validate:"required"`
 }
 
 type CreateAbstractPageAttempt struct {

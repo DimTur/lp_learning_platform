@@ -11,7 +11,6 @@ import (
 	"github.com/DimTur/lp_learning_platform/internal/services/plan"
 	"github.com/DimTur/lp_learning_platform/internal/services/question"
 	attstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
-	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
 	lessonstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
 	pagestorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
 	planstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
@@ -19,17 +18,33 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+type ChannelStorage interface {
+	channel.ChannelSaver
+	channel.ChannelProvider
+	channel.ChannelDel
+}
+
+type ChannelRabbitMq interface {
+	channel.RabbitMQQueues
+}
+
+type PlanRabbitMq interface {
+	plan.RabbitMQQueues
+}
+
 type App struct {
 	GRPCSrv *grpcapp.Server
 }
 
 func NewApp(
-	channelStorage *channelstorage.ChannelPostgresStorage,
+	channelStorage ChannelStorage,
 	planStorage *planstorage.PlansPostgresStorage,
 	lessonStorage *lessonstorage.LessonsPostgresStorage,
 	pageStorage *pagestorage.PagesPostgresStorage,
 	questionStorage *questiontorage.QuestionsPostgresStorage,
 	attemptStorage *attstorage.AttemptsPostgresStorage,
+	channelRabbitMq ChannelRabbitMq,
+	planRabbitMq PlanRabbitMq,
 	grpcAddr string,
 	logger *slog.Logger,
 	validator *validator.Validate,
@@ -40,6 +55,7 @@ func NewApp(
 		channelStorage,
 		channelStorage,
 		channelStorage,
+		channelRabbitMq,
 	)
 
 	lpGRPCPlanHandlers := plan.New(
@@ -48,6 +64,7 @@ func NewApp(
 		planStorage,
 		planStorage,
 		planStorage,
+		planRabbitMq,
 	)
 
 	lpGRPCLessonHandlers := lesson.New(

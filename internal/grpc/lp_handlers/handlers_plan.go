@@ -155,3 +155,22 @@ func (s *serverAPI) DeletePlan(ctx context.Context, req *lpv1.DeletePlanRequest)
 		Success: true,
 	}, nil
 }
+
+func (s *serverAPI) SharePlanWithUsers(ctx context.Context, req *lpv1.SharePlanWithUsersRequest) (*lpv1.SharePlanWithUsersResponse, error) {
+	sharingPlan := plans.SharePlanForUsers{
+		PlanID:    req.GetPlanId(),
+		UsersIDs:  req.GetUsersIds(),
+		CreatedBy: req.GetCreatedBy(),
+	}
+	if err := s.planHandlers.SharePlanWithUser(ctx, sharingPlan); err != nil {
+		if errors.Is(err, planserv.ErrInvalidCredentials) {
+			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &lpv1.SharePlanWithUsersResponse{
+		Success: true,
+	}, nil
+}

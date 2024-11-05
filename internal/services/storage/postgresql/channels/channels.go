@@ -137,8 +137,8 @@ func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID i
 			ID:             dbPlan.ID.Int64,
 			Name:           dbPlan.Name.String,
 			Description:    dbPlan.Description.String,
-			CreatedBy:      dbPlan.CreatedBy.Int64,
-			LastModifiedBy: dbPlan.LastModifiedBy.Int64,
+			CreatedBy:      dbPlan.CreatedBy.String,
+			LastModifiedBy: dbPlan.LastModifiedBy.String,
 			IsPublished:    dbPlan.IsPublished.Bool,
 			Public:         dbPlan.Public.Bool,
 			CreatedAt:      dbPlan.CreatedAt.Time,
@@ -235,6 +235,38 @@ func (c *ChannelPostgresStorage) DeleteChannel(ctx context.Context, id int64) er
 
 	if res.RowsAffected() == 0 {
 		return fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
+	}
+
+	return nil
+}
+
+const chareChannelQuery = `
+	INSERT INTO shared_channels_learninggroups(channel_id, learning_group_id, created_by, created_at)
+	VALUES ($1, $2, $3, $4)
+	RETURNING id`
+
+func (c *ChannelPostgresStorage) ShareChannelToGroup(ctx context.Context, s DBShareChannelToGroup) error {
+	const op = "storage.postgresql.channels.channels.ShareChannelToGroup"
+
+	var id int64
+
+	err := c.db.QueryRow(ctx, chareChannelQuery,
+		s.ChannelID,
+		s.LGroupID,
+		s.CreatedBy,
+		s.CreatedAt,
+	).Scan(&id)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			fmt.Printf("Postgres error code: %s, message: %s\n", pgErr.Code, pgErr.Message)
+			if pgErr.Code == "23505" { // unique violation code
+				return fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
+			} else if pgErr.Code == "23503" { // foreign key violation code
+				return fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
+			}
+		}
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	return nil

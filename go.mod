@@ -34,6 +34,7 @@ require (
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.23
+	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/net v0.29.0 // indirect

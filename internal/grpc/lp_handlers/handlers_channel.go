@@ -20,7 +20,6 @@ func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRe
 		CreatedBy:      req.GetCreatedBy(),
 		LastModifiedBy: req.GetCreatedBy(),
 	}
-
 	channelID, err := s.channelHandlers.CreateChannel(ctx, channel)
 	if err != nil {
 		if errors.Is(err, chanserv.ErrInvalidCredentials) {
@@ -151,6 +150,25 @@ func (s *serverAPI) DeleteChannel(ctx context.Context, req *lpv1.DeleteChannelRe
 	}
 
 	return &lpv1.DeleteChannelResponse{
+		Success: true,
+	}, nil
+}
+
+func (s *serverAPI) ShareChannelToGroup(ctx context.Context, req *lpv1.ShareChannelToGroupRequest) (*lpv1.ShareChannelToGroupResponse, error) {
+	sharingChannel := channels.ShareChannelToGroup{
+		ChannelID: req.GetChannelId(),
+		LGroupIDs: req.GetLgroupsIds(),
+		CreatedBy: req.GetCreatedBy(),
+	}
+	if err := s.channelHandlers.ShareChannelToGroup(ctx, sharingChannel); err != nil {
+		if errors.Is(err, chanserv.ErrInvalidCredentials) {
+			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &lpv1.ShareChannelToGroupResponse{
 		Success: true,
 	}, nil
 }
