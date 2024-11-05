@@ -5,64 +5,85 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
+	"github.com/DimTur/lp_learning_platform/internal/utils"
+	"github.com/go-playground/validator/v10"
 )
 
 type ChannelSaver interface {
-	SaveChannel(
-		ctx context.Context,
-		name string,
-		description string,
-		userID int64,
-		public bool,
-	) (id int64, err error)
+	CreateChannel(ctx context.Context, channel channels.CreateChannel) (int64, error)
+	UpdateChannel(ctx context.Context, updChannel channels.UpdateChannelRequest) (int64, error)
 }
 
 type ChannelProvider interface {
-	GetChannelByID(ctx context.Context, channelID int64) (channel models.Channel, err error)
+	GetChannelByID(ctx context.Context, channelID int64) (channels.ChannelWithPlans, error)
+	GetChannels(ctx context.Context, limit, offset int64) ([]channels.Channel, error)
+}
+
+type ChannelDel interface {
+	DeleteChannel(ctx context.Context, channelID int64) error
 }
 
 var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrInvalidChannelID   = errors.New("invalid channel id")
 	ErrChannelExitsts     = errors.New("channel already exists")
+	ErrChannelNotFound    = errors.New("channel not found")
 )
 
-type LPHandlers struct {
+type ChannelHandlers struct {
 	log             *slog.Logger
+	validator       *validator.Validate
 	channelSaver    ChannelSaver
 	channelProvider ChannelProvider
+	channelDel      ChannelDel
 }
 
 func New(
 	log *slog.Logger,
+	validator *validator.Validate,
 	channelSaver ChannelSaver,
 	channelProvider ChannelProvider,
-) *LPHandlers {
-	return &LPHandlers{
+	channelDel ChannelDel,
+) *ChannelHandlers {
+	return &ChannelHandlers{
 		log:             log,
+		validator:       validator,
 		channelSaver:    channelSaver,
 		channelProvider: channelProvider,
+		channelDel:      channelDel,
 	}
 }
 
 // CreateChannel creats new channel in the system and returns channel ID.
-func (lp *LPHandlers) CreateChannel(ctx context.Context, name string, description string, userID int64, public bool) (int64, error) {
+func (chh *ChannelHandlers) CreateChannel(ctx context.Context, channel channels.CreateChannel) (int64, error) {
 	const op = "channel.CreateChannel"
 
-	log := lp.log.With(
+	log := chh.log.With(
 		slog.String("op", op),
-		slog.String("name", name),
+		slog.String("name", channel.Name),
 	)
+
+	// Validation
+	err := chh.validator.Struct(channel)
+	if err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	now := time.Now()
+	channel.CreatedAt = now
+	channel.Modified = now
 
 	log.Info("creating channel")
 
-	id, err := lp.channelSaver.SaveChannel(ctx, name, description, userID, public)
+	id, err := chh.channelSaver.CreateChannel(ctx, channel)
 	if err != nil {
 		if errors.Is(err, storage.ErrInvalidCredentials) {
-			lp.log.Warn("invalid arguments", slog.String("err", err.Error()))
+			chh.log.Warn("invalid arguments", slog.String("err", err.Error()))
 			return 0, fmt.Errorf("%s: %w", op, err)
 		}
 
@@ -74,22 +95,22 @@ func (lp *LPHandlers) CreateChannel(ctx context.Context, name string, descriptio
 }
 
 // GetChannelByID gets channel by ID and returns it.
-func (lp *LPHandlers) GetChannel(ctx context.Context, chanID int64) (models.Channel, error) {
+func (chh *ChannelHandlers) GetChannel(ctx context.Context, channelID int64) (channels.ChannelWithPlans, error) {
 	const op = "channel.GetChannelByID"
 
-	log := lp.log.With(
+	log := chh.log.With(
 		slog.String("op", op),
-		slog.Int64("chanID", chanID),
+		slog.Int64("chanID", channelID),
 	)
 
 	log.Info("getting channel")
 
-	var channel models.Channel
-	channel, err := lp.channelProvider.GetChannelByID(ctx, chanID)
+	var channel channels.ChannelWithPlans
+	channel, err := chh.channelProvider.GetChannelByID(ctx, channelID)
 	if err != nil {
 		if errors.Is(err, storage.ErrChannelNotFound) {
-			lp.log.Warn("channel not found", slog.String("err", err.Error()))
-			return channel, fmt.Errorf("%s: %w", op, err)
+			chh.log.Warn("channel not found", slog.String("err", err.Error()))
+			return channel, ErrChannelNotFound
 		}
 
 		log.Error("failed to get channel", slog.String("err", err.Error()))
@@ -97,4 +118,99 @@ func (lp *LPHandlers) GetChannel(ctx context.Context, chanID int64) (models.Chan
 	}
 
 	return channel, nil
+}
+
+// GetChannels gets channels and returns them.
+func (chh *ChannelHandlers) GetChannels(ctx context.Context, limit, offset int64) ([]channels.Channel, error) {
+	const op = "channel.GetChannels"
+
+	log := chh.log.With(
+		slog.String("op", op),
+	)
+
+	log.Info("getting channels")
+
+	// Validation
+	params := utils.PaginationQueryParams{
+		Limit:  limit,
+		Offset: offset,
+	}
+	params.SetDefaults()
+
+	if err := chh.validator.Struct(params); err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	var channels []channels.Channel
+	channels, err := chh.channelProvider.GetChannels(ctx, params.Limit, params.Offset)
+	if err != nil {
+		if errors.Is(err, storage.ErrChannelNotFound) {
+			chh.log.Warn("channels not found", slog.String("err", err.Error()))
+			return channels, fmt.Errorf("%s: %w", op, ErrChannelNotFound)
+		}
+
+		log.Error("failed to get channels", slog.String("err", err.Error()))
+		return channels, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return channels, nil
+}
+
+// UpdateChannel performs a partial update
+func (chh *ChannelHandlers) UpdateChannel(ctx context.Context, updChannel channels.UpdateChannelRequest) (int64, error) {
+	const op = "channel.UpdateChannel"
+
+	log := chh.log.With(
+		slog.String("op", op),
+	)
+
+	log.Info("updating channel")
+
+	// Validation
+	err := chh.validator.Struct(updChannel)
+	if err != nil {
+		log.Warn("validation failed", slog.String("err", err.Error()))
+		return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	id, err := chh.channelSaver.UpdateChannel(ctx, updChannel)
+	if err != nil {
+		if errors.Is(err, storage.ErrInvalidCredentials) {
+			chh.log.Warn("invalid credentials", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, err)
+		}
+
+		log.Error("failed to update channel", slog.String("err", err.Error()))
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("channel updated with ", slog.Int64("channelID", id))
+
+	return id, nil
+}
+
+// DeleteChannel
+func (chh *ChannelHandlers) DeleteChannel(ctx context.Context, channelID int64) error {
+	const op = "channel.DeleteChannel"
+
+	log := chh.log.With(
+		slog.String("op", op),
+		slog.Int64("channel id", channelID),
+	)
+
+	log.Info("deleting channel with: ", slog.Int64("channelID", channelID))
+
+	err := chh.channelDel.DeleteChannel(ctx, channelID)
+	if err != nil {
+		if errors.Is(err, storage.ErrChannelNotFound) {
+			chh.log.Warn("channel not found", slog.String("err", err.Error()))
+			return fmt.Errorf("%s: %w", op, ErrChannelNotFound)
+		}
+
+		log.Error("failed to delete channel", slog.String("err", err.Error()))
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
 }

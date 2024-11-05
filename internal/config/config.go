@@ -14,7 +14,12 @@ type GRPCServer struct {
 }
 
 type Storage struct {
-	SQLitePath string `yaml:"path" env-default:"db.sql"`
+	Type     string `yaml:"type"`
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	DBName   string `yaml:"dbname"`
 }
 
 func Parse(s string) (*Config, error) {

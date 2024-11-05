@@ -1,3 +1,4 @@
-./vscode
+.vscode/
 commands.md
 *.db
+learning_platform.sql

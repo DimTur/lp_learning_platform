@@ -2,102 +2,85 @@ package lp_handlers
 
 import (
 	"context"
-	"errors"
 
-	"github.com/DimTur/lp_learning_platform/internal/domain/models"
-	chanserv "github.com/DimTur/lp_learning_platform/internal/services/channel"
-	lpv1 "github.com/DimTur/lp_protos/gen/go/lp"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/questions"
+	lpv1 "github.com/DimTur/lp_learning_platform/pkg/server/grpc"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-type LPHandlers interface {
-	CreateChannel(ctx context.Context,
-		name string,
-		description string,
-		userID int64,
-		public bool) (id int64, err error)
-	// CreatePlan(ctx context.Context, plan lpv1.CreatePlanRequest) (resp lpv1.CreatePlanResponse, err error)
-	// CreateLesson(ctx context.Context, lesson lpv1.CreateLessonRequest) (resp lpv1.CreateLessonResponse, err error)
-	GetChannel(ctx context.Context, channelID int64) (channel models.Channel, err error)
-	// GetPlan(ctx context.Context, plan lpv1.GetPlanRequest) (resp lpv1.GetPlanResponse, err error)
-	// GetLesson(ctx context.Context, lesson lpv1.GetLessonRequest) (resp lpv1.GetLessonResponse, err error)
+type ChannelHandlers interface {
+	CreateChannel(ctx context.Context, channel channels.CreateChannel) (int64, error)
+	GetChannel(ctx context.Context, channelID int64) (channels.ChannelWithPlans, error)
+	GetChannels(ctx context.Context, limit, offset int64) ([]channels.Channel, error)
+	UpdateChannel(ctx context.Context, updChannel channels.UpdateChannelRequest) (int64, error)
+	DeleteChannel(ctx context.Context, channelID int64) error
+}
+
+type PlanHandlers interface {
+	CreatePlan(ctx context.Context, plan plans.CreatePlan) (int64, error)
+	GetPlan(ctx context.Context, planID int64) (plan plans.Plan, err error)
+	GetPlans(ctx context.Context, channel_id int64, limit, offset int64) ([]plans.Plan, error)
+	UpdatePlan(ctx context.Context, updPlan plans.UpdatePlanRequest) (int64, error)
+	DeletePlan(ctx context.Context, planID int64) error
+}
+
+type LessonHandlers interface {
+	CreateLesson(ctx context.Context, lesson lessons.CreateLesson) (int64, error)
+	GetLesson(ctx context.Context, lessonID int64) (lessons.Lesson, error)
+	GetLessons(ctx context.Context, plan_id int64, limit, offset int64) ([]lessons.Lesson, error)
+	UpdateLesson(ctx context.Context, updLEsson lessons.UpdateLessonRequest) (int64, error)
+	DeleteLesson(ctx context.Context, lessonID int64) error
+}
+
+type PageHandlers interface {
+	CreatePage(ctx context.Context, page pages.CreatePage) (int64, error)
+	GetPage(ctx context.Context, pageID int64, contentType string) (pages.Page, error)
+	GetPages(ctx context.Context, lessonID int64, limit, offset int64) ([]pages.BasePage, error)
+	UpdatePage(ctx context.Context, updPage pages.UpdatePage) (int64, error)
+	DeletePage(ctx context.Context, pageID int64) error
+}
+
+type QuestionHandlers interface {
+	CreateQuestionPage(ctx context.Context, questionPage questions.CreateQuestionPage) (int64, error)
+	GetQuestionPageByID(ctx context.Context, pageID int64) (questions.QuestionPage, error)
+	UpdateQuestionPage(ctx context.Context, updPage questions.UpdateQuestionPage) (int64, error)
+}
+
+type AttemptHandlers interface {
+	CreateAttempt(ctx context.Context, attempt attempts.CreateLessonAttempt) (int64, error)
 }
 
 type serverAPI struct {
-	learningPlatform LPHandlers
+	channelHandlers  ChannelHandlers
+	planHandlers     PlanHandlers
+	lessonHandlers   LessonHandlers
+	pageHandlers     PageHandlers
+	questionHandlers QuestionHandlers
+	attemptHandlers  AttemptHandlers
 
 	lpv1.UnsafeLearningPlatformServer
 }
 
-func RegisterLPServiceServer(gRPC *grpc.Server, lp LPHandlers) {
-	lpv1.RegisterLearningPlatformServer(gRPC, &serverAPI{learningPlatform: lp})
-}
-
-func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRequest) (*lpv1.CreateChannelResponse, error) {
-	reqChan := req.GetChannel()
-	channelID, err := s.learningPlatform.CreateChannel(
-		ctx,
-		reqChan.GetName(),
-		reqChan.GetDescription(),
-		reqChan.GetCreatedBy(),
-		reqChan.GetPublic(),
-	)
-	if err != nil {
-		if errors.Is(err, chanserv.ErrInvalidCredentials) {
-			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
-		}
-
-		return nil, status.Error(codes.InvalidArgument, "invalid credentials")
-	}
-
-	return &lpv1.CreateChannelResponse{
-		Channel: &lpv1.Channel{
-			ChannelId:      channelID,
-			Name:           reqChan.GetName(),
-			Description:    reqChan.GetDescription(),
-			CreatedBy:      reqChan.GetCreatedBy(),
-			Public:         reqChan.GetPublic(),
-			LastModifiedBy: reqChan.GetCreatedBy(),
-		},
-	}, nil
-}
-
-func (s *serverAPI) CreatePlan(ctx context.Context, req *lpv1.CreatePlanRequest) (*lpv1.CreatePlanResponse, error) {
-	return &lpv1.CreatePlanResponse{}, nil
-}
-
-func (s *serverAPI) CreateLesson(ctx context.Context, req *lpv1.CreateLessonRequest) (*lpv1.CreateLessonResponse, error) {
-	return &lpv1.CreateLessonResponse{}, nil
-}
-
-func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest) (*lpv1.GetChannelResponse, error) {
-	channel, err := s.learningPlatform.GetChannel(ctx, req.GetChannelId())
-	if err != nil {
-		if errors.Is(err, chanserv.ErrInvalidCredentials) {
-			return nil, status.Error(codes.NotFound, "channel not found")
-		}
-
-		return nil, status.Error(codes.NotFound, "channel not found")
-	}
-
-	return &lpv1.GetChannelResponse{
-		Channel: &lpv1.Channel{
-			ChannelId:      channel.ID,
-			Name:           channel.Name,
-			Description:    channel.Description,
-			CreatedBy:      channel.CreatedBy,
-			Public:         channel.Public,
-			LastModifiedBy: channel.LastModifiedBy,
-		},
-	}, nil
-}
-
-func (s *serverAPI) GetPlan(ctx context.Context, req *lpv1.GetPlanRequest) (*lpv1.GetPlanResponse, error) {
-	return &lpv1.GetPlanResponse{}, nil
-}
-
-func (s *serverAPI) GetLesson(ctx context.Context, req *lpv1.GetLessonRequest) (*lpv1.GetLessonResponse, error) {
-	return &lpv1.GetLessonResponse{}, nil
+func RegisterLPServiceServer(
+	gRPC *grpc.Server,
+	ch ChannelHandlers,
+	ph PlanHandlers,
+	lh LessonHandlers,
+	pgh PageHandlers,
+	qh QuestionHandlers,
+	ah AttemptHandlers,
+) {
+	lpv1.RegisterLearningPlatformServer(gRPC, &serverAPI{
+		channelHandlers:  ch,
+		planHandlers:     ph,
+		lessonHandlers:   lh,
+		pageHandlers:     pgh,
+		questionHandlers: qh,
+		attemptHandlers:  ah,
+	})
 }

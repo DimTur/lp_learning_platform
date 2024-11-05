@@ -5,9 +5,23 @@ go 1.23.0
 require google.golang.org/grpc v1.66.1
 
 require (
+	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/go-playground/validator v9.31.0+incompatible // indirect
+	github.com/go-playground/validator/v10 v10.22.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/pgx/v5 v5.7.1 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
+	github.com/lib/pq v1.10.9 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
+	golang.org/x/crypto v0.27.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 )
 
 require (
@@ -17,7 +31,8 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/jackc/pgx v3.6.2+incompatible
+	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.23
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5 // indirect

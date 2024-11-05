@@ -1,0 +1,451 @@
+syntax = "proto3";
+
+package lp.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "lp.lp.v1;lp1";
+
+service LearningPlatform {
+    rpc CreateChannel (CreateChannelRequest) returns (CreateChannelResponse);
+    rpc GetChannel (GetChannelRequest) returns (GetChannelResponse);
+    rpc GetChannels (GetChannelsRequest) returns (GetChannelsResponse);
+    rpc UpdateChannel (UpdateChannelRequest) returns (UpdateChannelResponse);
+    rpc DeleteChannel (DeleteChannelRequest) returns (DeleteChannelResponse);
+
+    rpc CreatePlan (CreatePlanRequest) returns (CreatePlanResponse);
+    rpc GetPlan (GetPlanRequest) returns (GetPlanResponse);
+    rpc GetPlans (GetPlansRequest) returns (GetPlansResponse);
+    rpc UpdatePlan (UpdatePlanRequest) returns (UpdatePlanResponse);
+    rpc DeletePlan (DeletePlanRequest) returns (DeletePlanResponse);
+
+    rpc CreateLesson (CreateLessonRequest) returns (CreateLessonResponse);
+    rpc GetLesson (GetLessonRequest) returns (GetLessonResponse);
+    rpc GetLessons (GetLessonsRequest) returns (GetLessonsResponse);
+    rpc UpdateLesson (UpdateLessonRequest) returns (UpdateLessonResponse);
+    rpc DeleteLesson (DeleteLessonRequest) returns (DeleteLessonResponse);
+
+    rpc CreatePage (CreatePageRequest) returns (CreatePageResponse);
+    rpc GetPage (GetPageRequest) returns (GetPageResponse);
+    rpc GetPages (GetPagesRequest) returns (GetPagesResponse);
+    rpc UpdatePage (UpdatePageRequest) returns (UpdatePageResponse);
+    rpc DeletePage (DeletePageRequest) returns (DeletePageResponse);
+
+    rpc CreateQuestionPage (CreateQuestionPageRequest) returns (CreateQuestionPageResponse);
+    rpc GetQuestionPage (GetQuestionPageRequest) returns (GetQuestionPageResponse);
+    rpc UpdateQuestionPage (UpdateQuestionPageRequest) returns (UpdateQuestionPageResponse);
+
+    rpc CreateAttempt (CreateAttemptRequest) returns (CreateAttemptResponse);
+}
+
+enum ContentType {
+    CONTENT_TYPE_UNSPECIFIED = 0;
+    IMAGE = 1;
+    VIDEO = 2;
+    PDF = 3;
+    QUESTION = 4;
+}
+
+message BasePage {
+    int64 id = 1;
+    int64 lesson_id = 2;
+    int64 created_by = 3;
+    int64 last_modified_by = 4;
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp modified = 6;
+    ContentType content_type = 7;
+}
+
+message CreateBasePage {
+    int64 lesson_id = 1;
+    int64 created_by = 2;
+    int64 last_modified_by = 3;
+}
+
+message UpdateBasePage {
+    int64 id = 1;
+    int64 last_modified_by = 2;
+}
+
+message ImagePage {
+    BasePage base = 1;
+    string image_file_url = 2;
+    string image_name = 3;
+}
+
+message CreateImagePage {
+    CreateBasePage base = 1;
+    string image_file_url = 2;
+    string image_name = 3;
+}
+
+message UpdateImagePage {
+    UpdateBasePage base = 1;
+    string image_file_url = 2;
+    string image_name = 3;
+}
+
+message VideoPage {
+    BasePage base = 1;
+    string video_file_url = 2;
+    string video_name = 3;
+}
+
+message CreateVideoPage {
+    CreateBasePage base = 1;
+    string video_file_url = 2;
+    string video_name = 3;
+}
+
+message UpdateVideoPage {
+    UpdateBasePage base = 1;
+    string video_file_url = 2;
+    string video_name = 3;
+}
+
+message PDFPage {
+    BasePage base = 1;
+    string pdf_file_url = 2;
+    string pdf_name = 3;
+}
+
+message CreatePDFPage {
+    CreateBasePage base = 1;
+    string pdf_file_url = 2;
+    string pdf_name = 3;
+}
+
+message UpdatePDFPage {
+    UpdateBasePage base = 1;
+    string pdf_file_url = 2;
+    string pdf_name = 3;
+}
+
+message CreatePageRequest {
+    oneof page {
+        CreateImagePage image_page = 1;
+        CreateVideoPage video_page = 2;
+        CreatePDFPage pdf_page = 3;
+    }
+}
+
+message CreatePageResponse {
+    int64 id = 1;
+}
+
+message GetPageRequest {
+    int64 id = 1;
+    ContentType content_type = 2;
+}
+
+message GetPageResponse {
+    oneof page {
+        ImagePage image_page = 1;
+        VideoPage video_page = 2;
+        PDFPage pdf_page = 3;
+    }
+}
+
+message GetPagesRequest {
+    int64 lesson_id = 1; // ID of the lesson that includes the pages.
+    int64 limit = 2; // Limit for pagination.
+    int64 offset = 3; // Offset for pagination.
+}
+
+message GetPagesResponse {
+    repeated BasePage pages = 1; // The retrieved list of pages in the lesson.
+}
+
+message UpdatePageRequest {
+    oneof page {
+        UpdateImagePage image_page = 1;
+        UpdateVideoPage video_page = 2;
+        UpdatePDFPage pdf_page = 3;
+    }
+}
+
+message UpdatePageResponse {
+    int64 id = 1; // ID of the updated page.
+    bool success = 2;
+}
+
+message DeletePageRequest {
+    int64 id = 1; // ID of the page to delete.
+}
+
+message DeletePageResponse {
+    bool success = 1; // Indicates if the page was successfully deleted.
+}
+
+message Channel {
+    int64 id = 1; // ID of the channel.
+    string name = 2; // Name of the channel.
+    string description = 3; // Description of the channel.
+    int64 created_by = 4; // User ID who creates the channel.
+    int64 last_modified_by = 5; // ID of the user who modified the channel.
+    google.protobuf.Timestamp created_at = 6; // Timestamp when the channel was created.
+    google.protobuf.Timestamp modified = 7; // Timestamp when the channel was last modified.
+}
+
+message ChannelWithPlans {
+    int64 id = 1; // ID of the channel.
+    string name = 2; // Name of the channel.
+    string description = 3; // Description of the channel.
+    int64 created_by = 4; // User ID who creates the channel.
+    int64 last_modified_by = 5; // ID of the user who modified the channel.
+    google.protobuf.Timestamp created_at = 6; // Timestamp when the channel was created.
+    google.protobuf.Timestamp modified = 7; // Timestamp when the channel was last modified.
+    repeated Plan plans = 8;
+}
+
+message CreateChannelRequest {
+    string name = 1; // Name of the channel.
+    string description = 2; // Description of the channel.
+    int64 created_by = 3; // User ID who creates the channel.
+    int64 last_modified_by = 4; // ID of the user who modified the channel.
+}
+
+message CreateChannelResponse {
+    int64 id = 1; // ID of the new channel.
+}
+
+message GetChannelRequest {
+    int64 id = 1; // ID of the channel to retrieve.
+}
+
+message GetChannelResponse {
+    ChannelWithPlans channel = 1; // The retrieved channel.
+}
+
+message GetChannelsRequest {
+    int64 limit = 1; // Limit for pagination.
+    int64 offset = 2; // Offset for pagination.
+}
+
+message GetChannelsResponse {
+    repeated Channel channels = 1; // The retrieved list of channels.
+}
+
+message UpdateChannelRequest {
+    int64 id = 1; // ID of the channel.
+    optional string name = 2; // Name of the channel.
+    optional string description = 3; // Description of the channel.
+    int64 last_modified_by = 4; // ID of the user who modified the channel.
+}
+
+message UpdateChannelResponse {
+    int64 id = 1; // ID of the updated channel .
+}
+
+message DeleteChannelRequest {
+    int64 id = 1; // ID of the channel to delete.
+}
+
+message DeleteChannelResponse {
+    bool success = 1; // Indicates if the channel was successfully deleted.
+}
+
+message Plan {
+    int64 id = 1; // ID of the plan.
+    string name = 2; // Name of the plan.
+    string description = 3; // Description of the plan.
+    int64 created_by = 4; // User ID who creates the plan.
+    int64 last_modified_by = 5; // ID of the user who modified the plan.
+    bool is_published = 6; //
+    bool public = 7; // 
+    google.protobuf.Timestamp created_at = 8; // Timestamp when the plan was created.
+    google.protobuf.Timestamp modified = 9; // Timestamp when the plan was last modified.
+}
+
+message CreatePlanRequest {
+    string name = 1; // Name of the plan.
+    string description = 2; // Description of the plan.
+    int64 created_by = 3; // User ID who creates the plan.
+    int64 last_modified_by = 4; // ID of the user who modified the plan.
+    int64 channel_id = 5; // Сhannel ID within which the plan is created.
+}
+
+message CreatePlanResponse {
+    int64 id = 1; // ID of the new plan.
+}
+
+message GetPlanRequest {
+    int64 id = 1; // ID of the plan to retrieve.
+}
+
+message GetPlanResponse {
+    Plan plan = 1; // The retrieved plan.
+}
+
+message GetPlansRequest {
+    int64 channel_id = 1; // ID of the channel that includes the plans.
+    int64 limit = 2; // Limit for pagination.
+    int64 offset = 3; // Offset for pagination.
+}
+
+message GetPlansResponse {
+    repeated Plan plans = 1; // The retrieved list of plan.
+}
+
+message UpdatePlanRequest {
+    int64 id = 1; // ID of the plan.
+    optional string name = 2; // Name of the plan.
+    optional string description = 3; // Description of the plan.
+    int64 last_modified_by = 4; // ID of the user who modified the plan.
+    optional bool is_published = 5; // Has the plan been published.
+    optional bool public = 6; // Is the plan public.
+}
+
+message UpdatePlanResponse {
+    int64 id = 1; // ID of the updated plan.
+}
+
+message DeletePlanRequest {
+    int64 id = 1; // ID of the plan to delete.
+}
+
+message DeletePlanResponse {
+    bool success = 1; // Indicates if the plan was successfully deleted.
+}
+
+message Lesson {
+    int64 id = 1; // ID of the lesson.
+    string name = 2; // Name of the lesson.
+    int64 created_by = 3; // User ID who creates the lesson.
+    int64 last_modified_by = 4; // ID of the user who modified the lesson.
+    google.protobuf.Timestamp created_at = 5; // Timestamp when the lesson was created.
+    google.protobuf.Timestamp modified = 6; // Timestamp when the lesson was last modified.
+}
+
+message CreateLessonRequest {
+    string name = 1; // Name of the lesson.
+    string description = 2; // Description of the lesson.
+    int64 created_by = 3; // User ID who creates the lesson.
+    int64 last_modified_by = 4; // ID of the user who modified the lesson.
+    int64 plan_id = 5; // Plan ID within which the lesson is created.
+}
+
+message CreateLessonResponse {
+    int64 id = 1; // ID of the new lesson.
+}
+
+message GetLessonRequest {
+    int64 id = 1; // ID of the lesson to retrieve.
+}
+
+message GetLessonResponse {
+    Lesson lesson = 1; // The retrieved lesson.
+}
+
+message GetLessonsRequest {
+    int64 plan_id = 1; // ID of the plan that includes the lesson.
+    int64 limit = 2; // Limit for pagination.
+    int64 offset = 3; // Offset for pagination.
+}
+
+message GetLessonsResponse {
+    repeated Lesson lessons = 1; // The retrieved list of lesson.
+}
+
+message UpdateLessonRequest {
+    int64 id = 1; // ID of the lesson.
+    optional string name = 2; // Name of the lesson.
+    int64 last_modified_by = 3; // ID of the user who modified the lesson.
+}
+
+message UpdateLessonResponse {
+    int64 id = 1; // ID of the updated lesson.
+}
+
+message DeleteLessonRequest {
+    int64 id = 1; // ID of the lesson to delete.
+}
+
+message DeleteLessonResponse {
+    bool success = 1; // Indicates if the lesson was successfully deleted.
+}
+
+enum QuestionType {
+    QUESTION_TYPE_UNSPECIFIED = 0;
+    MULTICHOICE = 1;
+}
+
+enum Answer {
+    ANSWER_UNSPECIFIED = 0;
+    OPTION_A = 1;
+    OPTION_B = 2;
+    OPTION_C = 3;
+    OPTION_D = 4;
+    OPTION_E = 5;
+}
+
+message QuestionPage {
+    int64 id = 1; // ID of the page.
+    int64 lesson_id = 2; // Lesson ID within which the page is created.
+    int64 created_by = 3; // User ID who creates the page.
+    int64 last_modified_by = 4; // ID of the user who modified the page.
+    google.protobuf.Timestamp created_at = 5; // Timestamp when the page was created.
+    google.protobuf.Timestamp modified = 6; // Timestamp when the page was last modified.
+    ContentType content_type = 7; // Сontent type of page
+    QuestionType question_type = 8; // Question type for question
+    string question = 9; // Question.
+    string option_a = 10; // Option answer.
+    string option_b = 11; // Option answer.
+    string option_c = 12; // Option answer.
+    string option_d = 13; // Option answer.
+    string option_e = 14; // Option answer.
+    string answer = 15; // Answer for question.
+}
+
+message CreateQuestionPageRequest {
+    int64 lesson_id = 1; // Lesson ID within which the page is created.
+    int64 created_by = 2; // User ID who creates the lesson.
+    int64 last_modified_by = 3; // ID of the user who modified the page.
+    string question = 6; // Question.
+    string option_a = 7; // Option answer.
+    string option_b = 8; // Option answer.
+    optional string option_c = 9; // Option answer.
+    optional string option_d = 10; // Option answer.
+    optional string option_e = 11; // Option answer.
+    Answer answer = 12; // Answer for question.
+}
+
+message CreateQuestionPageResponse {
+    int64 id = 1; // ID of the new question page.
+}
+
+message GetQuestionPageRequest {
+    int64 id = 1; // ID of the question page to retrieve.
+}
+
+message GetQuestionPageResponse {
+    QuestionPage question_page = 1; // The retrieved question page.
+}
+
+message UpdateQuestionPageRequest {
+    int64 id = 1; // ID of the lesson.
+    int64 last_modified_by = 2; // ID of the user who modified the lesson.
+    optional string question = 3;
+    optional string option_a = 4;
+    optional string option_b = 5;
+    optional string option_c = 6;
+    optional string option_d = 7;
+    optional string option_e = 8;
+    optional Answer answer = 9;
+}
+
+message UpdateQuestionPageResponse {
+    int64 id = 1; // ID of the updated pdf page.
+}
+
+message CreateAttemptRequest {
+    int64 lesson_id = 1;
+    int64 plan_id = 2;
+    int64 channel_id = 3;
+    int64 user_id = 4;
+}
+
+message CreateAttemptResponse{
+    int64 id = 1; // ID of the created attempt.
+    bool success = 2;
+}
