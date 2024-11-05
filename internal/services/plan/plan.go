@@ -2,6 +2,7 @@ package plan
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -13,9 +14,16 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+const (
+	exchangePlan   = "share"
+	queuePlan      = "plan"
+	planRoutingKey = "plan"
+)
+
 type PlanSaver interface {
 	CreatePlan(ctx context.Context, plan plans.CreatePlan) (int64, error)
 	UpdatePlan(ctx context.Context, updPlan plans.UpdatePlanRequest) (int64, error)
+	SharePlanWithUser(ctx context.Context, s plans.DBSharePlanForUser) error
 }
 
 type PlanProvider interface {
@@ -26,6 +34,11 @@ type PlanDel interface {
 	DeletePlan(ctx context.Context, id int64) error
 }
 
+type RabbitMQQueues interface {
+	Publish(ctx context.Context, exchange, routingKey string, body []byte) error
+	PublishToQueue(ctx context.Context, queueName string, body []byte) error
+}
+
 var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrInvalidPlanID      = errors.New("invalid plan id")
@@ -34,11 +47,12 @@ var (
 )
 
 type PlanHandlers struct {
-	log          *slog.Logger
-	validator    *validator.Validate
-	planSaver    PlanSaver
-	planProvider PlanProvider
-	planDel      PlanDel
+	log            *slog.Logger
+	validator      *validator.Validate
+	planSaver      PlanSaver
+	planProvider   PlanProvider
+	planDel        PlanDel
+	rabbitMQQueues RabbitMQQueues
 }
 
 func New(
@@ -47,13 +61,15 @@ func New(
 	planSaver PlanSaver,
 	planProvider PlanProvider,
 	planDel PlanDel,
+	rabbitMQQueues RabbitMQQueues,
 ) *PlanHandlers {
 	return &PlanHandlers{
-		log:          log,
-		validator:    validator,
-		planSaver:    planSaver,
-		planProvider: planProvider,
-		planDel:      planDel,
+		log:            log,
+		validator:      validator,
+		planSaver:      planSaver,
+		planProvider:   planProvider,
+		planDel:        planDel,
+		rabbitMQQueues: rabbitMQQueues,
 	}
 }
 
@@ -213,6 +229,39 @@ func (ph *PlanHandlers) DeletePlan(ctx context.Context, planID int64) error {
 		log.Error("failed to delete plan", slog.String("err", err.Error()))
 		return fmt.Errorf("%s: %w", op, err)
 	}
+
+	return nil
+}
+
+// SharePlanWithUser sharing channel with lerning group
+func (chh *PlanHandlers) SharePlanWithUser(ctx context.Context, s plans.SharePlanForUsers) error {
+	const op = "plan.SharePlanWithUser"
+
+	log := chh.log.With(
+		slog.String("op", op),
+		slog.Int64("plan_id", s.PlanID),
+		slog.String("created_by", s.CreatedBy),
+	)
+
+	// Validation
+	err := chh.validator.Struct(s)
+	if err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	msgBody, err := json.Marshal(s)
+	if err != nil {
+		chh.log.Error("err to marshal shared msg", slog.String("err", err.Error()))
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err = chh.rabbitMQQueues.Publish(ctx, exchangePlan, planRoutingKey, msgBody); err != nil {
+		chh.log.Error("err send sharing plan to exchange", slog.String("err", err.Error()))
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("plan sent to share with users")
 
 	return nil
 }

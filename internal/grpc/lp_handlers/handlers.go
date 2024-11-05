@@ -19,6 +19,7 @@ type ChannelHandlers interface {
 	GetChannels(ctx context.Context, limit, offset int64) ([]channels.Channel, error)
 	UpdateChannel(ctx context.Context, updChannel channels.UpdateChannelRequest) (int64, error)
 	DeleteChannel(ctx context.Context, channelID int64) error
+	ShareChannelToGroup(ctx context.Context, s channels.ShareChannelToGroup) error
 }
 
 type PlanHandlers interface {
@@ -27,6 +28,7 @@ type PlanHandlers interface {
 	GetPlans(ctx context.Context, channel_id int64, limit, offset int64) ([]plans.Plan, error)
 	UpdatePlan(ctx context.Context, updPlan plans.UpdatePlanRequest) (int64, error)
 	DeletePlan(ctx context.Context, planID int64) error
+	SharePlanWithUser(ctx context.Context, s plans.SharePlanForUsers) error
 }
 
 type LessonHandlers interface {

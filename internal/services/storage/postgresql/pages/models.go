@@ -22,8 +22,8 @@ type UpdatePage interface {
 type BasePage struct {
 	ID             int64     `json:"id"`
 	LessonID       int64     `json:"lesson_id"`
-	CreatedBy      int64     `json:"created_by"`
-	LastModifiedBy int64     `json:"last_modified_by"`
+	CreatedBy      string    `json:"created_by"`
+	LastModifiedBy string    `json:"last_modified_by"`
 	CreatedAt      time.Time `json:"created_at"`
 	Modified       time.Time `json:"modified"`
 	ContentType    string    `json:"content_type"`
@@ -49,8 +49,8 @@ type PDFPage struct {
 
 type CreateBasePage struct {
 	LessonID       int64  `json:"lesson_id"`
-	CreatedBy      int64  `json:"created_by"`
-	LastModifiedBy int64  `json:"last_modified_by"`
+	CreatedBy      string `json:"created_by"`
+	LastModifiedBy string `json:"last_modified_by"`
 	ContentType    string `json:"content_type"`
 }
 
@@ -73,7 +73,7 @@ type CreatePDFPage struct {
 
 type UpdateBasePage struct {
 	ID             int64  `json:"id" validate:"required"`
-	LastModifiedBy int64  `json:"last_modified_by" validate:"required"`
+	LastModifiedBy string `json:"last_modified_by" validate:"required"`
 	ContentType    string `json:"content_type" validate:"required"`
 }
 
@@ -98,8 +98,8 @@ type UpdatePDFPage struct {
 type DBBasePage struct {
 	ID             int64     `db:"id"`
 	LessonID       int64     `db:"lesson_id"`
-	CreatedBy      int64     `db:"created_by"`
-	LastModifiedBy int64     `db:"last_modified_by"`
+	CreatedBy      string    `db:"created_by"`
+	LastModifiedBy string    `db:"last_modified_by"`
 	CreatedAt      time.Time `db:"created_at"`
 	Modified       time.Time `db:"modified"`
 	ContentType    string    `db:"content_type"`

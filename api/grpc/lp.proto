@@ -12,12 +12,14 @@ service LearningPlatform {
     rpc GetChannels (GetChannelsRequest) returns (GetChannelsResponse);
     rpc UpdateChannel (UpdateChannelRequest) returns (UpdateChannelResponse);
     rpc DeleteChannel (DeleteChannelRequest) returns (DeleteChannelResponse);
+    rpc ShareChannelToGroup (ShareChannelToGroupRequest) returns (ShareChannelToGroupResponse);
 
     rpc CreatePlan (CreatePlanRequest) returns (CreatePlanResponse);
     rpc GetPlan (GetPlanRequest) returns (GetPlanResponse);
     rpc GetPlans (GetPlansRequest) returns (GetPlansResponse);
     rpc UpdatePlan (UpdatePlanRequest) returns (UpdatePlanResponse);
     rpc DeletePlan (DeletePlanRequest) returns (DeletePlanResponse);
+    rpc SharePlanWithUsers (SharePlanWithUsersRequest) returns (SharePlanWithUsersResponse);
 
     rpc CreateLesson (CreateLessonRequest) returns (CreateLessonResponse);
     rpc GetLesson (GetLessonRequest) returns (GetLessonResponse);
@@ -49,8 +51,8 @@ enum ContentType {
 message BasePage {
     int64 id = 1;
     int64 lesson_id = 2;
-    int64 created_by = 3;
-    int64 last_modified_by = 4;
+    string created_by = 3;
+    string last_modified_by = 4;
     google.protobuf.Timestamp created_at = 5;
     google.protobuf.Timestamp modified = 6;
     ContentType content_type = 7;
@@ -58,13 +60,13 @@ message BasePage {
 
 message CreateBasePage {
     int64 lesson_id = 1;
-    int64 created_by = 2;
-    int64 last_modified_by = 3;
+    string created_by = 2;
+    string last_modified_by = 3;
 }
 
 message UpdateBasePage {
     int64 id = 1;
-    int64 last_modified_by = 2;
+    string last_modified_by = 2;
 }
 
 message ImagePage {
@@ -181,8 +183,8 @@ message Channel {
     int64 id = 1; // ID of the channel.
     string name = 2; // Name of the channel.
     string description = 3; // Description of the channel.
-    int64 created_by = 4; // User ID who creates the channel.
-    int64 last_modified_by = 5; // ID of the user who modified the channel.
+    string created_by = 4; // User ID who creates the channel.
+    string last_modified_by = 5; // ID of the user who modified the channel.
     google.protobuf.Timestamp created_at = 6; // Timestamp when the channel was created.
     google.protobuf.Timestamp modified = 7; // Timestamp when the channel was last modified.
 }
@@ -191,8 +193,8 @@ message ChannelWithPlans {
     int64 id = 1; // ID of the channel.
     string name = 2; // Name of the channel.
     string description = 3; // Description of the channel.
-    int64 created_by = 4; // User ID who creates the channel.
-    int64 last_modified_by = 5; // ID of the user who modified the channel.
+    string created_by = 4; // User ID who creates the channel.
+    string last_modified_by = 5; // ID of the user who modified the channel.
     google.protobuf.Timestamp created_at = 6; // Timestamp when the channel was created.
     google.protobuf.Timestamp modified = 7; // Timestamp when the channel was last modified.
     repeated Plan plans = 8;
@@ -201,8 +203,8 @@ message ChannelWithPlans {
 message CreateChannelRequest {
     string name = 1; // Name of the channel.
     string description = 2; // Description of the channel.
-    int64 created_by = 3; // User ID who creates the channel.
-    int64 last_modified_by = 4; // ID of the user who modified the channel.
+    string created_by = 3; // User ID who creates the channel.
+    string last_modified_by = 4; // ID of the user who modified the channel.
 }
 
 message CreateChannelResponse {
@@ -230,7 +232,7 @@ message UpdateChannelRequest {
     int64 id = 1; // ID of the channel.
     optional string name = 2; // Name of the channel.
     optional string description = 3; // Description of the channel.
-    int64 last_modified_by = 4; // ID of the user who modified the channel.
+    string last_modified_by = 4; // ID of the user who modified the channel.
 }
 
 message UpdateChannelResponse {
@@ -245,12 +247,22 @@ message DeleteChannelResponse {
     bool success = 1; // Indicates if the channel was successfully deleted.
 }
 
+message ShareChannelToGroupRequest {
+    int64 channel_id = 1;
+    repeated string lgroups_ids = 2;
+    string created_by = 3;
+}
+
+message ShareChannelToGroupResponse {
+    bool success = 1; // Indicates if the channel was successfully shared.
+}
+
 message Plan {
     int64 id = 1; // ID of the plan.
     string name = 2; // Name of the plan.
     string description = 3; // Description of the plan.
-    int64 created_by = 4; // User ID who creates the plan.
-    int64 last_modified_by = 5; // ID of the user who modified the plan.
+    string created_by = 4; // User ID who creates the plan.
+    string last_modified_by = 5; // ID of the user who modified the plan.
     bool is_published = 6; //
     bool public = 7; // 
     google.protobuf.Timestamp created_at = 8; // Timestamp when the plan was created.
@@ -260,8 +272,8 @@ message Plan {
 message CreatePlanRequest {
     string name = 1; // Name of the plan.
     string description = 2; // Description of the plan.
-    int64 created_by = 3; // User ID who creates the plan.
-    int64 last_modified_by = 4; // ID of the user who modified the plan.
+    string created_by = 3; // User ID who creates the plan.
+    string last_modified_by = 4; // ID of the user who modified the plan.
     int64 channel_id = 5; // Сhannel ID within which the plan is created.
 }
 
@@ -291,7 +303,7 @@ message UpdatePlanRequest {
     int64 id = 1; // ID of the plan.
     optional string name = 2; // Name of the plan.
     optional string description = 3; // Description of the plan.
-    int64 last_modified_by = 4; // ID of the user who modified the plan.
+    string last_modified_by = 4; // ID of the user who modified the plan.
     optional bool is_published = 5; // Has the plan been published.
     optional bool public = 6; // Is the plan public.
 }
@@ -308,11 +320,21 @@ message DeletePlanResponse {
     bool success = 1; // Indicates if the plan was successfully deleted.
 }
 
+message SharePlanWithUsersRequest {
+    int64 plan_id = 1;
+    repeated string users_ids = 2;
+    string created_by = 3;
+}
+
+message SharePlanWithUsersResponse {
+    bool success = 1; // Indicates if the plan was successfully shared.
+}
+
 message Lesson {
     int64 id = 1; // ID of the lesson.
     string name = 2; // Name of the lesson.
-    int64 created_by = 3; // User ID who creates the lesson.
-    int64 last_modified_by = 4; // ID of the user who modified the lesson.
+    string created_by = 3; // User ID who creates the lesson.
+    string last_modified_by = 4; // ID of the user who modified the lesson.
     google.protobuf.Timestamp created_at = 5; // Timestamp when the lesson was created.
     google.protobuf.Timestamp modified = 6; // Timestamp when the lesson was last modified.
 }
@@ -320,8 +342,8 @@ message Lesson {
 message CreateLessonRequest {
     string name = 1; // Name of the lesson.
     string description = 2; // Description of the lesson.
-    int64 created_by = 3; // User ID who creates the lesson.
-    int64 last_modified_by = 4; // ID of the user who modified the lesson.
+    string created_by = 3; // User ID who creates the lesson.
+    string last_modified_by = 4; // ID of the user who modified the lesson.
     int64 plan_id = 5; // Plan ID within which the lesson is created.
 }
 
@@ -350,7 +372,7 @@ message GetLessonsResponse {
 message UpdateLessonRequest {
     int64 id = 1; // ID of the lesson.
     optional string name = 2; // Name of the lesson.
-    int64 last_modified_by = 3; // ID of the user who modified the lesson.
+    string last_modified_by = 3; // ID of the user who modified the lesson.
 }
 
 message UpdateLessonResponse {
@@ -382,8 +404,8 @@ enum Answer {
 message QuestionPage {
     int64 id = 1; // ID of the page.
     int64 lesson_id = 2; // Lesson ID within which the page is created.
-    int64 created_by = 3; // User ID who creates the page.
-    int64 last_modified_by = 4; // ID of the user who modified the page.
+    string created_by = 3; // User ID who creates the page.
+    string last_modified_by = 4; // ID of the user who modified the page.
     google.protobuf.Timestamp created_at = 5; // Timestamp when the page was created.
     google.protobuf.Timestamp modified = 6; // Timestamp when the page was last modified.
     ContentType content_type = 7; // Сontent type of page
@@ -399,8 +421,8 @@ message QuestionPage {
 
 message CreateQuestionPageRequest {
     int64 lesson_id = 1; // Lesson ID within which the page is created.
-    int64 created_by = 2; // User ID who creates the lesson.
-    int64 last_modified_by = 3; // ID of the user who modified the page.
+    string created_by = 2; // User ID who creates the lesson.
+    string last_modified_by = 3; // ID of the user who modified the page.
     string question = 6; // Question.
     string option_a = 7; // Option answer.
     string option_b = 8; // Option answer.
@@ -424,7 +446,7 @@ message GetQuestionPageResponse {
 
 message UpdateQuestionPageRequest {
     int64 id = 1; // ID of the lesson.
-    int64 last_modified_by = 2; // ID of the user who modified the lesson.
+    string last_modified_by = 2; // ID of the user who modified the lesson.
     optional string question = 3;
     optional string option_a = 4;
     optional string option_b = 5;
@@ -442,7 +464,7 @@ message CreateAttemptRequest {
     int64 lesson_id = 1;
     int64 plan_id = 2;
     int64 channel_id = 3;
-    int64 user_id = 4;
+    string user_id = 4;
 }
 
 message CreateAttemptResponse{

@@ -19,30 +19,32 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	LearningPlatform_CreateChannel_FullMethodName      = "/lp.v1.LearningPlatform/CreateChannel"
-	LearningPlatform_GetChannel_FullMethodName         = "/lp.v1.LearningPlatform/GetChannel"
-	LearningPlatform_GetChannels_FullMethodName        = "/lp.v1.LearningPlatform/GetChannels"
-	LearningPlatform_UpdateChannel_FullMethodName      = "/lp.v1.LearningPlatform/UpdateChannel"
-	LearningPlatform_DeleteChannel_FullMethodName      = "/lp.v1.LearningPlatform/DeleteChannel"
-	LearningPlatform_CreatePlan_FullMethodName         = "/lp.v1.LearningPlatform/CreatePlan"
-	LearningPlatform_GetPlan_FullMethodName            = "/lp.v1.LearningPlatform/GetPlan"
-	LearningPlatform_GetPlans_FullMethodName           = "/lp.v1.LearningPlatform/GetPlans"
-	LearningPlatform_UpdatePlan_FullMethodName         = "/lp.v1.LearningPlatform/UpdatePlan"
-	LearningPlatform_DeletePlan_FullMethodName         = "/lp.v1.LearningPlatform/DeletePlan"
-	LearningPlatform_CreateLesson_FullMethodName       = "/lp.v1.LearningPlatform/CreateLesson"
-	LearningPlatform_GetLesson_FullMethodName          = "/lp.v1.LearningPlatform/GetLesson"
-	LearningPlatform_GetLessons_FullMethodName         = "/lp.v1.LearningPlatform/GetLessons"
-	LearningPlatform_UpdateLesson_FullMethodName       = "/lp.v1.LearningPlatform/UpdateLesson"
-	LearningPlatform_DeleteLesson_FullMethodName       = "/lp.v1.LearningPlatform/DeleteLesson"
-	LearningPlatform_CreatePage_FullMethodName         = "/lp.v1.LearningPlatform/CreatePage"
-	LearningPlatform_GetPage_FullMethodName            = "/lp.v1.LearningPlatform/GetPage"
-	LearningPlatform_GetPages_FullMethodName           = "/lp.v1.LearningPlatform/GetPages"
-	LearningPlatform_UpdatePage_FullMethodName         = "/lp.v1.LearningPlatform/UpdatePage"
-	LearningPlatform_DeletePage_FullMethodName         = "/lp.v1.LearningPlatform/DeletePage"
-	LearningPlatform_CreateQuestionPage_FullMethodName = "/lp.v1.LearningPlatform/CreateQuestionPage"
-	LearningPlatform_GetQuestionPage_FullMethodName    = "/lp.v1.LearningPlatform/GetQuestionPage"
-	LearningPlatform_UpdateQuestionPage_FullMethodName = "/lp.v1.LearningPlatform/UpdateQuestionPage"
-	LearningPlatform_CreateAttempt_FullMethodName      = "/lp.v1.LearningPlatform/CreateAttempt"
+	LearningPlatform_CreateChannel_FullMethodName       = "/lp.v1.LearningPlatform/CreateChannel"
+	LearningPlatform_GetChannel_FullMethodName          = "/lp.v1.LearningPlatform/GetChannel"
+	LearningPlatform_GetChannels_FullMethodName         = "/lp.v1.LearningPlatform/GetChannels"
+	LearningPlatform_UpdateChannel_FullMethodName       = "/lp.v1.LearningPlatform/UpdateChannel"
+	LearningPlatform_DeleteChannel_FullMethodName       = "/lp.v1.LearningPlatform/DeleteChannel"
+	LearningPlatform_ShareChannelToGroup_FullMethodName = "/lp.v1.LearningPlatform/ShareChannelToGroup"
+	LearningPlatform_CreatePlan_FullMethodName          = "/lp.v1.LearningPlatform/CreatePlan"
+	LearningPlatform_GetPlan_FullMethodName             = "/lp.v1.LearningPlatform/GetPlan"
+	LearningPlatform_GetPlans_FullMethodName            = "/lp.v1.LearningPlatform/GetPlans"
+	LearningPlatform_UpdatePlan_FullMethodName          = "/lp.v1.LearningPlatform/UpdatePlan"
+	LearningPlatform_DeletePlan_FullMethodName          = "/lp.v1.LearningPlatform/DeletePlan"
+	LearningPlatform_SharePlanWithUsers_FullMethodName  = "/lp.v1.LearningPlatform/SharePlanWithUsers"
+	LearningPlatform_CreateLesson_FullMethodName        = "/lp.v1.LearningPlatform/CreateLesson"
+	LearningPlatform_GetLesson_FullMethodName           = "/lp.v1.LearningPlatform/GetLesson"
+	LearningPlatform_GetLessons_FullMethodName          = "/lp.v1.LearningPlatform/GetLessons"
+	LearningPlatform_UpdateLesson_FullMethodName        = "/lp.v1.LearningPlatform/UpdateLesson"
+	LearningPlatform_DeleteLesson_FullMethodName        = "/lp.v1.LearningPlatform/DeleteLesson"
+	LearningPlatform_CreatePage_FullMethodName          = "/lp.v1.LearningPlatform/CreatePage"
+	LearningPlatform_GetPage_FullMethodName             = "/lp.v1.LearningPlatform/GetPage"
+	LearningPlatform_GetPages_FullMethodName            = "/lp.v1.LearningPlatform/GetPages"
+	LearningPlatform_UpdatePage_FullMethodName          = "/lp.v1.LearningPlatform/UpdatePage"
+	LearningPlatform_DeletePage_FullMethodName          = "/lp.v1.LearningPlatform/DeletePage"
+	LearningPlatform_CreateQuestionPage_FullMethodName  = "/lp.v1.LearningPlatform/CreateQuestionPage"
+	LearningPlatform_GetQuestionPage_FullMethodName     = "/lp.v1.LearningPlatform/GetQuestionPage"
+	LearningPlatform_UpdateQuestionPage_FullMethodName  = "/lp.v1.LearningPlatform/UpdateQuestionPage"
+	LearningPlatform_CreateAttempt_FullMethodName       = "/lp.v1.LearningPlatform/CreateAttempt"
 )
 
 // LearningPlatformClient is the client API for LearningPlatform service.
@@ -54,11 +56,13 @@ type LearningPlatformClient interface {
 	GetChannels(ctx context.Context, in *GetChannelsRequest, opts ...grpc.CallOption) (*GetChannelsResponse, error)
 	UpdateChannel(ctx context.Context, in *UpdateChannelRequest, opts ...grpc.CallOption) (*UpdateChannelResponse, error)
 	DeleteChannel(ctx context.Context, in *DeleteChannelRequest, opts ...grpc.CallOption) (*DeleteChannelResponse, error)
+	ShareChannelToGroup(ctx context.Context, in *ShareChannelToGroupRequest, opts ...grpc.CallOption) (*ShareChannelToGroupResponse, error)
 	CreatePlan(ctx context.Context, in *CreatePlanRequest, opts ...grpc.CallOption) (*CreatePlanResponse, error)
 	GetPlan(ctx context.Context, in *GetPlanRequest, opts ...grpc.CallOption) (*GetPlanResponse, error)
 	GetPlans(ctx context.Context, in *GetPlansRequest, opts ...grpc.CallOption) (*GetPlansResponse, error)
 	UpdatePlan(ctx context.Context, in *UpdatePlanRequest, opts ...grpc.CallOption) (*UpdatePlanResponse, error)
 	DeletePlan(ctx context.Context, in *DeletePlanRequest, opts ...grpc.CallOption) (*DeletePlanResponse, error)
+	SharePlanWithUsers(ctx context.Context, in *SharePlanWithUsersRequest, opts ...grpc.CallOption) (*SharePlanWithUsersResponse, error)
 	CreateLesson(ctx context.Context, in *CreateLessonRequest, opts ...grpc.CallOption) (*CreateLessonResponse, error)
 	GetLesson(ctx context.Context, in *GetLessonRequest, opts ...grpc.CallOption) (*GetLessonResponse, error)
 	GetLessons(ctx context.Context, in *GetLessonsRequest, opts ...grpc.CallOption) (*GetLessonsResponse, error)
@@ -133,6 +137,16 @@ func (c *learningPlatformClient) DeleteChannel(ctx context.Context, in *DeleteCh
 	return out, nil
 }
 
+func (c *learningPlatformClient) ShareChannelToGroup(ctx context.Context, in *ShareChannelToGroupRequest, opts ...grpc.CallOption) (*ShareChannelToGroupResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShareChannelToGroupResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_ShareChannelToGroup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *learningPlatformClient) CreatePlan(ctx context.Context, in *CreatePlanRequest, opts ...grpc.CallOption) (*CreatePlanResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreatePlanResponse)
@@ -177,6 +191,16 @@ func (c *learningPlatformClient) DeletePlan(ctx context.Context, in *DeletePlanR
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeletePlanResponse)
 	err := c.cc.Invoke(ctx, LearningPlatform_DeletePlan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *learningPlatformClient) SharePlanWithUsers(ctx context.Context, in *SharePlanWithUsersRequest, opts ...grpc.CallOption) (*SharePlanWithUsersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SharePlanWithUsersResponse)
+	err := c.cc.Invoke(ctx, LearningPlatform_SharePlanWithUsers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -332,11 +356,13 @@ type LearningPlatformServer interface {
 	GetChannels(context.Context, *GetChannelsRequest) (*GetChannelsResponse, error)
 	UpdateChannel(context.Context, *UpdateChannelRequest) (*UpdateChannelResponse, error)
 	DeleteChannel(context.Context, *DeleteChannelRequest) (*DeleteChannelResponse, error)
+	ShareChannelToGroup(context.Context, *ShareChannelToGroupRequest) (*ShareChannelToGroupResponse, error)
 	CreatePlan(context.Context, *CreatePlanRequest) (*CreatePlanResponse, error)
 	GetPlan(context.Context, *GetPlanRequest) (*GetPlanResponse, error)
 	GetPlans(context.Context, *GetPlansRequest) (*GetPlansResponse, error)
 	UpdatePlan(context.Context, *UpdatePlanRequest) (*UpdatePlanResponse, error)
 	DeletePlan(context.Context, *DeletePlanRequest) (*DeletePlanResponse, error)
+	SharePlanWithUsers(context.Context, *SharePlanWithUsersRequest) (*SharePlanWithUsersResponse, error)
 	CreateLesson(context.Context, *CreateLessonRequest) (*CreateLessonResponse, error)
 	GetLesson(context.Context, *GetLessonRequest) (*GetLessonResponse, error)
 	GetLessons(context.Context, *GetLessonsRequest) (*GetLessonsResponse, error)
@@ -376,6 +402,9 @@ func (UnimplementedLearningPlatformServer) UpdateChannel(context.Context, *Updat
 func (UnimplementedLearningPlatformServer) DeleteChannel(context.Context, *DeleteChannelRequest) (*DeleteChannelResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteChannel not implemented")
 }
+func (UnimplementedLearningPlatformServer) ShareChannelToGroup(context.Context, *ShareChannelToGroupRequest) (*ShareChannelToGroupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ShareChannelToGroup not implemented")
+}
 func (UnimplementedLearningPlatformServer) CreatePlan(context.Context, *CreatePlanRequest) (*CreatePlanResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePlan not implemented")
 }
@@ -390,6 +419,9 @@ func (UnimplementedLearningPlatformServer) UpdatePlan(context.Context, *UpdatePl
 }
 func (UnimplementedLearningPlatformServer) DeletePlan(context.Context, *DeletePlanRequest) (*DeletePlanResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePlan not implemented")
+}
+func (UnimplementedLearningPlatformServer) SharePlanWithUsers(context.Context, *SharePlanWithUsersRequest) (*SharePlanWithUsersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SharePlanWithUsers not implemented")
 }
 func (UnimplementedLearningPlatformServer) CreateLesson(context.Context, *CreateLessonRequest) (*CreateLessonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateLesson not implemented")
@@ -544,6 +576,24 @@ func _LearningPlatform_DeleteChannel_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _LearningPlatform_ShareChannelToGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShareChannelToGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).ShareChannelToGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_ShareChannelToGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).ShareChannelToGroup(ctx, req.(*ShareChannelToGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _LearningPlatform_CreatePlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreatePlanRequest)
 	if err := dec(in); err != nil {
@@ -630,6 +680,24 @@ func _LearningPlatform_DeletePlan_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(LearningPlatformServer).DeletePlan(ctx, req.(*DeletePlanRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _LearningPlatform_SharePlanWithUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SharePlanWithUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LearningPlatformServer).SharePlanWithUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: LearningPlatform_SharePlanWithUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LearningPlatformServer).SharePlanWithUsers(ctx, req.(*SharePlanWithUsersRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -914,6 +982,10 @@ var LearningPlatform_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _LearningPlatform_DeleteChannel_Handler,
 		},
 		{
+			MethodName: "ShareChannelToGroup",
+			Handler:    _LearningPlatform_ShareChannelToGroup_Handler,
+		},
+		{
 			MethodName: "CreatePlan",
 			Handler:    _LearningPlatform_CreatePlan_Handler,
 		},
@@ -932,6 +1004,10 @@ var LearningPlatform_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePlan",
 			Handler:    _LearningPlatform_DeletePlan_Handler,
+		},
+		{
+			MethodName: "SharePlanWithUsers",
+			Handler:    _LearningPlatform_SharePlanWithUsers_Handler,
 		},
 		{
 			MethodName: "CreateLesson",

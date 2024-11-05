@@ -56,7 +56,7 @@ func (ah *AttemptHandlers) CreateAttempt(ctx context.Context, attempt attempts.C
 	log := ah.log.With(
 		slog.String("op", op),
 		slog.Int64("lesson id", attempt.LessonID),
-		slog.Int64("user id", attempt.UserID),
+		slog.String("user id", attempt.UserID),
 	)
 
 	// Validation

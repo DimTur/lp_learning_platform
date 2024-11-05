@@ -2,6 +2,7 @@ package channel
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -13,9 +14,16 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+const (
+	exchangeChannel   = "share"
+	queueChannel      = "channel"
+	channelRoutingKey = "channel"
+)
+
 type ChannelSaver interface {
 	CreateChannel(ctx context.Context, channel channels.CreateChannel) (int64, error)
 	UpdateChannel(ctx context.Context, updChannel channels.UpdateChannelRequest) (int64, error)
+	ShareChannelToGroup(ctx context.Context, s channels.DBShareChannelToGroup) error
 }
 
 type ChannelProvider interface {
@@ -25,6 +33,11 @@ type ChannelProvider interface {
 
 type ChannelDel interface {
 	DeleteChannel(ctx context.Context, channelID int64) error
+}
+
+type RabbitMQQueues interface {
+	Publish(ctx context.Context, exchange, routingKey string, body []byte) error
+	PublishToQueue(ctx context.Context, queueName string, body []byte) error
 }
 
 var (
@@ -40,6 +53,7 @@ type ChannelHandlers struct {
 	channelSaver    ChannelSaver
 	channelProvider ChannelProvider
 	channelDel      ChannelDel
+	rabbitMQQueues  RabbitMQQueues
 }
 
 func New(
@@ -48,6 +62,7 @@ func New(
 	channelSaver ChannelSaver,
 	channelProvider ChannelProvider,
 	channelDel ChannelDel,
+	rabbitMQQueues RabbitMQQueues,
 ) *ChannelHandlers {
 	return &ChannelHandlers{
 		log:             log,
@@ -55,6 +70,7 @@ func New(
 		channelSaver:    channelSaver,
 		channelProvider: channelProvider,
 		channelDel:      channelDel,
+		rabbitMQQueues:  rabbitMQQueues,
 	}
 }
 
@@ -211,6 +227,39 @@ func (chh *ChannelHandlers) DeleteChannel(ctx context.Context, channelID int64) 
 		log.Error("failed to delete channel", slog.String("err", err.Error()))
 		return fmt.Errorf("%s: %w", op, err)
 	}
+
+	return nil
+}
+
+// ShareChannelToGroup sharing channel with lerning group
+func (chh *ChannelHandlers) ShareChannelToGroup(ctx context.Context, s channels.ShareChannelToGroup) error {
+	const op = "channel.ShareChannelToGroup"
+
+	log := chh.log.With(
+		slog.String("op", op),
+		slog.Int64("channel_id", s.ChannelID),
+		slog.String("created_by", s.CreatedBy),
+	)
+
+	// Validation
+	err := chh.validator.Struct(s)
+	if err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	msgBody, err := json.Marshal(s)
+	if err != nil {
+		chh.log.Error("err to marshal shared msg", slog.String("err", err.Error()))
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err = chh.rabbitMQQueues.Publish(ctx, exchangeChannel, channelRoutingKey, msgBody); err != nil {
+		chh.log.Error("err send sharing channel to exchange", slog.String("err", err.Error()))
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	log.Info("channel sent to share with learning groups")
 
 	return nil
 }
