@@ -20,6 +20,15 @@ type ShareExchange struct {
 	Args        ExchangeArgs `yaml:"args"`
 }
 
+type QueueConfig struct {
+	Name        string    `yaml:"name"`
+	Durable     bool      `yaml:"durable"`
+	AutoDeleted bool      `yaml:"auto_deleted"`
+	Exclusive   bool      `yaml:"exclusive"`
+	NoWait      bool      `yaml:"no_wait"`
+	Args        QueueArgs `yaml:"args"`
+}
+
 type ExchangeArgs struct {
 	AltExchange string `yaml:"alternate_exchange"`
 }

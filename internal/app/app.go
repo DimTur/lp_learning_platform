@@ -10,11 +10,6 @@ import (
 	"github.com/DimTur/lp_learning_platform/internal/services/page"
 	"github.com/DimTur/lp_learning_platform/internal/services/plan"
 	"github.com/DimTur/lp_learning_platform/internal/services/question"
-	attstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
-	lessonstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
-	pagestorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
-	planstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
-	questiontorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/questions"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -22,6 +17,34 @@ type ChannelStorage interface {
 	channel.ChannelSaver
 	channel.ChannelProvider
 	channel.ChannelDel
+}
+
+type PlanlStorage interface {
+	plan.PlanSaver
+	plan.PlanProvider
+	plan.PlanDel
+}
+
+type LessonStorage interface {
+	lesson.LessonSaver
+	lesson.LessonProvider
+	lesson.LessonDel
+}
+
+type PageStorage interface {
+	page.PageSaver
+	page.PageProvider
+	page.PageDel
+}
+
+type QuestionStorage interface {
+	question.QuestionPageSaver
+	question.QuestionPageProvider
+}
+
+type AttemptStorage interface {
+	attempt.AttemptSaver
+	attempt.AttemptProvider
 }
 
 type ChannelRabbitMq interface {
@@ -38,11 +61,11 @@ type App struct {
 
 func NewApp(
 	channelStorage ChannelStorage,
-	planStorage *planstorage.PlansPostgresStorage,
-	lessonStorage *lessonstorage.LessonsPostgresStorage,
-	pageStorage *pagestorage.PagesPostgresStorage,
-	questionStorage *questiontorage.QuestionsPostgresStorage,
-	attemptStorage *attstorage.AttemptsPostgresStorage,
+	planStorage PlanlStorage,
+	lessonStorage LessonStorage,
+	pageStorage PageStorage,
+	questionStorage QuestionStorage,
+	attemptStorage AttemptStorage,
 	channelRabbitMq ChannelRabbitMq,
 	planRabbitMq PlanRabbitMq,
 	grpcAddr string,

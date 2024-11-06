@@ -1,17 +1,9 @@
 package config
 
 type Channel struct {
-	ChannelQueue      ChannelQueue    `yaml:"channel_queue"`
+	ChannelQueue      QueueConfig     `yaml:"channel_queue"`
 	ChannelConsumer   ChannelConsumer `yaml:"channel_consumer"`
 	ChannelRoutingKey string          `yaml:"channel_routing_key"`
-}
-type ChannelQueue struct {
-	Name        string    `yaml:"name"`
-	Durable     bool      `yaml:"durable"`
-	AutoDeleted bool      `yaml:"auto_deleted"`
-	Exclusive   bool      `yaml:"exclusive"`
-	NoWait      bool      `yaml:"no_wait"`
-	Args        QueueArgs `yaml:"args"`
 }
 
 type ChannelConsumer struct {

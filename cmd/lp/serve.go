@@ -1,6 +1,7 @@
 package lp
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
@@ -37,20 +38,12 @@ func NewServeCmd() *cobra.Command {
 			defer cancel()
 			var wg sync.WaitGroup
 
-			cfg, err := config.Parse(configPath)
+			cfg, err := loadConfig(configPath)
 			if err != nil {
 				return err
 			}
 
-			dsn := fmt.Sprintf(
-				"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-				cfg.Storage.User,
-				cfg.Storage.Password,
-				cfg.Storage.Host,
-				cfg.Storage.Port,
-				cfg.Storage.DBName,
-			)
-			storagePool, err := pgxpool.New(ctx, dsn)
+			storagePool, err := initDBConnection(ctx, cfg)
 			if err != nil {
 				return err
 			}
@@ -66,71 +59,32 @@ func NewServeCmd() *cobra.Command {
 			validate := validator.New()
 
 			// Init RabbitMQ
-			rmqUrl := fmt.Sprintf(
-				"amqp://%s:%s@%s:%d/",
-				cfg.RabbitMQ.UserName,
-				cfg.RabbitMQ.Password,
-				cfg.RabbitMQ.Host,
-				cfg.RabbitMQ.Port,
-			)
-			rmq, err := rabbitmq.NewClient(rmqUrl)
+			rmq, err := initRabbitMQ(cfg)
 			if err != nil {
 				log.Error("failed init rabbit mq", slog.Any("err", err))
 			}
 
 			// Declare Share exchange
-			if err := rmq.DeclareExchange(
-				cfg.RabbitMQ.ShareExchange.Name,
-				cfg.RabbitMQ.ShareExchange.Kind,
-				cfg.RabbitMQ.ShareExchange.Durable,
-				cfg.RabbitMQ.ShareExchange.AutoDeleted,
-				cfg.RabbitMQ.ShareExchange.Internal,
-				cfg.RabbitMQ.ShareExchange.NoWait,
-				cfg.RabbitMQ.ShareExchange.Args.ToMap(),
-			); err != nil {
+			if err := declareExchange(rmq, cfg); err != nil {
 				log.Error("failed to declare Share exchange", slog.Any("err", err))
 			}
 
-			// Declare Channel Queue
-			if _, err := rmq.DeclareQueue(
-				cfg.RabbitMQ.Channel.ChannelQueue.Name,
-				cfg.RabbitMQ.Channel.ChannelQueue.Durable,
-				cfg.RabbitMQ.Channel.ChannelQueue.AutoDeleted,
-				cfg.RabbitMQ.Channel.ChannelQueue.Exclusive,
-				cfg.RabbitMQ.Channel.ChannelQueue.NoWait,
-				cfg.RabbitMQ.Channel.ChannelQueue.Args.ToMap(),
-			); err != nil {
-				log.Error("failed to declare Channel queue", slog.Any("err", err))
-			}
-
-			// Bind Channel queue to Share exchange
-			if err := rmq.BindQueueToExchange(
-				cfg.RabbitMQ.Channel.ChannelQueue.Name,
+			// Declare and bind Channel Queue
+			if err = declareQueueAndBind(rmq,
+				cfg.RabbitMQ.Channel.ChannelQueue,
 				cfg.RabbitMQ.ShareExchange.Name,
 				cfg.RabbitMQ.Channel.ChannelRoutingKey,
 			); err != nil {
-				log.Error("failed to bind Channel queue", slog.Any("err", err))
+				log.Error("failed to declare and bind Channel queue", slog.Any("err", err))
 			}
 
-			// Declare Plan Queue
-			if _, err := rmq.DeclareQueue(
-				cfg.RabbitMQ.Plan.PlanQueue.Name,
-				cfg.RabbitMQ.Plan.PlanQueue.Durable,
-				cfg.RabbitMQ.Plan.PlanQueue.AutoDeleted,
-				cfg.RabbitMQ.Plan.PlanQueue.Exclusive,
-				cfg.RabbitMQ.Plan.PlanQueue.NoWait,
-				cfg.RabbitMQ.Plan.PlanQueue.Args.ToMap(),
-			); err != nil {
-				log.Error("failed to declare Plan queue", slog.Any("err", err))
-			}
-
-			// Bind Plan queue to Share exchange
-			if err := rmq.BindQueueToExchange(
-				cfg.RabbitMQ.Plan.PlanQueue.Name,
+			// Declare and bind Plan Queue
+			if err = declareQueueAndBind(rmq,
+				cfg.RabbitMQ.Plan.PlanQueue,
 				cfg.RabbitMQ.ShareExchange.Name,
 				cfg.RabbitMQ.Plan.PlanRoutingKey,
 			); err != nil {
-				log.Error("failed to bind Plan queue", slog.Any("err", err))
+				log.Error("failed to declare and bind plan queue", slog.Any("err", err))
 			}
 
 			application, err := app.NewApp(
@@ -150,43 +104,7 @@ func NewServeCmd() *cobra.Command {
 				return err
 			}
 
-			// Start sharing channels with learning groups consumer
-			channelsConsumer := consumers.NewConsumeChannel(rmq, channelStorage, log)
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				if err := channelsConsumer.Start(
-					ctx,
-					cfg.RabbitMQ.Channel.ChannelConsumer.Queue,
-					cfg.RabbitMQ.Channel.ChannelConsumer.Consumer,
-					cfg.RabbitMQ.Channel.ChannelConsumer.AutoAck,
-					cfg.RabbitMQ.Channel.ChannelConsumer.Exclusive,
-					cfg.RabbitMQ.Channel.ChannelConsumer.NoLocal,
-					cfg.RabbitMQ.Channel.ChannelConsumer.NoWait,
-					cfg.RabbitMQ.Channel.ChannelConsumer.ConsumerArgs.ToMap(),
-				); err != nil {
-					log.Error("failed to start share channels consumer", slog.Any("err", err))
-				}
-			}()
-
-			// Start sharing plans with users consumer
-			plansConsumer := consumers.NewConsumePlan(rmq, planStorage, log)
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				if err := plansConsumer.Start(
-					ctx,
-					cfg.RabbitMQ.Plan.PlanConsumer.Queue,
-					cfg.RabbitMQ.Plan.PlanConsumer.Consumer,
-					cfg.RabbitMQ.Plan.PlanConsumer.AutoAck,
-					cfg.RabbitMQ.Plan.PlanConsumer.Exclusive,
-					cfg.RabbitMQ.Plan.PlanConsumer.NoLocal,
-					cfg.RabbitMQ.Plan.PlanConsumer.NoWait,
-					cfg.RabbitMQ.Plan.PlanConsumer.ConsumerArgs.ToMap(),
-				); err != nil {
-					log.Error("failed to start share plans consumer", slog.Any("err", err))
-				}
-			}()
+			startConsumers(ctx, cfg, rmq, channelStorage, planStorage, log, &wg)
 
 			grpcCloser, err := application.GRPCSrv.Run()
 			if err != nil {
@@ -206,4 +124,114 @@ func NewServeCmd() *cobra.Command {
 
 	c.Flags().StringVar(&configPath, "config", "", "path to config")
 	return c
+}
+
+func loadConfig(configPath string) (*config.Config, error) {
+	return config.Parse(configPath)
+}
+
+func initDBConnection(ctx context.Context, cfg *config.Config) (*pgxpool.Pool, error) {
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.Storage.User,
+		cfg.Storage.Password,
+		cfg.Storage.Host,
+		cfg.Storage.Port,
+		cfg.Storage.DBName,
+	)
+	return pgxpool.New(ctx, dsn)
+}
+
+func initRabbitMQ(cfg *config.Config) (*rabbitmq.RMQClient, error) {
+	rmqUrl := fmt.Sprintf(
+		"amqp://%s:%s@%s:%d/",
+		cfg.RabbitMQ.UserName,
+		cfg.RabbitMQ.Password,
+		cfg.RabbitMQ.Host,
+		cfg.RabbitMQ.Port,
+	)
+	return rabbitmq.NewClient(rmqUrl)
+}
+
+func declareExchange(rmq *rabbitmq.RMQClient, cfg *config.Config) error {
+	return rmq.DeclareExchange(
+		cfg.RabbitMQ.ShareExchange.Name,
+		cfg.RabbitMQ.ShareExchange.Kind,
+		cfg.RabbitMQ.ShareExchange.Durable,
+		cfg.RabbitMQ.ShareExchange.AutoDeleted,
+		cfg.RabbitMQ.ShareExchange.Internal,
+		cfg.RabbitMQ.ShareExchange.NoWait,
+		cfg.RabbitMQ.ShareExchange.Args.ToMap(),
+	)
+}
+
+func startConsumers(
+	ctx context.Context,
+	cfg *config.Config,
+	rmq *rabbitmq.RMQClient,
+	channelStorage *channelstorage.ChannelPostgresStorage,
+	planStorage *planstorage.PlansPostgresStorage,
+	log *slog.Logger,
+	wg *sync.WaitGroup,
+) {
+	channelsConsumer := consumers.NewConsumeChannel(rmq, channelStorage, log)
+	plansConsumer := consumers.NewConsumePlan(rmq, planStorage, log)
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		if err := channelsConsumer.Start(
+			ctx,
+			cfg.RabbitMQ.Channel.ChannelConsumer.Queue,
+			cfg.RabbitMQ.Channel.ChannelConsumer.Consumer,
+			cfg.RabbitMQ.Channel.ChannelConsumer.AutoAck,
+			cfg.RabbitMQ.Channel.ChannelConsumer.Exclusive,
+			cfg.RabbitMQ.Channel.ChannelConsumer.NoLocal,
+			cfg.RabbitMQ.Channel.ChannelConsumer.NoWait,
+			cfg.RabbitMQ.Channel.ChannelConsumer.ConsumerArgs.ToMap(),
+		); err != nil {
+			log.Error("failed to start share channels consumer", slog.Any("err", err))
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		if err := plansConsumer.Start(
+			ctx,
+			cfg.RabbitMQ.Plan.PlanConsumer.Queue,
+			cfg.RabbitMQ.Plan.PlanConsumer.Consumer,
+			cfg.RabbitMQ.Plan.PlanConsumer.AutoAck,
+			cfg.RabbitMQ.Plan.PlanConsumer.Exclusive,
+			cfg.RabbitMQ.Plan.PlanConsumer.NoLocal,
+			cfg.RabbitMQ.Plan.PlanConsumer.NoWait,
+			cfg.RabbitMQ.Plan.PlanConsumer.ConsumerArgs.ToMap(),
+		); err != nil {
+			log.Error("failed to start share plans consumer", slog.Any("err", err))
+		}
+	}()
+}
+
+func declareQueueAndBind(rmq *rabbitmq.RMQClient, queueConfig config.QueueConfig, exchangeName, routingKey string) error {
+	// Announcement of the queue
+	if _, err := rmq.DeclareQueue(
+		queueConfig.Name,
+		queueConfig.Durable,
+		queueConfig.AutoDeleted,
+		queueConfig.Exclusive,
+		queueConfig.NoWait,
+		queueConfig.Args.ToMap(),
+	); err != nil {
+		return fmt.Errorf("failed to declare queue %s: %w", queueConfig.Name, err)
+	}
+
+	// Binding a queue to an exchange
+	if err := rmq.BindQueueToExchange(
+		queueConfig.Name,
+		exchangeName,
+		routingKey,
+	); err != nil {
+		return fmt.Errorf("failed to bind queue %s to exchange %s: %w", queueConfig.Name, exchangeName, err)
+	}
+
+	return nil
 }
