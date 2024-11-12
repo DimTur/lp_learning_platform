@@ -4,6 +4,8 @@ github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/DimTur/lp_protos v0.0.7 h1:CVxNOtf4AGIUjiWdZhfOFL1yp5CRv8ZTHNwVjy9ImEk=
 github.com/DimTur/lp_protos v0.0.7/go.mod h1:RQnLrkhMklS3HjtJNjVKtDYEPYNOIPxS72xBX1Iwrdo=
+github.com/DimTur/lp_protos v0.1.0 h1:+9CHBvQqeM4Ovu6O7d5H+zheSWdoSutc2C2+/heQpTQ=
+github.com/DimTur/lp_protos v0.1.0/go.mod h1:RQnLrkhMklS3HjtJNjVKtDYEPYNOIPxS72xBX1Iwrdo=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/cpuguy83/go-md2man/v2 v2.0.4/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=

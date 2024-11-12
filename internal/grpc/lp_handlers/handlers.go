@@ -9,7 +9,7 @@ import (
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/questions"
-	lpv1 "github.com/DimTur/lp_learning_platform/pkg/server/grpc"
+	lpv1 "github.com/DimTur/lp_protos/gen/go/lp"
 	"google.golang.org/grpc"
 )
 

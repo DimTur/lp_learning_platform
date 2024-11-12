@@ -6,7 +6,7 @@ import (
 
 	planserv "github.com/DimTur/lp_learning_platform/internal/services/plan"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
-	lpv1 "github.com/DimTur/lp_learning_platform/pkg/server/grpc"
+	lpv1 "github.com/DimTur/lp_protos/gen/go/lp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
