@@ -23,7 +23,7 @@ const createChannelQuery = `
 	VALUES ($1, $2, $3, $4, $5, $6)
 	RETURNING id`
 
-func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel CreateChannel) (int64, error) {
+func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel *CreateChannel) (int64, error) {
 	const op = "storage.postgresql.channels.channels.CreateChannel"
 
 	var id int64
@@ -49,6 +49,7 @@ func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel Crea
 	return id, nil
 }
 
+// TODO: create index for c.id, sclg.channel_id, и sclg.learning_group_id
 const getChannelWithPlansQuery = `
 	SELECT
 		c.id AS channel_id,
@@ -69,17 +70,20 @@ const getChannelWithPlansQuery = `
 		p.modified AS plan_modified
 	FROM
 		channels c
+	JOIN
+		shared_channels_learninggroups sclg ON c.id = sclg.channel_id
+		AND sclg.learning_group_id = ANY($2)
 	LEFT JOIN
 		channels_plans cp ON c.id = cp.channel_id
 	LEFT JOIN
 		plans p ON cp.plan_id = p.id
 	WHERE
-		c.id = $1`
+		c.id = $1;`
 
-func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID int64) (ChannelWithPlans, error) {
+func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, chLg *GetChannelByID) (ChannelWithPlans, error) {
 	const op = "storage.postgresql.channels.channels.GetChannelByID"
 
-	rows, err := c.db.Query(ctx, getChannelWithPlansQuery, channelID)
+	rows, err := c.db.Query(ctx, getChannelWithPlansQuery, chLg.ChannelID, chLg.LgIDs)
 	if err != nil {
 		return ChannelWithPlans{}, fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
 	}
@@ -151,17 +155,19 @@ func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID i
 }
 
 const getChannelsQuery = `
-	SELECT *
-	FROM channels
-	ORDER BY id
-	LIMIT $1 OFFSET $2`
+	SELECT * FROM channels c
+	JOIN
+		shared_channels_learninggroups sclg ON c.id = sclg.channel_id
+		AND sclg.learning_group_id = ANY($1)
+	ORDER BY c.id
+	LIMIT $2 OFFSET $3`
 
-func (c *ChannelPostgresStorage) GetChannels(ctx context.Context, limit, offset int64) ([]Channel, error) {
+func (c *ChannelPostgresStorage) GetChannels(ctx context.Context, inputParam *GetChannels) ([]Channel, error) {
 	const op = "storage.postgresql.channels.channels.GetChannels"
 
 	var channels []DBChannel
 
-	rows, err := c.db.Query(ctx, getChannelsQuery, limit, offset)
+	rows, err := c.db.Query(ctx, getChannelsQuery, inputParam.LgIDs, inputParam.Limit, inputParam.Offset)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -197,23 +203,27 @@ func (c *ChannelPostgresStorage) GetChannels(ctx context.Context, limit, offset 
 
 const updateChannelQuery = `
 	UPDATE channels 
-	SET name = COALESCE($2, name), 
-	    description = COALESCE($3, description), 
-	    last_modified_by = $4, 
-	    modified = now() 
-	WHERE id = $1
+	SET name = COALESCE($3, name), 
+	    description = COALESCE($4, description), 
+	    last_modified_by = $5, 
+	    modified = now()
+	JOIN
+		shared_channels_learninggroups sclg ON c.id = sclg.channel_id
+		AND sclg.learning_group_id = ANY($1)
+	WHERE id = $2
 	RETURNING id`
 
-func (c *ChannelPostgresStorage) UpdateChannel(ctx context.Context, updChannel UpdateChannelRequest) (int64, error) {
+func (c *ChannelPostgresStorage) UpdateChannel(ctx context.Context, updChannel *UpdateChannelRequest) (int64, error) {
 	const op = "storage.postgresql.channels.channels.UpdateChannel"
 
 	var id int64
 
 	err := c.db.QueryRow(ctx, updateChannelQuery,
-		updChannel.ID,
+		updChannel.AdminInLgIds,
+		updChannel.ChannelID,
 		updChannel.Name,
 		updChannel.Description,
-		updChannel.LastModifiedBy,
+		updChannel.UserID,
 	).Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
@@ -222,13 +232,21 @@ func (c *ChannelPostgresStorage) UpdateChannel(ctx context.Context, updChannel U
 }
 
 const deleteChannelQuery = `
-	DELETE FROM channels
-	WHERE id = $1`
+	DELETE FROM channels c
+	JOIN
+		shared_channels_learninggroups sclg ON c.id = sclg.channel_id
+		AND sclg.learning_group_id = ANY($1)
+	WHERE id = $2`
 
-func (c *ChannelPostgresStorage) DeleteChannel(ctx context.Context, id int64) error {
+func (c *ChannelPostgresStorage) DeleteChannel(ctx context.Context, delChannel *DeleteChannelRequest) error {
 	const op = "storage.postgresql.channels.channels.DeleteChannel"
 
-	res, err := c.db.Exec(ctx, deleteChannelQuery, id)
+	res, err := c.db.Exec(
+		ctx,
+		deleteChannelQuery,
+		delChannel.AdminInLgIds,
+		delChannel.ChannelID,
+	)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}

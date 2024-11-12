@@ -14,11 +14,11 @@ import (
 )
 
 type ChannelHandlers interface {
-	CreateChannel(ctx context.Context, channel channels.CreateChannel) (int64, error)
-	GetChannel(ctx context.Context, channelID int64) (channels.ChannelWithPlans, error)
-	GetChannels(ctx context.Context, limit, offset int64) ([]channels.Channel, error)
-	UpdateChannel(ctx context.Context, updChannel channels.UpdateChannelRequest) (int64, error)
-	DeleteChannel(ctx context.Context, channelID int64) error
+	CreateChannel(ctx context.Context, channel *channels.CreateChannel) (int64, error)
+	GetChannel(ctx context.Context, chLg *channels.GetChannelByID) (*channels.ChannelWithPlans, error)
+	GetChannels(ctx context.Context, inputParams *channels.GetChannels) ([]channels.Channel, error)
+	UpdateChannel(ctx context.Context, updChannel *channels.UpdateChannelRequest) (int64, error)
+	DeleteChannel(ctx context.Context, delChannel *channels.DeleteChannelRequest) error
 	ShareChannelToGroup(ctx context.Context, s channels.ShareChannelToGroup) error
 }
 

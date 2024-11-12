@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	pageserv "github.com/DimTur/lp_learning_platform/internal/services/page"
 	pagestore "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
 	lpv1 "github.com/DimTur/lp_protos/gen/go/lp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *serverAPI) CreatePage(ctx context.Context, req *lpv1.CreatePageRequest) (*lpv1.CreatePageResponse, error) {
@@ -93,8 +93,8 @@ func (s *serverAPI) GetPage(ctx context.Context, req *lpv1.GetPageRequest) (*lpv
 					LessonId:       p.LessonID,
 					CreatedBy:      p.CreatedBy,
 					LastModifiedBy: p.LastModifiedBy,
-					CreatedAt:      timestamppb.New(p.CreatedAt),
-					Modified:       timestamppb.New(p.Modified),
+					CreatedAt:      p.CreatedAt.Format(time.RFC3339),
+					Modified:       p.Modified.Format(time.RFC3339),
 					ContentType:    lpv1.ContentType_IMAGE,
 				},
 				ImageFileUrl: p.ImageFileUrl,
@@ -109,8 +109,8 @@ func (s *serverAPI) GetPage(ctx context.Context, req *lpv1.GetPageRequest) (*lpv
 					LessonId:       p.LessonID,
 					CreatedBy:      p.CreatedBy,
 					LastModifiedBy: p.LastModifiedBy,
-					CreatedAt:      timestamppb.New(p.CreatedAt),
-					Modified:       timestamppb.New(p.Modified),
+					CreatedAt:      p.CreatedAt.Format(time.RFC3339),
+					Modified:       p.Modified.Format(time.RFC3339),
 					ContentType:    lpv1.ContentType_VIDEO,
 				},
 				VideoFileUrl: p.VideoFileUrl,
@@ -125,8 +125,8 @@ func (s *serverAPI) GetPage(ctx context.Context, req *lpv1.GetPageRequest) (*lpv
 					LessonId:       p.LessonID,
 					CreatedBy:      p.CreatedBy,
 					LastModifiedBy: p.LastModifiedBy,
-					CreatedAt:      timestamppb.New(p.CreatedAt),
-					Modified:       timestamppb.New(p.Modified),
+					CreatedAt:      p.CreatedAt.Format(time.RFC3339),
+					Modified:       p.Modified.Format(time.RFC3339),
 					ContentType:    lpv1.ContentType_PDF,
 				},
 				PdfFileUrl: p.PdfFileUrl,
@@ -160,8 +160,8 @@ func (s *serverAPI) GetPages(ctx context.Context, req *lpv1.GetPagesRequest) (*l
 			LessonId:       page.LessonID,
 			CreatedBy:      page.CreatedBy,
 			LastModifiedBy: page.LastModifiedBy,
-			CreatedAt:      timestamppb.New(page.CreatedAt),
-			Modified:       timestamppb.New(page.Modified),
+			CreatedAt:      page.CreatedAt.Format(time.RFC3339),
+			Modified:       page.Modified.Format(time.RFC3339),
 			ContentType:    convertToContentType(page.ContentType),
 		})
 	}

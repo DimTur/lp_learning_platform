@@ -3,6 +3,7 @@ package lp_handlers
 import (
 	"context"
 	"errors"
+	"time"
 
 	planserv "github.com/DimTur/lp_learning_platform/internal/services/plan"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
@@ -10,7 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *serverAPI) CreatePlan(ctx context.Context, req *lpv1.CreatePlanRequest) (*lpv1.CreatePlanResponse, error) {
@@ -55,8 +55,8 @@ func (s *serverAPI) GetPlan(ctx context.Context, req *lpv1.GetPlanRequest) (*lpv
 			LastModifiedBy: plan.LastModifiedBy,
 			IsPublished:    plan.IsPublished,
 			Public:         plan.Public,
-			CreatedAt:      timestamppb.New(plan.CreatedAt),
-			Modified:       timestamppb.New(plan.Modified),
+			CreatedAt:      plan.CreatedAt.Format(time.RFC3339),
+			Modified:       plan.Modified.Format(time.RFC3339),
 		},
 	}, nil
 }
@@ -84,8 +84,8 @@ func (s *serverAPI) GetPlans(ctx context.Context, req *lpv1.GetPlansRequest) (*l
 			LastModifiedBy: plan.LastModifiedBy,
 			IsPublished:    plan.IsPublished,
 			Public:         plan.Public,
-			CreatedAt:      timestamppb.New(plan.CreatedAt),
-			Modified:       timestamppb.New(plan.Modified),
+			CreatedAt:      plan.CreatedAt.Format(time.RFC3339),
+			Modified:       plan.Modified.Format(time.RFC3339),
 		})
 	}
 

@@ -3,6 +3,7 @@ package lp_handlers
 import (
 	"context"
 	"errors"
+	"time"
 
 	chanserv "github.com/DimTur/lp_learning_platform/internal/services/channel"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
@@ -10,7 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRequest) (*lpv1.CreateChannelResponse, error) {
@@ -20,7 +20,7 @@ func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRe
 		CreatedBy:      req.GetCreatedBy(),
 		LastModifiedBy: req.GetCreatedBy(),
 	}
-	channelID, err := s.channelHandlers.CreateChannel(ctx, channel)
+	channelID, err := s.channelHandlers.CreateChannel(ctx, &channel)
 	if err != nil {
 		if errors.Is(err, chanserv.ErrInvalidCredentials) {
 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
@@ -35,7 +35,10 @@ func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRe
 }
 
 func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest) (*lpv1.GetChannelResponse, error) {
-	channel, err := s.channelHandlers.GetChannel(ctx, req.GetId())
+	channel, err := s.channelHandlers.GetChannel(ctx, &channels.GetChannelByID{
+		ChannelID: req.GetChannelId(),
+		LgIDs:     req.GetLearningGroupIds(),
+	})
 	if err != nil {
 		if errors.Is(err, chanserv.ErrChannelNotFound) {
 			return nil, status.Error(codes.NotFound, "channel not found")
@@ -54,8 +57,8 @@ func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest)
 			LastModifiedBy: plan.LastModifiedBy,
 			IsPublished:    plan.IsPublished,
 			Public:         plan.Public,
-			CreatedAt:      timestamppb.New(plan.CreatedAt),
-			Modified:       timestamppb.New(plan.Modified),
+			CreatedAt:      plan.CreatedAt.Format(time.RFC3339),
+			Modified:       plan.Modified.Format(time.RFC3339),
 		})
 	}
 
@@ -66,15 +69,19 @@ func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest)
 			Description:    channel.Description,
 			CreatedBy:      channel.CreatedBy,
 			LastModifiedBy: channel.LastModifiedBy,
-			CreatedAt:      timestamppb.New(channel.CreatedAt),
-			Modified:       timestamppb.New(channel.Modified),
+			CreatedAt:      channel.CreatedAt.Format(time.RFC3339),
+			Modified:       channel.Modified.Format(time.RFC3339),
 			Plans:          plans,
 		},
 	}, nil
 }
 
 func (s *serverAPI) GetChannels(ctx context.Context, req *lpv1.GetChannelsRequest) (*lpv1.GetChannelsResponse, error) {
-	channels, err := s.channelHandlers.GetChannels(ctx, req.GetLimit(), req.GetOffset())
+	channels, err := s.channelHandlers.GetChannels(ctx, &channels.GetChannels{
+		LgIDs:  req.GetLearningGroupIds(),
+		Limit:  req.GetLimit(),
+		Offset: req.GetOffset(),
+	})
 	if err != nil {
 		switch {
 		case errors.Is(err, chanserv.ErrChannelNotFound):
@@ -94,8 +101,8 @@ func (s *serverAPI) GetChannels(ctx context.Context, req *lpv1.GetChannelsReques
 			Description:    channel.Description,
 			CreatedBy:      channel.CreatedBy,
 			LastModifiedBy: channel.LastModifiedBy,
-			CreatedAt:      timestamppb.New(channel.CreatedAt),
-			Modified:       timestamppb.New(channel.Modified),
+			CreatedAt:      channel.CreatedAt.Format(time.RFC3339),
+			Modified:       channel.Modified.Format(time.RFC3339),
 		})
 	}
 
@@ -116,13 +123,14 @@ func (s *serverAPI) UpdateChannel(ctx context.Context, req *lpv1.UpdateChannelRe
 	}
 
 	updChannel := channels.UpdateChannelRequest{
-		ID:             req.GetId(),
-		Name:           name,
-		Description:    description,
-		LastModifiedBy: req.GetLastModifiedBy(),
+		UserID:       req.GetUserId(),
+		AdminInLgIds: req.GetAdminInLgIds(),
+		ChannelID:    req.GetChannelId(),
+		Name:         name,
+		Description:  description,
 	}
 
-	id, err := s.channelHandlers.UpdateChannel(ctx, updChannel)
+	id, err := s.channelHandlers.UpdateChannel(ctx, &updChannel)
 	if err != nil {
 		switch {
 		case errors.Is(err, chanserv.ErrInvalidCredentials):
@@ -138,9 +146,10 @@ func (s *serverAPI) UpdateChannel(ctx context.Context, req *lpv1.UpdateChannelRe
 }
 
 func (s *serverAPI) DeleteChannel(ctx context.Context, req *lpv1.DeleteChannelRequest) (*lpv1.DeleteChannelResponse, error) {
-	channelID := req.GetId()
-
-	err := s.channelHandlers.DeleteChannel(ctx, channelID)
+	err := s.channelHandlers.DeleteChannel(ctx, &channels.DeleteChannelRequest{
+		ChannelID:    req.GetChannelId(),
+		AdminInLgIds: req.GetAdminInLgIds(),
+	})
 	if err != nil {
 		if errors.Is(err, chanserv.ErrChannelNotFound) {
 			return nil, status.Error(codes.NotFound, "channel not found")

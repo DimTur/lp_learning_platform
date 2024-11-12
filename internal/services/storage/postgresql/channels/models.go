@@ -15,6 +15,26 @@ type Channel struct {
 	Modified       time.Time
 }
 
+type GetChannelByID struct {
+	ChannelID int64    `json:"channel_id" validate:"required"`
+	LgIDs     []string `json:"learning_group_ids" validate:"required"`
+}
+
+type GetChannels struct {
+	LgIDs  []string `json:"learning_group_ids" validate:"required"`
+	Limit  int64    `json:"limit,omitempty" validate:"min=1"`
+	Offset int64    `json:"offset,omitempty" validate:"min=0"`
+}
+
+func (p *GetChannels) SetDefaults() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	if p.Offset < 0 {
+		p.Offset = 0
+	}
+}
+
 type ChannelWithPlans struct {
 	ID             int64
 	Name           string
@@ -49,10 +69,16 @@ type CreateChannel struct {
 }
 
 type UpdateChannelRequest struct {
-	ID             int64   `json:"id" validate:"required"`
-	Name           *string `json:"name,omitempty"`
-	Description    *string `json:"description,omitempty"`
-	LastModifiedBy string  `json:"last_modified_by" validate:"required"`
+	UserID       string   `json:"user_id" validate:"required"`
+	AdminInLgIds []string `json:"admin_in_lg_ch_ids" validate:"required"`
+	ChannelID    int64    `json:"id" validate:"required"`
+	Name         *string  `json:"name,omitempty"`
+	Description  *string  `json:"description,omitempty"`
+}
+
+type DeleteChannelRequest struct {
+	ChannelID    int64    `json:"id" validate:"required"`
+	AdminInLgIds []string `json:"admin_in_lg_ch_ids" validate:"required"`
 }
 
 type ShareChannelToGroup struct {

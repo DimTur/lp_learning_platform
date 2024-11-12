@@ -3,6 +3,7 @@ package lp_handlers
 import (
 	"context"
 	"errors"
+	"time"
 
 	lessonserv "github.com/DimTur/lp_learning_platform/internal/services/lesson"
 	planserv "github.com/DimTur/lp_learning_platform/internal/services/plan"
@@ -11,7 +12,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *serverAPI) CreateLesson(ctx context.Context, req *lpv1.CreateLessonRequest) (*lpv1.CreateLessonResponse, error) {
@@ -52,8 +52,8 @@ func (s *serverAPI) GetLesson(ctx context.Context, req *lpv1.GetLessonRequest) (
 			Name:           lesson.Name,
 			CreatedBy:      lesson.CreatedBy,
 			LastModifiedBy: lesson.LastModifiedBy,
-			CreatedAt:      timestamppb.New(lesson.CreatedAt),
-			Modified:       timestamppb.New(lesson.Modified),
+			CreatedAt:      lesson.CreatedAt.Format(time.RFC3339),
+			Modified:       lesson.Modified.Format(time.RFC3339),
 		},
 	}, nil
 }
@@ -78,8 +78,8 @@ func (s *serverAPI) GetLessons(ctx context.Context, req *lpv1.GetLessonsRequest)
 			Name:           lesson.Name,
 			CreatedBy:      lesson.CreatedBy,
 			LastModifiedBy: lesson.LastModifiedBy,
-			CreatedAt:      timestamppb.New(lesson.CreatedAt),
-			Modified:       timestamppb.New(lesson.Modified),
+			CreatedAt:      lesson.CreatedAt.Format(time.RFC3339),
+			Modified:       lesson.Modified.Format(time.RFC3339),
 		})
 	}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	questionserv "github.com/DimTur/lp_learning_platform/internal/services/question"
 	questionstore "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/questions"
@@ -11,7 +12,6 @@ import (
 	lpv1 "github.com/DimTur/lp_protos/gen/go/lp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *serverAPI) CreateQuestionPage(ctx context.Context, req *lpv1.CreateQuestionPageRequest) (*lpv1.CreateQuestionPageResponse, error) {
@@ -67,8 +67,8 @@ func (s *serverAPI) GetQuestionPage(ctx context.Context, req *lpv1.GetQuestionPa
 			LessonId:       page.LessonID,
 			CreatedBy:      page.CreatedBy,
 			LastModifiedBy: page.LastModifiedBy,
-			CreatedAt:      timestamppb.New(page.CreatedAt),
-			Modified:       timestamppb.New(page.Modified),
+			CreatedAt:      page.CreatedAt.Format(time.RFC3339),
+			Modified:       page.Modified.Format(time.RFC3339),
 			ContentType:    lpv1.ContentType_QUESTION,
 			QuestionType:   lpv1.QuestionType_MULTICHOICE,
 			Question:       page.Question,
