@@ -100,7 +100,7 @@ func (chh *ChannelHandlers) CreateChannel(ctx context.Context, channel channels.
 	if err != nil {
 		if errors.Is(err, storage.ErrInvalidCredentials) {
 			chh.log.Warn("invalid arguments", slog.String("err", err.Error()))
-			return 0, fmt.Errorf("%s: %w", op, err)
+			return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 		}
 
 		log.Error("failed to save channel", slog.String("err", err.Error()))

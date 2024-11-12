@@ -81,7 +81,7 @@ func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, channelID i
 
 	rows, err := c.db.Query(ctx, getChannelWithPlansQuery, channelID)
 	if err != nil {
-		return ChannelWithPlans{}, fmt.Errorf("%s: %w", op, err)
+		return ChannelWithPlans{}, fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
 	}
 	defer rows.Close()
 
