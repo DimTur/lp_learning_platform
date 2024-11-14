@@ -20,6 +20,8 @@ type ChannelHandlers interface {
 	UpdateChannel(ctx context.Context, updChannel *channels.UpdateChannelRequest) (int64, error)
 	DeleteChannel(ctx context.Context, delChannel *channels.DeleteChannelRequest) error
 	ShareChannelToGroup(ctx context.Context, s channels.ShareChannelToGroup) error
+	IsChannelCreator(ctx context.Context, isCC *channels.IsChannelCreator) (bool, error)
+	GetLearningGroupsShareWithChannel(ctx context.Context, channelID int64) ([]string, error)
 }
 
 type PlanHandlers interface {

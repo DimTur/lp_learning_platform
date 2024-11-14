@@ -28,6 +28,8 @@ type ChannelSaver interface {
 type ChannelProvider interface {
 	GetChannelByID(ctx context.Context, chLg *channels.GetChannelByID) (channels.ChannelWithPlans, error)
 	GetChannels(ctx context.Context, inpputParams *channels.GetChannels) ([]channels.Channel, error)
+	GetChannelCreator(ctx context.Context, channelID int64) (*channels.DBChannelCreator, error)
+	GetLearningGroupsShareWithChannel(ctx context.Context, channelID int64) ([]string, error)
 }
 
 type ChannelDel interface {
@@ -44,6 +46,8 @@ var (
 	ErrInvalidChannelID   = errors.New("invalid channel id")
 	ErrChannelExitsts     = errors.New("channel already exists")
 	ErrChannelNotFound    = errors.New("channel not found")
+
+	ErrPermissionDenied = errors.New("permission denied")
 )
 
 type ChannelHandlers struct {
@@ -104,12 +108,28 @@ func (chh *ChannelHandlers) CreateChannel(ctx context.Context, channel *channels
 
 		log.Error("failed to save channel", slog.String("err", err.Error()))
 		return 0, fmt.Errorf("%s: %w", op, err)
+	} else {
+		s := &channels.ShareChannelToGroup{
+			ChannelID: id,
+			LGroupIDs: []string{channel.LearningGroupId},
+			CreatedBy: channel.CreatedBy,
+		}
+		msgBody, err := json.Marshal(s)
+		if err != nil {
+			chh.log.Error("err to marshal shared msg", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, err)
+		}
+
+		if err = chh.rabbitMQQueues.Publish(ctx, exchangeChannel, channelRoutingKey, msgBody); err != nil {
+			chh.log.Error("err send sharing channel to exchange", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, err)
+		}
 	}
 
 	return id, nil
 }
 
-// GetChannelByID gets channel by ID and returns it.
+// GetChannel gets channel by ID and returns it.
 func (chh *ChannelHandlers) GetChannel(ctx context.Context, chLg *channels.GetChannelByID) (*channels.ChannelWithPlans, error) {
 	const op = "channel.GetChannelByID"
 
@@ -262,4 +282,55 @@ func (chh *ChannelHandlers) ShareChannelToGroup(ctx context.Context, s channels.
 	log.Info("channel sent to share with learning groups")
 
 	return nil
+}
+
+func (chh *ChannelHandlers) IsChannelCreator(ctx context.Context, isCC *channels.IsChannelCreator) (bool, error) {
+	const op = "channel.IsChannelCreator"
+
+	log := chh.log.With(
+		slog.String("op", op),
+		slog.Int64("channel_id", isCC.ChannelID),
+		slog.String("user_id", isCC.UserID),
+	)
+
+	// Validation
+	err := chh.validator.Struct(isCC)
+	if err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return false, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	creator, err := chh.channelProvider.GetChannelCreator(ctx, isCC.ChannelID)
+	if err != nil {
+		if errors.Is(err, storage.ErrChannelNotFound) {
+			chh.log.Warn("channel not found", slog.String("err", err.Error()))
+			return false, fmt.Errorf("%s: %w", op, ErrChannelNotFound)
+		}
+
+		log.Error("failed to check channel creator", slog.String("err", err.Error()))
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	if creator.CreatedBy != isCC.UserID {
+		return false, fmt.Errorf("%s: %w", op, ErrPermissionDenied)
+	}
+
+	return true, nil
+}
+
+func (chh *ChannelHandlers) GetLearningGroupsShareWithChannel(ctx context.Context, channelID int64) ([]string, error) {
+	const op = "channel.GetLearningGroupsShareWithChannel"
+
+	log := chh.log.With(
+		slog.String("op", op),
+		slog.Int64("channel_id", channelID),
+	)
+
+	lgIDs, err := chh.channelProvider.GetLearningGroupsShareWithChannel(ctx, channelID)
+	if err != nil {
+		log.Error("failed to get learning group ids", slog.String("err", err.Error()))
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return lgIDs, nil
 }

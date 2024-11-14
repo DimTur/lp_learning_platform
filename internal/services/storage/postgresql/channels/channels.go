@@ -49,7 +49,6 @@ func (c *ChannelPostgresStorage) CreateChannel(ctx context.Context, channel *Cre
 	return id, nil
 }
 
-// TODO: create index for c.id, sclg.channel_id, и sclg.learning_group_id
 const getChannelWithPlansQuery = `
 	SELECT
 		c.id AS channel_id,
@@ -70,9 +69,6 @@ const getChannelWithPlansQuery = `
 		p.modified AS plan_modified
 	FROM
 		channels c
-	JOIN
-		shared_channels_learninggroups sclg ON c.id = sclg.channel_id
-		AND sclg.learning_group_id = ANY($2)
 	LEFT JOIN
 		channels_plans cp ON c.id = cp.channel_id
 	LEFT JOIN
@@ -83,7 +79,7 @@ const getChannelWithPlansQuery = `
 func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, chLg *GetChannelByID) (ChannelWithPlans, error) {
 	const op = "storage.postgresql.channels.channels.GetChannelByID"
 
-	rows, err := c.db.Query(ctx, getChannelWithPlansQuery, chLg.ChannelID, chLg.LgIDs)
+	rows, err := c.db.Query(ctx, getChannelWithPlansQuery, chLg.ChannelID)
 	if err != nil {
 		return ChannelWithPlans{}, fmt.Errorf("%s: %w", op, storage.ErrChannelNotFound)
 	}
@@ -154,8 +150,18 @@ func (c *ChannelPostgresStorage) GetChannelByID(ctx context.Context, chLg *GetCh
 	return channel, nil
 }
 
+// TODO: create index for c.id, sclg.channel_id, и sclg.learning_group_id
 const getChannelsQuery = `
-	SELECT * FROM channels c
+	SELECT
+	 	c.id AS channel_id,
+		c.name AS channel_name,
+		c.description AS channel_description,
+		c.created_by AS channel_created_by,
+		c.last_modified_by AS channel_last_modified_by,
+		c.created_at AS channel_created_at,
+		c.modified AS channel_modified 
+	FROM 
+		channels c
 	JOIN
 		shared_channels_learninggroups sclg ON c.id = sclg.channel_id
 		AND sclg.learning_group_id = ANY($1)
@@ -203,14 +209,11 @@ func (c *ChannelPostgresStorage) GetChannels(ctx context.Context, inputParam *Ge
 
 const updateChannelQuery = `
 	UPDATE channels 
-	SET name = COALESCE($3, name), 
-	    description = COALESCE($4, description), 
-	    last_modified_by = $5, 
+	SET name = COALESCE($2, name), 
+	    description = COALESCE($3, description), 
+	    last_modified_by = $4, 
 	    modified = now()
-	JOIN
-		shared_channels_learninggroups sclg ON c.id = sclg.channel_id
-		AND sclg.learning_group_id = ANY($1)
-	WHERE id = $2
+	WHERE id = $1
 	RETURNING id`
 
 func (c *ChannelPostgresStorage) UpdateChannel(ctx context.Context, updChannel *UpdateChannelRequest) (int64, error) {
@@ -219,7 +222,6 @@ func (c *ChannelPostgresStorage) UpdateChannel(ctx context.Context, updChannel *
 	var id int64
 
 	err := c.db.QueryRow(ctx, updateChannelQuery,
-		updChannel.AdminInLgIds,
 		updChannel.ChannelID,
 		updChannel.Name,
 		updChannel.Description,
@@ -233,10 +235,7 @@ func (c *ChannelPostgresStorage) UpdateChannel(ctx context.Context, updChannel *
 
 const deleteChannelQuery = `
 	DELETE FROM channels c
-	JOIN
-		shared_channels_learninggroups sclg ON c.id = sclg.channel_id
-		AND sclg.learning_group_id = ANY($1)
-	WHERE id = $2`
+	WHERE id = $1`
 
 func (c *ChannelPostgresStorage) DeleteChannel(ctx context.Context, delChannel *DeleteChannelRequest) error {
 	const op = "storage.postgresql.channels.channels.DeleteChannel"
@@ -244,7 +243,6 @@ func (c *ChannelPostgresStorage) DeleteChannel(ctx context.Context, delChannel *
 	res, err := c.db.Exec(
 		ctx,
 		deleteChannelQuery,
-		delChannel.AdminInLgIds,
 		delChannel.ChannelID,
 	)
 	if err != nil {
@@ -288,4 +286,59 @@ func (c *ChannelPostgresStorage) ShareChannelToGroup(ctx context.Context, s DBSh
 	}
 
 	return nil
+}
+
+const isChannelCreatorQuery = `
+	SELECT id, created_by
+	FROM channels
+	WHERE id = $1`
+
+func (c *ChannelPostgresStorage) GetChannelCreator(ctx context.Context, channelID int64) (*DBChannelCreator, error) {
+	const op = "storage.postgresql.channels.channels.GetChannelCreator"
+
+	var dbCreator DBChannelCreator
+	row := c.db.QueryRow(ctx, isChannelCreatorQuery, channelID)
+	if err := row.Scan(&dbCreator.CreatedBy, &dbCreator.CreatedBy); err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return &dbCreator, nil
+}
+
+const sharingGroupsQuery = `
+	SELECT 
+		c.id AS channel_id,
+		sclg.learning_group_id AS learning_group_id
+	FROM 
+		channels c
+	JOIN
+		shared_channels_learninggroups sclg ON c.id = sclg.channel_id
+	WHERE 
+		c.id = $1`
+
+func (c *ChannelPostgresStorage) GetLearningGroupsShareWithChannel(ctx context.Context, channelID int64) ([]string, error) {
+	const op = "storage.postgresql.channels.channels.GetLearningGroupsShareWithChannel"
+
+	var lgIDs []string
+	rows, err := c.db.Query(ctx, sharingGroupsQuery, channelID)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id DBLearningGroupID
+		if err := rows.Scan(
+			&id.ID,
+		); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrScanFailed)
+		}
+		lgIDs = append(lgIDs, id.ID)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return lgIDs, nil
 }

@@ -16,8 +16,7 @@ type Channel struct {
 }
 
 type GetChannelByID struct {
-	ChannelID int64    `json:"channel_id" validate:"required"`
-	LgIDs     []string `json:"learning_group_ids" validate:"required"`
+	ChannelID int64 `json:"channel_id" validate:"required"`
 }
 
 type GetChannels struct {
@@ -59,32 +58,36 @@ type PlanInChannel struct {
 }
 
 type CreateChannel struct {
-	ID             int64     `json:"id"`
-	Name           string    `json:"name" validate:"required"`
-	Description    string    `json:"description"`
-	CreatedBy      string    `json:"created_by" validate:"required"`
-	LastModifiedBy string    `json:"last_modified_by" validate:"required"`
-	CreatedAt      time.Time `json:"created_at"`
-	Modified       time.Time `json:"modified"`
+	ID              int64     `json:"id"`
+	Name            string    `json:"name" validate:"required"`
+	Description     string    `json:"description"`
+	CreatedBy       string    `json:"created_by" validate:"required"`
+	LastModifiedBy  string    `json:"last_modified_by" validate:"required"`
+	CreatedAt       time.Time `json:"created_at"`
+	Modified        time.Time `json:"modified"`
+	LearningGroupId string    `json:"learning_group_id" validate:"required"`
 }
 
 type UpdateChannelRequest struct {
-	UserID       string   `json:"user_id" validate:"required"`
-	AdminInLgIds []string `json:"admin_in_lg_ch_ids" validate:"required"`
-	ChannelID    int64    `json:"id" validate:"required"`
-	Name         *string  `json:"name,omitempty"`
-	Description  *string  `json:"description,omitempty"`
+	UserID      string  `json:"user_id" validate:"required"`
+	ChannelID   int64   `json:"id" validate:"required"`
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
 }
 
 type DeleteChannelRequest struct {
-	ChannelID    int64    `json:"id" validate:"required"`
-	AdminInLgIds []string `json:"admin_in_lg_ch_ids" validate:"required"`
+	ChannelID int64 `json:"id" validate:"required"`
 }
 
 type ShareChannelToGroup struct {
 	ChannelID int64    `json:"channel_id" validate:"required"`
 	LGroupIDs []string `json:"lgroup_ids" validate:"required"`
 	CreatedBy string   `json:"created_by" validate:"required"`
+}
+
+type IsChannelCreator struct {
+	UserID    string `json:"user_id" validate:"required"`
+	ChannelID int64  `json:"channel_id" validate:"required"`
 }
 
 type DBChannel struct {
@@ -126,4 +129,12 @@ type DBShareChannelToGroup struct {
 	LGroupID  string    `db:"learning_group_id"`
 	CreatedBy string    `db:"created_by"`
 	CreatedAt time.Time `db:"created_at"`
+}
+
+type DBChannelCreator struct {
+	CreatedBy string `db:"created_by"`
+}
+
+type DBLearningGroupID struct {
+	ID string `db:"learning_group_id"`
 }

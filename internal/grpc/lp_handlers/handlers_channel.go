@@ -15,10 +15,11 @@ import (
 
 func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRequest) (*lpv1.CreateChannelResponse, error) {
 	channel := channels.CreateChannel{
-		Name:           req.GetName(),
-		Description:    req.GetDescription(),
-		CreatedBy:      req.GetCreatedBy(),
-		LastModifiedBy: req.GetCreatedBy(),
+		Name:            req.GetName(),
+		Description:     req.GetDescription(),
+		CreatedBy:       req.GetCreatedBy(),
+		LastModifiedBy:  req.GetCreatedBy(),
+		LearningGroupId: req.GetLearningGroupId(),
 	}
 	channelID, err := s.channelHandlers.CreateChannel(ctx, &channel)
 	if err != nil {
@@ -37,7 +38,6 @@ func (s *serverAPI) CreateChannel(ctx context.Context, req *lpv1.CreateChannelRe
 func (s *serverAPI) GetChannel(ctx context.Context, req *lpv1.GetChannelRequest) (*lpv1.GetChannelResponse, error) {
 	channel, err := s.channelHandlers.GetChannel(ctx, &channels.GetChannelByID{
 		ChannelID: req.GetChannelId(),
-		LgIDs:     req.GetLearningGroupIds(),
 	})
 	if err != nil {
 		if errors.Is(err, chanserv.ErrChannelNotFound) {
@@ -123,11 +123,10 @@ func (s *serverAPI) UpdateChannel(ctx context.Context, req *lpv1.UpdateChannelRe
 	}
 
 	updChannel := channels.UpdateChannelRequest{
-		UserID:       req.GetUserId(),
-		AdminInLgIds: req.GetAdminInLgIds(),
-		ChannelID:    req.GetChannelId(),
-		Name:         name,
-		Description:  description,
+		UserID:      req.GetUserId(),
+		ChannelID:   req.GetChannelId(),
+		Name:        name,
+		Description: description,
 	}
 
 	id, err := s.channelHandlers.UpdateChannel(ctx, &updChannel)
@@ -147,8 +146,7 @@ func (s *serverAPI) UpdateChannel(ctx context.Context, req *lpv1.UpdateChannelRe
 
 func (s *serverAPI) DeleteChannel(ctx context.Context, req *lpv1.DeleteChannelRequest) (*lpv1.DeleteChannelResponse, error) {
 	err := s.channelHandlers.DeleteChannel(ctx, &channels.DeleteChannelRequest{
-		ChannelID:    req.GetChannelId(),
-		AdminInLgIds: req.GetAdminInLgIds(),
+		ChannelID: req.GetChannelId(),
 	})
 	if err != nil {
 		if errors.Is(err, chanserv.ErrChannelNotFound) {
@@ -179,5 +177,40 @@ func (s *serverAPI) ShareChannelToGroup(ctx context.Context, req *lpv1.ShareChan
 
 	return &lpv1.ShareChannelToGroupResponse{
 		Success: true,
+	}, nil
+}
+
+func (s *serverAPI) IsChannelCreator(ctx context.Context, req *lpv1.IsChannelCreatorRequest) (*lpv1.IsChannelCreatorResponse, error) {
+
+	isCreator, err := s.channelHandlers.IsChannelCreator(ctx, &channels.IsChannelCreator{
+		UserID:    req.GetUserId(),
+		ChannelID: req.GetChannelId(),
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, chanserv.ErrChannelNotFound):
+			return nil, status.Error(codes.NotFound, "channel not found")
+		case errors.Is(err, chanserv.ErrPermissionDenied):
+			return nil, status.Error(codes.PermissionDenied, "permission denied")
+		case errors.Is(err, chanserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return &lpv1.IsChannelCreatorResponse{
+		IsCreator: isCreator,
+	}, nil
+}
+
+func (s *serverAPI) GetLearningGroupsShareWithChannel(ctx context.Context, req *lpv1.GetLearningGroupsShareWithChannelRequest) (*lpv1.GetLearningGroupsShareWithChannelResponse, error) {
+	lgIDs, err := s.channelHandlers.GetLearningGroupsShareWithChannel(ctx, req.ChannelId)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &lpv1.GetLearningGroupsShareWithChannelResponse{
+		LearningGroupIds: lgIDs,
 	}, nil
 }
