@@ -108,22 +108,36 @@ func (ph *PlanHandlers) CreatePlan(ctx context.Context, plan plans.CreatePlan) (
 
 		log.Error("failed to save plan", slog.String("err", err.Error()))
 		return 0, fmt.Errorf("%s: %w", op, err)
-	} else {
-		s := &plans.SharePlanForUsers{
-			PlanID:    id,
-			UsersIDs:  []string{plan.CreatedBy},
-			CreatedBy: plan.CreatedBy,
-		}
-		msgBody, err := json.Marshal(s)
-		if err != nil {
-			ph.log.Error("err to marshal shared msg", slog.String("err", err.Error()))
-			return 0, fmt.Errorf("%s: %w", op, err)
-		}
+	}
 
-		if err = ph.rabbitMQQueues.Publish(ctx, exchangePlan, planRoutingKey, msgBody); err != nil {
-			ph.log.Error("err send sharing plan to exchange", slog.String("err", err.Error()))
-			return 0, fmt.Errorf("%s: %w", op, err)
-		}
+	canShare, err := ph.planProvider.CanShare(ctx, &plans.DBCanShare{
+		ChannelID: plan.ChannelID,
+		PlanID:    id,
+	})
+	if err != nil {
+		ph.log.Error("invalid credentials", slog.String("err", err.Error()))
+		return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	if !canShare {
+		ph.log.Error("can't sharing")
+		return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	s := &plans.SharePlanForUsers{
+		PlanID:    id,
+		UsersIDs:  []string{plan.CreatedBy},
+		CreatedBy: plan.CreatedBy,
+	}
+	msgBody, err := json.Marshal(s)
+	if err != nil {
+		ph.log.Error("err to marshal shared msg", slog.String("err", err.Error()))
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	if err = ph.rabbitMQQueues.Publish(ctx, exchangePlan, planRoutingKey, msgBody); err != nil {
+		ph.log.Error("err send sharing plan to exchange", slog.String("err", err.Error()))
+		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return id, nil
