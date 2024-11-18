@@ -27,16 +27,28 @@ type CreatePlan struct {
 	ChannelID      int64     `json:"channel_id" validate:"required"`
 }
 
+type GetPlan struct {
+	PlanID    int64 `json:"plan_id" validate:"required"`
+	ChannelID int64 `json:"channel_id" validate:"required"`
+}
+
+type DeletePlan struct {
+	PlanID    int64 `json:"plan_id" validate:"required"`
+	ChannelID int64 `json:"channel_id" validate:"required"`
+}
+
 type UpdatePlanRequest struct {
-	ID             int64   `json:"id" validate:"required"`
-	Name           *string `json:"name,omitempty"`
-	Description    *string `json:"description,omitempty"`
-	LastModifiedBy string  `json:"last_modified_by" validate:"required"`
-	IsPublished    *bool   `json:"is_published,omitempty"`
-	Public         *bool   `json:"public,omitempty"`
+	ChannelID      int64  `json:"channel_id" validate:"required"`
+	PlanID         int64  `json:"plan_id" validate:"required"`
+	Name           string `json:"name,omitempty"`
+	Description    string `json:"description,omitempty"`
+	LastModifiedBy string `json:"last_modified_by" validate:"required"`
+	IsPublished    bool   `json:"is_published,omitempty"`
+	Public         bool   `json:"public,omitempty"`
 }
 
 type SharePlanForUsers struct {
+	ChannelID int64    `json:"channel_id" validate:"required"`
 	PlanID    int64    `json:"plan_id" validate:"required"`
 	UsersIDs  []string `json:"users_ids" validate:"required"`
 	CreatedBy string   `json:"created_by" validate:"required"`
@@ -55,8 +67,35 @@ type DBPlan struct {
 }
 
 type DBSharePlanForUser struct {
+	ChannelID int64     `db:"channel_id"`
 	PlanID    int64     `db:"plan_id"`
 	UserID    string    `db:"user_id"`
 	CreatedBy string    `db:"created_by"`
 	CreatedAt time.Time `db:"created_at"`
+}
+
+type DBCanShare struct {
+	ChannelID int64 `db:"channel_id"`
+	PlanID    int64 `db:"plan_id"`
+}
+
+type IsUserShareWithPlan struct {
+	UserID string `json:"user_id" validate:"required"`
+	PlanID int64  `json:"plan_id" validate:"required"`
+}
+
+type GetPlans struct {
+	UserID    string `json:"user_id" validate:"required"`
+	ChannelID int64  `json:"channel_id" validate:"required"`
+	Limit     int64  `json:"limit,omitempty" validate:"min=1"`
+	Offset    int64  `json:"offset,omitempty" validate:"min=0"`
+}
+
+func (p *GetPlans) SetDefaults() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	if p.Offset < 0 {
+		p.Offset = 0
+	}
 }

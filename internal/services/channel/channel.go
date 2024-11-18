@@ -329,7 +329,7 @@ func (chh *ChannelHandlers) GetLearningGroupsShareWithChannel(ctx context.Contex
 	lgIDs, err := chh.channelProvider.GetLearningGroupsShareWithChannel(ctx, channelID)
 	if err != nil {
 		log.Error("failed to get learning group ids", slog.String("err", err.Error()))
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
 	return lgIDs, nil

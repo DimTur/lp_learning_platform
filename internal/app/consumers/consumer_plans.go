@@ -87,7 +87,7 @@ func (c *ConsumerSharedPlans) handleMessage(ctx context.Context, msg interface{}
 			CreatedAt: time.Now(),
 		}
 
-		if err := c.planStorage.SharePlanWithUser(ctx, *share); err != nil {
+		if err := c.planStorage.SharePlanWithUser(ctx, share); err != nil {
 			if errors.Is(err, storage.ErrInvalidCredentials) {
 				log.Warn("invalid arguments", slog.String("err", err.Error()))
 				log.Info(

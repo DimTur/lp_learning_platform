@@ -207,7 +207,12 @@ func (s *serverAPI) IsChannelCreator(ctx context.Context, req *lpv1.IsChannelCre
 func (s *serverAPI) GetLearningGroupsShareWithChannel(ctx context.Context, req *lpv1.GetLearningGroupsShareWithChannelRequest) (*lpv1.GetLearningGroupsShareWithChannelResponse, error) {
 	lgIDs, err := s.channelHandlers.GetLearningGroupsShareWithChannel(ctx, req.ChannelId)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		switch {
+		case errors.Is(err, chanserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
 	}
 
 	return &lpv1.GetLearningGroupsShareWithChannelResponse{

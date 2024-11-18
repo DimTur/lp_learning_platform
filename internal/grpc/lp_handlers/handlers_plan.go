@@ -10,16 +10,14 @@ import (
 	lpv1 "github.com/DimTur/lp_protos/gen/go/lp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 )
 
 func (s *serverAPI) CreatePlan(ctx context.Context, req *lpv1.CreatePlanRequest) (*lpv1.CreatePlanResponse, error) {
 	plan := plans.CreatePlan{
-		Name:           req.GetName(),
-		Description:    req.GetDescription(),
-		CreatedBy:      req.GetCreatedBy(),
-		LastModifiedBy: req.GetCreatedBy(),
-		ChannelID:      req.GetChannelId(),
+		Name:        req.GetName(),
+		Description: req.GetDescription(),
+		CreatedBy:   req.GetCreatedBy(),
+		ChannelID:   req.GetChannelId(),
 	}
 
 	planID, err := s.planHandlers.CreatePlan(ctx, plan)
@@ -37,10 +35,15 @@ func (s *serverAPI) CreatePlan(ctx context.Context, req *lpv1.CreatePlanRequest)
 }
 
 func (s *serverAPI) GetPlan(ctx context.Context, req *lpv1.GetPlanRequest) (*lpv1.GetPlanResponse, error) {
-	plan, err := s.planHandlers.GetPlan(ctx, req.GetId())
+	plan, err := s.planHandlers.GetPlan(ctx, &plans.GetPlan{
+		PlanID:    req.GetPlanId(),
+		ChannelID: req.GetChannelId(),
+	})
 	if err != nil {
 		if errors.Is(err, planserv.ErrPlanNotFound) {
-			return nil, status.Error(codes.NotFound, "plan not found")
+			return &lpv1.GetPlanResponse{
+				Plan: &lpv1.Plan{},
+			}, status.Error(codes.NotFound, "plan not found")
 		}
 
 		return nil, status.Error(codes.Internal, err.Error())
@@ -62,7 +65,12 @@ func (s *serverAPI) GetPlan(ctx context.Context, req *lpv1.GetPlanRequest) (*lpv
 }
 
 func (s *serverAPI) GetPlans(ctx context.Context, req *lpv1.GetPlansRequest) (*lpv1.GetPlansResponse, error) {
-	plans, err := s.planHandlers.GetPlans(ctx, req.GetChannelId(), req.GetLimit(), req.GetOffset())
+	plans, err := s.planHandlers.GetPlans(ctx, &plans.GetPlans{
+		UserID:    req.GetUserId(),
+		ChannelID: req.GetChannelId(),
+		Limit:     req.GetLimit(),
+		Offset:    req.GetOffset(),
+	})
 	if err != nil {
 		switch {
 		case errors.Is(err, planserv.ErrPlanNotFound):
@@ -95,42 +103,29 @@ func (s *serverAPI) GetPlans(ctx context.Context, req *lpv1.GetPlansRequest) (*l
 }
 
 func (s *serverAPI) UpdatePlan(ctx context.Context, req *lpv1.UpdatePlanRequest) (*lpv1.UpdatePlanResponse, error) {
-	var name *string
-	if req.GetName() != "" {
-		name = proto.String(req.GetName())
-	}
-
-	var description *string
-	if req.GetDescription() != "" {
-		description = proto.String(req.GetDescription())
-	}
-
-	var isPublished *bool
-	if req.IsPublished != nil {
-		isPublished = proto.Bool(req.GetIsPublished())
-	}
-
-	var public *bool
-	if req.Public != nil {
-		public = proto.Bool(req.GetPublic())
-	}
-
-	updPlan := plans.UpdatePlanRequest{
-		ID:             req.GetId(),
-		Name:           name,
-		Description:    description,
+	id, err := s.planHandlers.UpdatePlan(ctx, &plans.UpdatePlanRequest{
+		ChannelID:      req.GetChannelId(),
+		PlanID:         req.GetPlanId(),
+		Name:           req.GetName(),
+		Description:    req.GetDescription(),
 		LastModifiedBy: req.GetLastModifiedBy(),
-		IsPublished:    isPublished,
-		Public:         public,
-	}
-
-	id, err := s.planHandlers.UpdatePlan(ctx, updPlan)
+		IsPublished:    req.GetIsPublished(),
+		Public:         req.GetPublic(),
+	})
 	if err != nil {
 		switch {
+		case errors.Is(err, planserv.ErrPlanNotFound):
+			return &lpv1.UpdatePlanResponse{
+				Id: 0,
+			}, status.Error(codes.NotFound, "plan not found")
 		case errors.Is(err, planserv.ErrInvalidCredentials):
-			return nil, status.Error(codes.InvalidArgument, "bad request")
+			return &lpv1.UpdatePlanResponse{
+				Id: 0,
+			}, status.Error(codes.InvalidArgument, "bad request")
 		default:
-			return nil, status.Error(codes.Internal, err.Error())
+			return &lpv1.UpdatePlanResponse{
+				Id: 0,
+			}, status.Error(codes.Internal, err.Error())
 		}
 	}
 
@@ -140,9 +135,10 @@ func (s *serverAPI) UpdatePlan(ctx context.Context, req *lpv1.UpdatePlanRequest)
 }
 
 func (s *serverAPI) DeletePlan(ctx context.Context, req *lpv1.DeletePlanRequest) (*lpv1.DeletePlanResponse, error) {
-	planID := req.GetId()
-
-	err := s.planHandlers.DeletePlan(ctx, planID)
+	err := s.planHandlers.DeletePlan(ctx, &plans.DeletePlan{
+		ChannelID: req.GetChannelId(),
+		PlanID:    req.GetPlanId(),
+	})
 	if err != nil {
 		if errors.Is(err, planserv.ErrPlanNotFound) {
 			return nil, status.Error(codes.NotFound, "plan not found")
@@ -157,12 +153,12 @@ func (s *serverAPI) DeletePlan(ctx context.Context, req *lpv1.DeletePlanRequest)
 }
 
 func (s *serverAPI) SharePlanWithUsers(ctx context.Context, req *lpv1.SharePlanWithUsersRequest) (*lpv1.SharePlanWithUsersResponse, error) {
-	sharingPlan := plans.SharePlanForUsers{
+	if err := s.planHandlers.SharePlanWithUser(ctx, &plans.SharePlanForUsers{
+		ChannelID: req.GetChannelId(),
 		PlanID:    req.GetPlanId(),
 		UsersIDs:  req.GetUsersIds(),
 		CreatedBy: req.GetCreatedBy(),
-	}
-	if err := s.planHandlers.SharePlanWithUser(ctx, sharingPlan); err != nil {
+	}); err != nil {
 		if errors.Is(err, planserv.ErrInvalidCredentials) {
 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
 		}
@@ -172,5 +168,23 @@ func (s *serverAPI) SharePlanWithUsers(ctx context.Context, req *lpv1.SharePlanW
 
 	return &lpv1.SharePlanWithUsersResponse{
 		Success: true,
+	}, nil
+}
+
+func (s *serverAPI) IsUserShareWithPlan(ctx context.Context, req *lpv1.IsUserShareWithPlanRequest) (*lpv1.IsUserShareWithPlanResponse, error) {
+	isShare, err := s.planHandlers.IsUserShareWithPlan(ctx, &plans.IsUserShareWithPlan{
+		UserID: req.GetUserId(),
+		PlanID: req.GetPlanId(),
+	})
+	if err != nil {
+		if errors.Is(err, planserv.ErrInvalidCredentials) {
+			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
+		}
+
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &lpv1.IsUserShareWithPlanResponse{
+		IsShare: isShare,
 	}, nil
 }

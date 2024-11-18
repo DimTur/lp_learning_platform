@@ -24,4 +24,6 @@ var (
 	ErrFailedContTransaction = errors.New("failed to continue transaction")
 	ErrRollBack              = errors.New("failed to rollback transaction")
 	ErrCommitTransaction     = errors.New("failed to commit transaction")
+
+	ErrPlanAlreadySharedWithUser = errors.New("plan already shared with user")
 )

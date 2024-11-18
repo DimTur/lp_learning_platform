@@ -26,11 +26,12 @@ type ChannelHandlers interface {
 
 type PlanHandlers interface {
 	CreatePlan(ctx context.Context, plan plans.CreatePlan) (int64, error)
-	GetPlan(ctx context.Context, planID int64) (plan plans.Plan, err error)
-	GetPlans(ctx context.Context, channel_id int64, limit, offset int64) ([]plans.Plan, error)
-	UpdatePlan(ctx context.Context, updPlan plans.UpdatePlanRequest) (int64, error)
-	DeletePlan(ctx context.Context, planID int64) error
-	SharePlanWithUser(ctx context.Context, s plans.SharePlanForUsers) error
+	GetPlan(ctx context.Context, planCh *plans.GetPlan) (plans.Plan, error)
+	GetPlans(ctx context.Context, inputParams *plans.GetPlans) ([]plans.Plan, error)
+	UpdatePlan(ctx context.Context, updPlan *plans.UpdatePlanRequest) (int64, error)
+	DeletePlan(ctx context.Context, planCh *plans.DeletePlan) error
+	SharePlanWithUser(ctx context.Context, s *plans.SharePlanForUsers) error
+	IsUserShareWithPlan(ctx context.Context, userPlan *plans.IsUserShareWithPlan) (bool, error)
 }
 
 type LessonHandlers interface {
