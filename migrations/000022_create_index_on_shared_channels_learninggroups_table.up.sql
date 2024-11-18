@@ -1,0 +1,2 @@
+CREATE UNIQUE INDEX unique_channels_learninggroups
+ON shared_channels_learninggroups(channel_id, learning_group_id);
