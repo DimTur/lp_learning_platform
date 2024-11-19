@@ -30,7 +30,7 @@ const (
 	VALUES ($1, $2)`
 )
 
-func (p *PlansPostgresStorage) CreatePlan(ctx context.Context, plan CreatePlan) (int64, error) {
+func (p *PlansPostgresStorage) CreatePlan(ctx context.Context, plan *CreatePlan) (int64, error) {
 	const op = "storage.postgresql.plans.plans.CreatePlan"
 
 	tx, err := p.db.Begin(ctx)
@@ -205,11 +205,11 @@ func (p *PlansPostgresStorage) GetPlans(ctx context.Context, inputParams *GetPla
 const updatePlanQuery = `
 	UPDATE plans p
 	SET name = COALESCE($3, p.name), 
-    description = COALESCE($4, p.description), 
-    last_modified_by = $5, 
-    is_published = COALESCE($6, p.is_published), 
-    public = COALESCE($7, p.public), 
-    modified = now() 
+    	description = COALESCE($4, p.description), 
+    	last_modified_by = $5, 
+    	is_published = COALESCE($6, p.is_published), 
+    	public = COALESCE($7, p.public), 
+    	modified = now() 
 	FROM 
 		channels_plans cp
 	WHERE 

@@ -20,7 +20,7 @@ const (
 )
 
 type PlanSaver interface {
-	CreatePlan(ctx context.Context, plan plans.CreatePlan) (int64, error)
+	CreatePlan(ctx context.Context, plan *plans.CreatePlan) (int64, error)
 	UpdatePlan(ctx context.Context, updPlan *plans.UpdatePlanRequest) (int64, error)
 	SharePlanWithUser(ctx context.Context, s *plans.DBSharePlanForUser) error
 }
@@ -75,7 +75,7 @@ func New(
 }
 
 // CreatePlan creats new plan in the system and returns plan ID.
-func (ph *PlanHandlers) CreatePlan(ctx context.Context, plan plans.CreatePlan) (int64, error) {
+func (ph *PlanHandlers) CreatePlan(ctx context.Context, plan *plans.CreatePlan) (int64, error) {
 	const op = "plan.CreatePlan"
 
 	log := ph.log.With(
@@ -144,7 +144,7 @@ func (ph *PlanHandlers) CreatePlan(ctx context.Context, plan plans.CreatePlan) (
 }
 
 // GetPlan gets plan by ID and returns it.
-func (ph *PlanHandlers) GetPlan(ctx context.Context, planCh *plans.GetPlan) (plans.Plan, error) {
+func (ph *PlanHandlers) GetPlan(ctx context.Context, planCh *plans.GetPlan) (*plans.Plan, error) {
 	const op = "plans.GetPlan"
 
 	log := ph.log.With(
@@ -159,14 +159,14 @@ func (ph *PlanHandlers) GetPlan(ctx context.Context, planCh *plans.GetPlan) (pla
 	if err != nil {
 		if errors.Is(err, storage.ErrPlanNotFound) {
 			ph.log.Warn("plan not found", slog.String("err", err.Error()))
-			return plan, ErrPlanNotFound
+			return &plans.Plan{}, ErrPlanNotFound
 		}
 
 		log.Error("failed to get plan", slog.String("err", err.Error()))
-		return plan, fmt.Errorf("%s: %w", op, err)
+		return &plans.Plan{}, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return plan, nil
+	return &plan, nil
 }
 
 // GetPlans gets plans and returns them.

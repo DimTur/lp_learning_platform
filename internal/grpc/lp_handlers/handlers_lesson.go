@@ -11,18 +11,17 @@ import (
 	lpv1 "github.com/DimTur/lp_protos/gen/go/lp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 )
 
 func (s *serverAPI) CreateLesson(ctx context.Context, req *lpv1.CreateLessonRequest) (*lpv1.CreateLessonResponse, error) {
-	lesson := lessons.CreateLesson{
+
+	lessonID, err := s.lessonHandlers.CreateLesson(ctx, &lessons.CreateLesson{
 		Name:           req.GetName(),
+		Description:    req.GetDescription(),
 		CreatedBy:      req.GetCreatedBy(),
 		LastModifiedBy: req.GetCreatedBy(),
 		PlanID:         req.GetPlanId(),
-	}
-
-	lessonID, err := s.lessonHandlers.CreateLesson(ctx, lesson)
+	})
 	if err != nil {
 		if errors.Is(err, planserv.ErrInvalidCredentials) {
 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
@@ -37,7 +36,10 @@ func (s *serverAPI) CreateLesson(ctx context.Context, req *lpv1.CreateLessonRequ
 }
 
 func (s *serverAPI) GetLesson(ctx context.Context, req *lpv1.GetLessonRequest) (*lpv1.GetLessonResponse, error) {
-	lesson, err := s.lessonHandlers.GetLesson(ctx, req.GetId())
+	lesson, err := s.lessonHandlers.GetLesson(ctx, &lessons.GetLesson{
+		LessonID: req.LessonId,
+		PlanID:   req.PlanId,
+	})
 	if err != nil {
 		if errors.Is(err, lessonserv.ErrLessonNotFound) {
 			return nil, status.Error(codes.NotFound, "lesson not found")
@@ -59,7 +61,11 @@ func (s *serverAPI) GetLesson(ctx context.Context, req *lpv1.GetLessonRequest) (
 }
 
 func (s *serverAPI) GetLessons(ctx context.Context, req *lpv1.GetLessonsRequest) (*lpv1.GetLessonsResponse, error) {
-	lessons, err := s.lessonHandlers.GetLessons(ctx, req.GetPlanId(), req.GetLimit(), req.GetOffset())
+	lessons, err := s.lessonHandlers.GetLessons(ctx, &lessons.GetLessons{
+		PlanID: req.GetPlanId(),
+		Limit:  req.GetLimit(),
+		Offset: req.GetOffset(),
+	})
 	if err != nil {
 		switch {
 		case errors.Is(err, lessonserv.ErrLessonNotFound):
@@ -89,20 +95,17 @@ func (s *serverAPI) GetLessons(ctx context.Context, req *lpv1.GetLessonsRequest)
 }
 
 func (s *serverAPI) UpdateLesson(ctx context.Context, req *lpv1.UpdateLessonRequest) (*lpv1.UpdateLessonResponse, error) {
-	var name *string
-	if req.GetName() != "" {
-		name = proto.String(req.GetName())
-	}
-
-	updLesson := lessons.UpdateLessonRequest{
-		ID:             req.GetId(),
-		Name:           name,
+	id, err := s.lessonHandlers.UpdateLesson(ctx, &lessons.UpdateLessonRequest{
+		PlanID:         req.GetPlanId(),
+		LessonID:       req.GetLessonId(),
+		Name:           req.GetName(),
+		Description:    req.GetDescription(),
 		LastModifiedBy: req.GetLastModifiedBy(),
-	}
-
-	id, err := s.lessonHandlers.UpdateLesson(ctx, updLesson)
+	})
 	if err != nil {
 		switch {
+		case errors.Is(err, lessonserv.ErrLessonNotFound):
+			return nil, status.Error(codes.NotFound, "lesson not found")
 		case errors.Is(err, lessonserv.ErrInvalidCredentials):
 			return nil, status.Error(codes.InvalidArgument, "bad request")
 		default:
@@ -116,9 +119,10 @@ func (s *serverAPI) UpdateLesson(ctx context.Context, req *lpv1.UpdateLessonRequ
 }
 
 func (s *serverAPI) DeleteLesson(ctx context.Context, req *lpv1.DeleteLessonRequest) (*lpv1.DeleteLessonResponse, error) {
-	lessonID := req.GetId()
-
-	err := s.lessonHandlers.DeleteLesson(ctx, lessonID)
+	err := s.lessonHandlers.DeleteLesson(ctx, &lessons.DeleteLesson{
+		LessonID: req.LessonId,
+		PlanID:   req.PlanId,
+	})
 	if err != nil {
 		if errors.Is(err, lessonserv.ErrLessonNotFound) {
 			return nil, status.Error(codes.NotFound, "lesson not found")

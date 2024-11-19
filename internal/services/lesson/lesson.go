@@ -9,21 +9,20 @@ import (
 
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
-	"github.com/DimTur/lp_learning_platform/internal/utils"
 	"github.com/go-playground/validator/v10"
 )
 
 type LessonSaver interface {
-	CreateLesson(ctx context.Context, lesson lessons.CreateLesson) (int64, error)
-	UpdateLesson(ctx context.Context, updLesson lessons.UpdateLessonRequest) (int64, error)
+	CreateLesson(ctx context.Context, lesson *lessons.CreateLesson) (int64, error)
+	UpdateLesson(ctx context.Context, updLesson *lessons.UpdateLessonRequest) (int64, error)
 }
 
 type LessonProvider interface {
-	GetLessonByID(ctx context.Context, lessonID int64) (lessons.Lesson, error)
-	GetLessons(ctx context.Context, plan_id int64, limit, offset int64) ([]lessons.Lesson, error)
+	GetLessonByID(ctx context.Context, lessonPlan *lessons.GetLesson) (lessons.Lesson, error)
+	GetLessons(ctx context.Context, inputParams *lessons.GetLessons) ([]lessons.Lesson, error)
 }
 type LessonDel interface {
-	DeleteLesson(ctx context.Context, id int64) error
+	DeleteLesson(ctx context.Context, lessonP *lessons.DeleteLesson) error
 }
 
 var (
@@ -58,12 +57,12 @@ func New(
 }
 
 // CreateLesson creats new lesson in the system and returns lesson ID.
-func (lh *LessonHandlers) CreateLesson(ctx context.Context, lesson lessons.CreateLesson) (int64, error) {
+func (lh *LessonHandlers) CreateLesson(ctx context.Context, lesson *lessons.CreateLesson) (int64, error) {
 	const op = "lesson.CreateLesson"
 
 	log := lh.log.With(
 		slog.String("op", op),
-		slog.String("name", lesson.Name),
+		slog.String("lesson_name", lesson.Name),
 	)
 
 	// Validation
@@ -94,46 +93,47 @@ func (lh *LessonHandlers) CreateLesson(ctx context.Context, lesson lessons.Creat
 }
 
 // GetLesson gets lesson by ID and returns it.
-func (lh *LessonHandlers) GetLesson(ctx context.Context, lessonID int64) (lessons.Lesson, error) {
+func (lh *LessonHandlers) GetLesson(ctx context.Context, lessonPlan *lessons.GetLesson) (*lessons.Lesson, error) {
 	const op = "lessons.GetLesson"
 
 	log := lh.log.With(
 		slog.String("op", op),
-		slog.Int64("lessonID", lessonID),
+		slog.Int64("lesson_id", lessonPlan.LessonID),
+		slog.Int64("plan_id", lessonPlan.PlanID),
 	)
 
 	log.Info("getting lesson")
 
-	var lesson lessons.Lesson
-	lesson, err := lh.lessonProvider.GetLessonByID(ctx, lessonID)
+	lesson, err := lh.lessonProvider.GetLessonByID(ctx, lessonPlan)
 	if err != nil {
 		if errors.Is(err, storage.ErrLessonNotFound) {
 			lh.log.Warn("lesson not found", slog.String("err", err.Error()))
-			return lesson, ErrLessonNotFound
+			return nil, ErrLessonNotFound
 		}
 
 		log.Error("failed to get lesson", slog.String("err", err.Error()))
-		return lesson, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return lesson, nil
+	return &lesson, nil
 }
 
 // GetLessons gets lessons and returns them.
-func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, offset int64) ([]lessons.Lesson, error) {
+func (lh *LessonHandlers) GetLessons(ctx context.Context, inputParams *lessons.GetLessons) ([]lessons.Lesson, error) {
 	const op = "lessons.GetLessons"
 
 	log := lh.log.With(
 		slog.String("op", op),
-		slog.Int64("getting lessons included in plan with id", planID),
+		slog.Int64("getting lessons included in plan with id", inputParams.PlanID),
 	)
 
 	log.Info("getting lessons")
 
 	// Validation
-	params := utils.PaginationQueryParams{
-		Limit:  limit,
-		Offset: offset,
+	params := lessons.GetLessons{
+		PlanID: inputParams.PlanID,
+		Limit:  inputParams.Limit,
+		Offset: inputParams.Offset,
 	}
 	params.SetDefaults()
 
@@ -142,8 +142,7 @@ func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, o
 		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	var lessons []lessons.Lesson
-	lessons, err := lh.lessonProvider.GetLessons(ctx, planID, params.Limit, params.Offset)
+	lessons, err := lh.lessonProvider.GetLessons(ctx, inputParams)
 	if err != nil {
 		if errors.Is(err, storage.ErrLessonNotFound) {
 			lh.log.Warn("lessons not found", slog.String("err", err.Error()))
@@ -158,12 +157,13 @@ func (lh *LessonHandlers) GetLessons(ctx context.Context, planID int64, limit, o
 }
 
 // UpdateLesson performs a partial update
-func (lh *LessonHandlers) UpdateLesson(ctx context.Context, updLesson lessons.UpdateLessonRequest) (int64, error) {
+func (lh *LessonHandlers) UpdateLesson(ctx context.Context, updLesson *lessons.UpdateLessonRequest) (int64, error) {
 	const op = "lessons.UpdateLesson"
 
 	log := lh.log.With(
 		slog.String("op", op),
-		slog.Int64("updating lesson with id: ", updLesson.ID),
+		slog.Int64("lesson_id: ", updLesson.LessonID),
+		slog.Int64("plan_id: ", updLesson.PlanID),
 	)
 
 	log.Info("updating lesson")
@@ -177,32 +177,36 @@ func (lh *LessonHandlers) UpdateLesson(ctx context.Context, updLesson lessons.Up
 
 	id, err := lh.lessonSaver.UpdateLesson(ctx, updLesson)
 	if err != nil {
-		if errors.Is(err, storage.ErrInvalidCredentials) {
+		switch {
+		case errors.Is(err, storage.ErrLessonNotFound):
+			lh.log.Warn("lesson not found", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, ErrLessonNotFound)
+		case errors.Is(err, storage.ErrInvalidCredentials):
 			lh.log.Warn("invalid credentials", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		default:
+			log.Error("failed to update lesson", slog.String("err", err.Error()))
 			return 0, fmt.Errorf("%s: %w", op, err)
 		}
-
-		log.Error("failed to update lesson", slog.String("err", err.Error()))
-		return 0, fmt.Errorf("%s: %w", op, err)
 	}
-
-	log.Info("lesson updated with ", slog.Int64("lessonID", id))
+	log.Info("lesson updated with ", slog.Int64("lesson_id", id))
 
 	return id, nil
 }
 
 // DeleteLesson
-func (lh *LessonHandlers) DeleteLesson(ctx context.Context, lessonID int64) error {
+func (lh *LessonHandlers) DeleteLesson(ctx context.Context, lessonP *lessons.DeleteLesson) error {
 	const op = "lessons.DeleteLesson"
 
 	log := lh.log.With(
 		slog.String("op", op),
-		slog.Int64("lesson id", lessonID),
+		slog.Int64("lesson_id", lessonP.LessonID),
+		slog.Int64("plan_id", lessonP.PlanID),
 	)
 
-	log.Info("deleting lesson with: ", slog.Int64("lessonID", lessonID))
+	log.Info("deleting lesson with: ", slog.Int64("lesson_id", lessonP.LessonID))
 
-	err := lh.lessonDel.DeleteLesson(ctx, lessonID)
+	err := lh.lessonDel.DeleteLesson(ctx, lessonP)
 	if err != nil {
 		if errors.Is(err, storage.ErrLessonNotFound) {
 			lh.log.Warn("lesson not found", slog.String("err", err.Error()))

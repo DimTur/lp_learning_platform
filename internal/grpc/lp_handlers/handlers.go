@@ -25,8 +25,8 @@ type ChannelHandlers interface {
 }
 
 type PlanHandlers interface {
-	CreatePlan(ctx context.Context, plan plans.CreatePlan) (int64, error)
-	GetPlan(ctx context.Context, planCh *plans.GetPlan) (plans.Plan, error)
+	CreatePlan(ctx context.Context, plan *plans.CreatePlan) (int64, error)
+	GetPlan(ctx context.Context, planCh *plans.GetPlan) (*plans.Plan, error)
 	GetPlans(ctx context.Context, inputParams *plans.GetPlans) ([]plans.Plan, error)
 	UpdatePlan(ctx context.Context, updPlan *plans.UpdatePlanRequest) (int64, error)
 	DeletePlan(ctx context.Context, planCh *plans.DeletePlan) error
@@ -35,11 +35,11 @@ type PlanHandlers interface {
 }
 
 type LessonHandlers interface {
-	CreateLesson(ctx context.Context, lesson lessons.CreateLesson) (int64, error)
-	GetLesson(ctx context.Context, lessonID int64) (lessons.Lesson, error)
-	GetLessons(ctx context.Context, plan_id int64, limit, offset int64) ([]lessons.Lesson, error)
-	UpdateLesson(ctx context.Context, updLEsson lessons.UpdateLessonRequest) (int64, error)
-	DeleteLesson(ctx context.Context, lessonID int64) error
+	CreateLesson(ctx context.Context, lesson *lessons.CreateLesson) (int64, error)
+	GetLesson(ctx context.Context, lessonPlan *lessons.GetLesson) (*lessons.Lesson, error)
+	GetLessons(ctx context.Context, inputParams *lessons.GetLessons) ([]lessons.Lesson, error)
+	UpdateLesson(ctx context.Context, updLesson *lessons.UpdateLessonRequest) (int64, error)
+	DeleteLesson(ctx context.Context, lessonP *lessons.DeleteLesson) error
 }
 
 type PageHandlers interface {

@@ -13,14 +13,12 @@ import (
 )
 
 func (s *serverAPI) CreatePlan(ctx context.Context, req *lpv1.CreatePlanRequest) (*lpv1.CreatePlanResponse, error) {
-	plan := plans.CreatePlan{
+	planID, err := s.planHandlers.CreatePlan(ctx, &plans.CreatePlan{
 		Name:        req.GetName(),
 		Description: req.GetDescription(),
 		CreatedBy:   req.GetCreatedBy(),
 		ChannelID:   req.GetChannelId(),
-	}
-
-	planID, err := s.planHandlers.CreatePlan(ctx, plan)
+	})
 	if err != nil {
 		if errors.Is(err, planserv.ErrInvalidCredentials) {
 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
