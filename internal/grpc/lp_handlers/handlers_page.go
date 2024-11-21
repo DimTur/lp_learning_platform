@@ -13,135 +13,171 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *serverAPI) CreatePage(ctx context.Context, req *lpv1.CreatePageRequest) (*lpv1.CreatePageResponse, error) {
-	var page pagestore.CreatePage
-
-	switch pageReq := req.GetPage().(type) {
-	case *lpv1.CreatePageRequest_ImagePage:
-		page = &pagestore.CreateImagePage{
-			CreateBasePage: pagestore.CreateBasePage{
-				LessonID:       pageReq.ImagePage.Base.LessonId,
-				CreatedBy:      pageReq.ImagePage.Base.CreatedBy,
-				LastModifiedBy: pageReq.ImagePage.Base.LastModifiedBy,
-				ContentType:    "image",
-			},
-			ImageFileUrl: pageReq.ImagePage.ImageFileUrl,
-			ImageName:    pageReq.ImagePage.ImageName,
-		}
-	case *lpv1.CreatePageRequest_VideoPage:
-		page = &pagestore.CreateVideoPage{
-			CreateBasePage: pagestore.CreateBasePage{
-				LessonID:       pageReq.VideoPage.Base.LessonId,
-				CreatedBy:      pageReq.VideoPage.Base.CreatedBy,
-				LastModifiedBy: pageReq.VideoPage.Base.LastModifiedBy,
-				ContentType:    "video",
-			},
-			VideoFileUrl: pageReq.VideoPage.VideoFileUrl,
-			VideoName:    pageReq.VideoPage.VideoName,
-		}
-	case *lpv1.CreatePageRequest_PdfPage:
-		page = &pagestore.CreatePDFPage{
-			CreateBasePage: pagestore.CreateBasePage{
-				LessonID:       pageReq.PdfPage.Base.LessonId,
-				CreatedBy:      pageReq.PdfPage.Base.CreatedBy,
-				LastModifiedBy: pageReq.PdfPage.Base.LastModifiedBy,
-				ContentType:    "pdf",
-			},
-			PdfFileUrl: pageReq.PdfPage.PdfFileUrl,
-			PdfName:    pageReq.PdfPage.PdfName,
-		}
-	default:
-		return nil, status.Errorf(codes.InvalidArgument, "unsupported page type")
-	}
-
-	pageID, err := s.pageHandlers.CreatePage(ctx, page)
+func (s *serverAPI) CreateImagePage(ctx context.Context, req *lpv1.CreateImagePageRequest) (*lpv1.CreateImagePageResponse, error) {
+	pageID, err := s.pageHandlers.CreateImagePage(ctx, &pagestore.CreateImagePage{
+		CreateBasePage: pagestore.CreateBasePage{
+			LessonID:       req.Base.GetLessonId(),
+			CreatedBy:      req.Base.GetCreatedBy(),
+			LastModifiedBy: req.Base.GetCreatedBy(),
+			ContentType:    "image",
+		},
+		ImageName:    req.GetImageName(),
+		ImageFileUrl: req.GetImageFileUrl(),
+	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to create page: %v", err)
+		switch {
+		case errors.Is(err, pageserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
 	}
 
-	return &lpv1.CreatePageResponse{
+	return &lpv1.CreateImagePageResponse{
 		Id: pageID,
 	}, nil
 }
 
-func (s *serverAPI) GetPage(ctx context.Context, req *lpv1.GetPageRequest) (*lpv1.GetPageResponse, error) {
-
-	contentType, err := ContentTypeToString(req.GetContentType())
+func (s *serverAPI) CreateVideoPage(ctx context.Context, req *lpv1.CreateVideoPageRequest) (*lpv1.CreateVideoPageResponse, error) {
+	pageID, err := s.pageHandlers.CreateVideoPage(ctx, &pagestore.CreateVideoPage{
+		CreateBasePage: pagestore.CreateBasePage{
+			LessonID:       req.Base.GetLessonId(),
+			CreatedBy:      req.Base.GetCreatedBy(),
+			LastModifiedBy: req.Base.GetCreatedBy(),
+			ContentType:    "video",
+		},
+		VideoName:    req.GetVideoName(),
+		VideoFileUrl: req.GetVideoFileUrl(),
+	})
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		switch {
+		case errors.Is(err, pageserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
 	}
 
-	page, err := s.pageHandlers.GetPage(ctx, req.GetId(), contentType)
+	return &lpv1.CreateVideoPageResponse{
+		Id: pageID,
+	}, nil
+}
+
+func (s *serverAPI) CreatePDFPage(ctx context.Context, req *lpv1.CreatePDFPageRequest) (*lpv1.CreatePDFPageResponse, error) {
+	pageID, err := s.pageHandlers.CreatePDFPage(ctx, &pagestore.CreatePDFPage{
+		CreateBasePage: pagestore.CreateBasePage{
+			LessonID:       req.Base.GetLessonId(),
+			CreatedBy:      req.Base.GetCreatedBy(),
+			LastModifiedBy: req.Base.GetCreatedBy(),
+			ContentType:    "pdf",
+		},
+		PdfName:    req.GetPdfName(),
+		PdfFileUrl: req.GetPdfFileUrl(),
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, pageserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return &lpv1.CreatePDFPageResponse{
+		Id: pageID,
+	}, nil
+}
+
+func (s *serverAPI) GetImagePage(ctx context.Context, req *lpv1.GetImagePageRequest) (*lpv1.GetImagePageResponse, error) {
+	page, err := s.pageHandlers.GetImagePage(ctx, &pagestore.GetPage{
+		PageID:   req.GetPageId(),
+		LessonID: req.GetLessonId(),
+	})
 	if err != nil {
 		switch {
 		case errors.Is(err, pageserv.ErrPageNotFound):
-			return nil, status.Error(codes.NotFound, "page not found")
-		case errors.Is(err, pageserv.ErrUnContType):
-			return nil, status.Error(codes.InvalidArgument, "unsupported content type")
+			return nil, status.Error(codes.NotFound, "image page not found")
 		default:
-			return nil, status.Error(codes.Internal, fmt.Sprintf("failed to get page: %v", err))
+			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
 
-	var response lpv1.GetPageResponse
-	switch p := page.(type) {
-	case *pagestore.ImagePage:
-		response.Page = &lpv1.GetPageResponse_ImagePage{
-			ImagePage: &lpv1.ImagePage{
-				Base: &lpv1.BasePage{
-					Id:             p.ID,
-					LessonId:       p.LessonID,
-					CreatedBy:      p.CreatedBy,
-					LastModifiedBy: p.LastModifiedBy,
-					CreatedAt:      p.CreatedAt.Format(time.RFC3339),
-					Modified:       p.Modified.Format(time.RFC3339),
-					ContentType:    lpv1.ContentType_IMAGE,
-				},
-				ImageFileUrl: p.ImageFileUrl,
-				ImageName:    p.ImageName,
-			},
+	return &lpv1.GetImagePageResponse{
+		Base: &lpv1.BasePage{
+			Id:             page.BasePage.ID,
+			LessonId:       page.BasePage.LessonID,
+			CreatedBy:      page.BasePage.CreatedBy,
+			LastModifiedBy: page.BasePage.LastModifiedBy,
+			CreatedAt:      page.BasePage.CreatedAt.Format(time.RFC3339),
+			Modified:       page.BasePage.Modified.Format(time.RFC3339),
+		},
+		ImageFileUrl: page.ImageFileUrl,
+		ImageName:    page.ImageName,
+	}, nil
+}
+
+func (s *serverAPI) GetVideoPage(ctx context.Context, req *lpv1.GetVideoPageRequest) (*lpv1.GetVideoPageResponse, error) {
+	page, err := s.pageHandlers.GetVideoPage(ctx, &pagestore.GetPage{
+		PageID:   req.GetPageId(),
+		LessonID: req.GetLessonId(),
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, pageserv.ErrPageNotFound):
+			return nil, status.Error(codes.NotFound, "image page not found")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
 		}
-	case *pagestore.VideoPage:
-		response.Page = &lpv1.GetPageResponse_VideoPage{
-			VideoPage: &lpv1.VideoPage{
-				Base: &lpv1.BasePage{
-					Id:             p.ID,
-					LessonId:       p.LessonID,
-					CreatedBy:      p.CreatedBy,
-					LastModifiedBy: p.LastModifiedBy,
-					CreatedAt:      p.CreatedAt.Format(time.RFC3339),
-					Modified:       p.Modified.Format(time.RFC3339),
-					ContentType:    lpv1.ContentType_VIDEO,
-				},
-				VideoFileUrl: p.VideoFileUrl,
-				VideoName:    p.VideoName,
-			},
-		}
-	case *pagestore.PDFPage:
-		response.Page = &lpv1.GetPageResponse_PdfPage{
-			PdfPage: &lpv1.PDFPage{
-				Base: &lpv1.BasePage{
-					Id:             p.ID,
-					LessonId:       p.LessonID,
-					CreatedBy:      p.CreatedBy,
-					LastModifiedBy: p.LastModifiedBy,
-					CreatedAt:      p.CreatedAt.Format(time.RFC3339),
-					Modified:       p.Modified.Format(time.RFC3339),
-					ContentType:    lpv1.ContentType_PDF,
-				},
-				PdfFileUrl: p.PdfFileUrl,
-				PdfName:    p.PdfName,
-			},
-		}
-	default:
-		return nil, status.Error(codes.Internal, "unknown page type")
 	}
 
-	return &response, nil
+	return &lpv1.GetVideoPageResponse{
+		Base: &lpv1.BasePage{
+			Id:             page.BasePage.ID,
+			LessonId:       page.BasePage.LessonID,
+			CreatedBy:      page.BasePage.CreatedBy,
+			LastModifiedBy: page.BasePage.LastModifiedBy,
+			CreatedAt:      page.BasePage.CreatedAt.Format(time.RFC3339),
+			Modified:       page.BasePage.Modified.Format(time.RFC3339),
+		},
+		VideoFileUrl: page.VideoFileUrl,
+		VideoName:    page.VideoName,
+	}, nil
+}
+
+func (s *serverAPI) GetPDFPage(ctx context.Context, req *lpv1.GetPDFPageRequest) (*lpv1.GetPDFPageResponse, error) {
+	page, err := s.pageHandlers.GetPDFPage(ctx, &pagestore.GetPage{
+		PageID:   req.GetPageId(),
+		LessonID: req.GetLessonId(),
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, pageserv.ErrPageNotFound):
+			return nil, status.Error(codes.NotFound, "image page not found")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return &lpv1.GetPDFPageResponse{
+		Base: &lpv1.BasePage{
+			Id:             page.BasePage.ID,
+			LessonId:       page.BasePage.LessonID,
+			CreatedBy:      page.BasePage.CreatedBy,
+			LastModifiedBy: page.BasePage.LastModifiedBy,
+			CreatedAt:      page.BasePage.CreatedAt.Format(time.RFC3339),
+			Modified:       page.BasePage.Modified.Format(time.RFC3339),
+		},
+		PdfFileUrl: page.PdfFileUrl,
+		PdfName:    page.PdfName,
+	}, nil
 }
 
 func (s *serverAPI) GetPages(ctx context.Context, req *lpv1.GetPagesRequest) (*lpv1.GetPagesResponse, error) {
-	pages, err := s.pageHandlers.GetPages(ctx, req.GetLessonId(), req.GetLimit(), req.GetOffset())
+	pages, err := s.pageHandlers.GetPages(ctx, &pagestore.GetPages{
+		LessonID: req.GetLessonId(),
+		Limit:    req.GetLimit(),
+		Offset:   req.GetOffset(),
+	})
 	if err != nil {
 		switch {
 		case errors.Is(err, pageserv.ErrPageNotFound):
@@ -171,45 +207,16 @@ func (s *serverAPI) GetPages(ctx context.Context, req *lpv1.GetPagesRequest) (*l
 	}, nil
 }
 
-func (s *serverAPI) UpdatePage(ctx context.Context, req *lpv1.UpdatePageRequest) (*lpv1.UpdatePageResponse, error) {
-	var page pagestore.UpdatePage
-
-	switch pageReq := req.GetPage().(type) {
-	case *lpv1.UpdatePageRequest_ImagePage:
-		page = &pagestore.UpdateImagePage{
-			UpdateBasePage: pagestore.UpdateBasePage{
-				ID:             pageReq.ImagePage.Base.GetId(),
-				LastModifiedBy: pageReq.ImagePage.Base.GetLastModifiedBy(),
-				ContentType:    "image",
-			},
-			ImageFileUrl: pageReq.ImagePage.GetImageFileUrl(),
-			ImageName:    pageReq.ImagePage.GetImageName(),
-		}
-	case *lpv1.UpdatePageRequest_VideoPage:
-		page = &pagestore.UpdateVideoPage{
-			UpdateBasePage: pagestore.UpdateBasePage{
-				ID:             pageReq.VideoPage.Base.GetId(),
-				LastModifiedBy: pageReq.VideoPage.Base.GetLastModifiedBy(),
-				ContentType:    "video",
-			},
-			VideoFileUrl: pageReq.VideoPage.GetVideoFileUrl(),
-			VideoName:    pageReq.VideoPage.GetVideoName(),
-		}
-	case *lpv1.UpdatePageRequest_PdfPage:
-		page = &pagestore.UpdatePDFPage{
-			UpdateBasePage: pagestore.UpdateBasePage{
-				ID:             pageReq.PdfPage.Base.GetId(),
-				LastModifiedBy: pageReq.PdfPage.Base.GetLastModifiedBy(),
-				ContentType:    "pdf",
-			},
-			PdfFileUrl: pageReq.PdfPage.PdfFileUrl,
-			PdfName:    pageReq.PdfPage.GetPdfName(),
-		}
-	default:
-		return nil, status.Errorf(codes.InvalidArgument, "unsupported page type")
-	}
-
-	pageID, err := s.pageHandlers.UpdatePage(ctx, page)
+func (s *serverAPI) UpdateImagePage(ctx context.Context, req *lpv1.UpdateImagePageRequest) (*lpv1.UpdateImagePageResponse, error) {
+	id, err := s.pageHandlers.UpdateImagePage(ctx, pagestore.UpdateImagePage{
+		UpdateBasePage: pagestore.UpdateBasePage{
+			ID:             req.Base.GetId(),
+			LastModifiedBy: req.Base.GetLastModifiedBy(),
+			ContentType:    "image",
+		},
+		ImageFileUrl: req.GetImageFileUrl(),
+		ImageName:    req.GetImageName(),
+	})
 	if err != nil {
 		switch {
 		case errors.Is(err, pageserv.ErrInvalidCredentials):
@@ -219,16 +226,64 @@ func (s *serverAPI) UpdatePage(ctx context.Context, req *lpv1.UpdatePageRequest)
 		}
 	}
 
-	return &lpv1.UpdatePageResponse{
-		Id:      pageID,
-		Success: true,
+	return &lpv1.UpdateImagePageResponse{
+		Id: id,
+	}, nil
+}
+
+func (s *serverAPI) UpdateVideoPage(ctx context.Context, req *lpv1.UpdateVideoPageRequest) (*lpv1.UpdateVideoPageResponse, error) {
+	id, err := s.pageHandlers.UpdateVideoPage(ctx, pagestore.UpdateVideoPage{
+		UpdateBasePage: pagestore.UpdateBasePage{
+			ID:             req.Base.GetId(),
+			LastModifiedBy: req.Base.GetLastModifiedBy(),
+			ContentType:    "video",
+		},
+		VideoFileUrl: req.GetVideoFileUrl(),
+		VideoName:    req.GetVideoName(),
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, pageserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return &lpv1.UpdateVideoPageResponse{
+		Id: id,
+	}, nil
+}
+
+func (s *serverAPI) UpdatePDFPage(ctx context.Context, req *lpv1.UpdatePDFPageRequest) (*lpv1.UpdatePDFPageResponse, error) {
+	id, err := s.pageHandlers.UpdatePDFPage(ctx, pagestore.UpdatePDFPage{
+		UpdateBasePage: pagestore.UpdateBasePage{
+			ID:             req.Base.GetId(),
+			LastModifiedBy: req.Base.GetLastModifiedBy(),
+			ContentType:    "video",
+		},
+		PdfFileUrl: req.GetPdfFileUrl(),
+		PdfName:    req.GetPdfName(),
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, pageserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return &lpv1.UpdatePDFPageResponse{
+		Id: id,
 	}, nil
 }
 
 func (s *serverAPI) DeletePage(ctx context.Context, req *lpv1.DeletePageRequest) (*lpv1.DeletePageResponse, error) {
-	pageId := req.GetId()
-
-	err := s.pageHandlers.DeletePage(ctx, pageId)
+	err := s.pageHandlers.DeletePage(ctx, &pagestore.DeletePage{
+		PageID:   req.GetPageId(),
+		LessonID: req.GetLessonId(),
+	})
 	if err != nil {
 		if errors.Is(err, pageserv.ErrPageNotFound) {
 			return nil, status.Error(codes.NotFound, "page not found")
@@ -267,97 +322,3 @@ func convertToContentType(contentTypeStr string) lpv1.ContentType {
 		return lpv1.ContentType_CONTENT_TYPE_UNSPECIFIED
 	}
 }
-
-// func (s *serverAPI) CreateImagePage(ctx context.Context, req *lpv1.CreateImagePageRequest) (*lpv1.CreateImagePageResponse, error) {
-// 	imagePage := models.CreateImagePage{
-// 		LessonID:       req.GetLessonId(),
-// 		CreatedBy:      req.GetCreatedBy(),
-// 		LastModifiedBy: req.GetCreatedBy(),
-// 		ContentType:    req.GetContentType().String(),
-// 		ImageFileUrl:   req.GetImageFileUrl(),
-// 		ImageName:      req.GetImageName(),
-// 	}
-
-// 	pageID, err := s.pageHandlers.CreateImagePage(ctx, imagePage)
-// 	if err != nil {
-// 		if errors.Is(err, lessonserv.ErrInvalidCredentials) {
-// 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
-// 		}
-
-// 		return nil, status.Error(codes.Internal, err.Error())
-// 	}
-
-// 	return &lpv1.CreateImagePageResponse{
-// 		Id: pageID,
-// 	}, nil
-// }
-
-// func (s *serverAPI) CreateVideoPage(ctx context.Context, req *lpv1.CreateVideoPageRequest) (*lpv1.CreateVideoPageResponse, error) {
-// 	videoPage := models.CreateVideoPage{
-// 		LessonID:       req.GetLessonId(),
-// 		CreatedBy:      req.GetCreatedBy(),
-// 		LastModifiedBy: req.GetCreatedBy(),
-// 		ContentType:    req.GetContentType().String(),
-// 		VideoFileUrl:   req.GetVideoFileUrl(),
-// 		VideoName:      req.GetVideoName(),
-// 	}
-
-// 	pageID, err := s.pageHandlers.CreateVideoPage(ctx, videoPage)
-// 	if err != nil {
-// 		if errors.Is(err, lessonserv.ErrInvalidCredentials) {
-// 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
-// 		}
-
-// 		return nil, status.Error(codes.Internal, err.Error())
-// 	}
-
-// 	return &lpv1.CreateVideoPageResponse{
-// 		Id: pageID,
-// 	}, nil
-// }
-
-// func (s *serverAPI) CreatePDFPage(ctx context.Context, req *lpv1.CreatePDFPageRequest) (*lpv1.CreatePDFPageResponse, error) {
-// 	imagePage := models.CreatePDFPage{
-// 		LessonID:       req.GetLessonId(),
-// 		CreatedBy:      req.GetCreatedBy(),
-// 		LastModifiedBy: req.GetCreatedBy(),
-// 		ContentType:    req.GetContentType().String(),
-// 		PdfFileUrl:     req.GetPdfFileUrl(),
-// 		PdfName:        req.GetPdfName(),
-// 	}
-
-// 	pageID, err := s.pageHandlers.CreatePDFPage(ctx, imagePage)
-// 	if err != nil {
-// 		if errors.Is(err, lessonserv.ErrInvalidCredentials) {
-// 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
-// 		}
-
-// 		return nil, status.Error(codes.Internal, err.Error())
-// 	}
-
-// 	return &lpv1.CreatePDFPageResponse{
-// 		Id: pageID,
-// 	}, nil
-// }
-
-// func (s *serverAPI) GetLesson(ctx context.Context, req *lpv1.GetLessonRequest) (*lpv1.GetLessonResponse, error) {
-// 	lesson, err := s.lessonHandlers.GetLesson(ctx, req.GetId())
-// 	if err != nil {
-// 		if errors.Is(err, pageserv.ErrPageNotFound) {
-// 			return nil, status.Error(codes.NotFound, "lesson not found")
-// 		}
-
-// 		return nil, status.Error(codes.Internal, err.Error())
-// 	}
-
-// 	return &lpv1.GetLessonResponse{
-// 		Lesson: &lpv1.Lesson{
-// 			Id:             lesson.ID,
-// 			Name:           lesson.Name,
-// 			CreatedBy:      lesson.CreatedBy,
-// 			LastModifiedBy: lesson.LastModifiedBy,
-// 			CreatedAt:      timestamppb.New(lesson.CreatedAt),
-// 			Modified:       timestamppb.New(lesson.Modified),
-// 		},
-// 	}, nil
-// }

@@ -43,11 +43,17 @@ type LessonHandlers interface {
 }
 
 type PageHandlers interface {
-	CreatePage(ctx context.Context, page pages.CreatePage) (int64, error)
-	GetPage(ctx context.Context, pageID int64, contentType string) (pages.Page, error)
-	GetPages(ctx context.Context, lessonID int64, limit, offset int64) ([]pages.BasePage, error)
-	UpdatePage(ctx context.Context, updPage pages.UpdatePage) (int64, error)
-	DeletePage(ctx context.Context, pageID int64) error
+	CreateImagePage(ctx context.Context, imagePage *pages.CreateImagePage) (int64, error)
+	CreatePDFPage(ctx context.Context, pdfPage *pages.CreatePDFPage) (int64, error)
+	CreateVideoPage(ctx context.Context, videoPage *pages.CreateVideoPage) (int64, error)
+	GetImagePage(ctx context.Context, pageLesson *pages.GetPage) (*pages.ImagePage, error)
+	GetVideoPage(ctx context.Context, pageLesson *pages.GetPage) (*pages.VideoPage, error)
+	GetPDFPage(ctx context.Context, pageLesson *pages.GetPage) (*pages.PDFPage, error)
+	GetPages(ctx context.Context, inputParams *pages.GetPages) ([]pages.BasePage, error)
+	UpdateImagePage(ctx context.Context, updPage pages.UpdateImagePage) (int64, error)
+	UpdateVideoPage(ctx context.Context, updPage pages.UpdateVideoPage) (int64, error)
+	UpdatePDFPage(ctx context.Context, updPage pages.UpdatePDFPage) (int64, error)
+	DeletePage(ctx context.Context, pageLesson *pages.DeletePage) error
 }
 
 type QuestionHandlers interface {

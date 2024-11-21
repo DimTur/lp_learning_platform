@@ -71,6 +71,31 @@ type CreatePDFPage struct {
 	PdfName    string `json:"pdf_name"`
 }
 
+type GetPage struct {
+	PageID   int64 `json:"page_id" validate:"required"`
+	LessonID int64 `json:"lesson_id" validate:"required"`
+}
+
+type GetPages struct {
+	LessonID int64 `json:"lesson_id" validate:"required"`
+	Limit    int64 `json:"limit,omitempty" validate:"min=1"`
+	Offset   int64 `json:"offset,omitempty" validate:"min=0"`
+}
+
+func (p *GetPages) SetDefaults() {
+	if p.Limit == 0 {
+		p.Limit = 10
+	}
+	if p.Offset < 0 {
+		p.Offset = 0
+	}
+}
+
+type DeletePage struct {
+	PageID   int64 `json:"page_id" validate:"required"`
+	LessonID int64 `json:"lesson_id" validate:"required"`
+}
+
 type UpdateBasePage struct {
 	ID             int64  `json:"id" validate:"required"`
 	LastModifiedBy string `json:"last_modified_by" validate:"required"`
