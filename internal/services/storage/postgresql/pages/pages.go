@@ -2,6 +2,7 @@ package pages
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -68,7 +69,7 @@ func (p *PagesPostgresStorage) updateAbstractPage(ctx context.Context, page Upda
 	}
 
 	commonFields := page.GetCommonFields()
-	_, err = tx.Exec(
+	result, err := tx.Exec(
 		ctx,
 		updateAbstractPageQuery,
 		commonFields.ID,
@@ -76,6 +77,10 @@ func (p *PagesPostgresStorage) updateAbstractPage(ctx context.Context, page Upda
 	)
 	if err != nil {
 		return 0, nil, fmt.Errorf("update abstract: %w", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return 0, nil, storage.ErrPageNotFound
 	}
 
 	return commonFields.ID, tx, err
@@ -369,7 +374,12 @@ func (p *PagesPostgresStorage) UpdatePage(ctx context.Context, updPage UpdatePag
 
 	pageID, tx, err := p.updateAbstractPage(ctx, updPage)
 	if err != nil {
-		return 0, fmt.Errorf("update page abstract: %w", err)
+		switch {
+		case errors.Is(err, storage.ErrPageNotFound):
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
+		default:
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
+		}
 	}
 	defer func(err error) {
 		if err != nil {
@@ -387,11 +397,11 @@ func (p *PagesPostgresStorage) UpdatePage(ctx context.Context, updPage UpdatePag
 			updPage.GetContentTypeSpecificFields()...)...,
 	)
 	if err != nil {
-		return 0, fmt.Errorf("update page specific: %w", storage.ErrInvalidCredentials)
+		return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
 	}
 
 	if err = tx.Commit(ctx); err != nil {
-		return 0, fmt.Errorf("update page commit: %w", storage.ErrCommitTransaction)
+		return 0, fmt.Errorf("%s: %w", op, storage.ErrCommitTransaction)
 	}
 
 	return pageID, nil

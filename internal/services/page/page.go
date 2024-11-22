@@ -63,7 +63,7 @@ func (ph *PageHandlers) CreateImagePage(ctx context.Context, imagePage *pages.Cr
 
 	log := ph.log.With(
 		slog.String("op", op),
-		slog.Int64("lessom_id", imagePage.GetCommonFields().LessonID),
+		slog.Int64("lesson_id", imagePage.GetCommonFields().LessonID),
 		slog.String("page_type", imagePage.GetCommonFields().ContentType),
 	)
 
@@ -96,7 +96,7 @@ func (ph *PageHandlers) CreatePDFPage(ctx context.Context, pdfPage *pages.Create
 
 	log := ph.log.With(
 		slog.String("op", op),
-		slog.Int64("lessom_id", pdfPage.GetCommonFields().LessonID),
+		slog.Int64("lesson_id", pdfPage.GetCommonFields().LessonID),
 		slog.String("page_type", pdfPage.GetCommonFields().ContentType),
 	)
 
@@ -129,7 +129,7 @@ func (ph *PageHandlers) CreateVideoPage(ctx context.Context, videoPage *pages.Cr
 
 	log := ph.log.With(
 		slog.String("op", op),
-		slog.Int64("lessom_id", videoPage.GetCommonFields().LessonID),
+		slog.Int64("lesson_id", videoPage.GetCommonFields().LessonID),
 		slog.String("page_type", videoPage.GetCommonFields().ContentType),
 	)
 
@@ -188,6 +188,7 @@ func (ph *PageHandlers) GetImagePage(ctx context.Context, pageLesson *pages.GetP
 			LastModifiedBy: page.GetCommonFields().LastModifiedBy,
 			CreatedAt:      page.GetCommonFields().CreatedAt,
 			Modified:       page.GetCommonFields().Modified,
+			ContentType:    page.GetCommonFields().ContentType,
 		},
 		ImageFileUrl: page.GetContentTypeSpecificFields()[0].(string),
 		ImageName:    page.GetContentTypeSpecificFields()[1].(string),
@@ -227,6 +228,7 @@ func (ph *PageHandlers) GetVideoPage(ctx context.Context, pageLesson *pages.GetP
 			LastModifiedBy: page.GetCommonFields().LastModifiedBy,
 			CreatedAt:      page.GetCommonFields().CreatedAt,
 			Modified:       page.GetCommonFields().Modified,
+			ContentType:    page.GetCommonFields().ContentType,
 		},
 		VideoFileUrl: page.GetContentTypeSpecificFields()[0].(string),
 		VideoName:    page.GetContentTypeSpecificFields()[1].(string),
@@ -266,6 +268,7 @@ func (ph *PageHandlers) GetPDFPage(ctx context.Context, pageLesson *pages.GetPag
 			LastModifiedBy: page.GetCommonFields().LastModifiedBy,
 			CreatedAt:      page.GetCommonFields().CreatedAt,
 			Modified:       page.GetCommonFields().Modified,
+			ContentType:    page.GetCommonFields().ContentType,
 		},
 		PdfFileUrl: page.GetContentTypeSpecificFields()[0].(string),
 		PdfName:    page.GetContentTypeSpecificFields()[1].(string),
@@ -287,8 +290,9 @@ func (ph *PageHandlers) GetPages(ctx context.Context, inputParams *pages.GetPage
 
 	// Validation
 	params := pages.GetPages{
-		Limit:  inputParams.Limit,
-		Offset: inputParams.Offset,
+		LessonID: inputParams.LessonID,
+		Limit:    inputParams.Limit,
+		Offset:   inputParams.Offset,
 	}
 	params.SetDefaults()
 
@@ -331,13 +335,17 @@ func (ph *PageHandlers) UpdateImagePage(ctx context.Context, updPage pages.Updat
 
 	id, err := ph.pageSaver.UpdatePage(ctx, &updPage)
 	if err != nil {
-		if errors.Is(err, storage.ErrInvalidCredentials) {
+		switch {
+		case errors.Is(err, storage.ErrInvalidCredentials):
 			ph.log.Warn("invalid credentials", slog.String("err", err.Error()))
 			return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		case errors.Is(err, storage.ErrPageNotFound):
+			ph.log.Warn("image page not found", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, ErrPageNotFound)
+		default:
+			log.Error("failed to update image page", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, err)
 		}
-
-		log.Error("failed to update image page", slog.String("err", err.Error()))
-		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
 	log.Info("image page updated with ", slog.Int64("page_id", id))
@@ -364,13 +372,17 @@ func (ph *PageHandlers) UpdateVideoPage(ctx context.Context, updPage pages.Updat
 
 	id, err := ph.pageSaver.UpdatePage(ctx, &updPage)
 	if err != nil {
-		if errors.Is(err, storage.ErrInvalidCredentials) {
+		switch {
+		case errors.Is(err, storage.ErrInvalidCredentials):
 			ph.log.Warn("invalid credentials", slog.String("err", err.Error()))
 			return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		case errors.Is(err, storage.ErrPageNotFound):
+			ph.log.Warn("video page not found", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, ErrPageNotFound)
+		default:
+			log.Error("failed to update video page", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, err)
 		}
-
-		log.Error("failed to update video page", slog.String("err", err.Error()))
-		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
 	log.Info("page updated with ", slog.Int64("page", id))
@@ -397,13 +409,17 @@ func (ph *PageHandlers) UpdatePDFPage(ctx context.Context, updPage pages.UpdateP
 
 	id, err := ph.pageSaver.UpdatePage(ctx, &updPage)
 	if err != nil {
-		if errors.Is(err, storage.ErrInvalidCredentials) {
+		switch {
+		case errors.Is(err, storage.ErrInvalidCredentials):
 			ph.log.Warn("invalid credentials", slog.String("err", err.Error()))
 			return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		case errors.Is(err, storage.ErrPageNotFound):
+			ph.log.Warn("pdf page not found", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, ErrPageNotFound)
+		default:
+			log.Error("failed to update pdf page", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, err)
 		}
-
-		log.Error("failed to update PDF page", slog.String("err", err.Error()))
-		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
 	log.Info("page updated with ", slog.Int64("page", id))

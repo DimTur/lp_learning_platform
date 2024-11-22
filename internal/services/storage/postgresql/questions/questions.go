@@ -7,6 +7,8 @@ import (
 	"log"
 
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
+	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -45,7 +47,7 @@ const (
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 )
 
-func (q *QuestionsPostgresStorage) CreateQuestionPage(ctx context.Context, questionPage CreateQuestionPage) (int64, error) {
+func (q *QuestionsPostgresStorage) CreateQuestionPage(ctx context.Context, questionPage *CreateQuestionPage) (int64, error) {
 	const op = "storage.postgresql.pages.pages.CreateQuestionPage"
 
 	tx, err := q.db.Begin(ctx)
@@ -141,14 +143,21 @@ const getQuestionPageByIDQuery = `
 		question_abstractquestion aq ON qp.question_id = aq.id
 	INNER JOIN
 		question_multichoicequestion mq ON aq.id = mq.question_abstractquestion_id
-	WHERE abstractpage_id = $1`
+	WHERE 
+		abstractpage_id = $1
+		AND lesson_id = $2`
 
-func (q *QuestionsPostgresStorage) GetQuestionPageByID(ctx context.Context, pageID int64) (QuestionPage, error) {
+func (q *QuestionsPostgresStorage) GetQuestionPageByID(ctx context.Context, questionLesson *pages.GetPage) (*QuestionPage, error) {
 	const op = "storage.postgresql.pages.pages.GetQuestionPageByID"
 
 	var questionPage DBQuestionPage
 
-	err := q.db.QueryRow(ctx, getQuestionPageByIDQuery, pageID).Scan(
+	err := q.db.QueryRow(
+		ctx,
+		getQuestionPageByIDQuery,
+		questionLesson.PageID,
+		questionLesson.LessonID,
+	).Scan(
 		&questionPage.ID,
 		&questionPage.LessonID,
 		&questionPage.CreatedBy,
@@ -166,10 +175,16 @@ func (q *QuestionsPostgresStorage) GetQuestionPageByID(ctx context.Context, page
 		&questionPage.Answer,
 	)
 	if err != nil {
-		return (QuestionPage)(questionPage), fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrQuestionNotFound)
+		default:
+			return nil, fmt.Errorf("%s: %w", op, err)
+		}
+
 	}
 
-	return (QuestionPage)(questionPage), nil
+	return (*QuestionPage)(&questionPage), nil
 }
 
 const (
@@ -199,7 +214,7 @@ const (
 	AND qp.abstractpage_id = $1`
 )
 
-func (q *QuestionsPostgresStorage) UpdateQuestionPage(ctx context.Context, updPage UpdateQuestionPage) (int64, error) {
+func (q *QuestionsPostgresStorage) UpdateQuestionPage(ctx context.Context, updPage *UpdateQuestionPage) (int64, error) {
 	const op = "storage.postgresql.pages.pages.UpdateQuestionPageByID"
 
 	tx, err := q.db.Begin(ctx)
@@ -214,7 +229,7 @@ func (q *QuestionsPostgresStorage) UpdateQuestionPage(ctx context.Context, updPa
 		}
 	}()
 
-	_, err = tx.Exec(
+	result, err := tx.Exec(
 		ctx,
 		updateAbstractPageQuery,
 		updPage.ID,
@@ -238,6 +253,10 @@ func (q *QuestionsPostgresStorage) UpdateQuestionPage(ctx context.Context, updPa
 	)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return 0, fmt.Errorf("%s: %w", op, storage.ErrQuestionNotFound)
 	}
 
 	if err = tx.Commit(ctx); err != nil {

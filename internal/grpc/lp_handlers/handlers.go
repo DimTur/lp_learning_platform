@@ -57,9 +57,9 @@ type PageHandlers interface {
 }
 
 type QuestionHandlers interface {
-	CreateQuestionPage(ctx context.Context, questionPage questions.CreateQuestionPage) (int64, error)
-	GetQuestionPageByID(ctx context.Context, pageID int64) (questions.QuestionPage, error)
-	UpdateQuestionPage(ctx context.Context, updPage questions.UpdateQuestionPage) (int64, error)
+	CreateQuestionPage(ctx context.Context, questionPage *questions.CreateQuestionPage) (int64, error)
+	GetQuestionPageByID(ctx context.Context, questionLesson *pages.GetPage) (*questions.QuestionPage, error)
+	UpdateQuestionPage(ctx context.Context, updPage *questions.UpdateQuestionPage) (int64, error)
 }
 
 type AttemptHandlers interface {

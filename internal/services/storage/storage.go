@@ -12,9 +12,10 @@ var (
 	ErrLessonExitsts  = errors.New("lesson already exists")
 	ErrLessonNotFound = errors.New("lesson not found")
 
-	ErrPageExitsts  = errors.New("page already exists")
-	ErrPageNotFound = errors.New("page not found")
-	ErrUnContType   = errors.New("unsupported content type")
+	ErrPageExitsts      = errors.New("page already exists")
+	ErrPageNotFound     = errors.New("page not found")
+	ErrQuestionNotFound = errors.New("question not found")
+	ErrUnContType       = errors.New("unsupported content type")
 
 	ErrInvalidCredentials    = errors.New("invalid credentials")
 	ErrRowsIteration         = errors.New("rows iteration failed")

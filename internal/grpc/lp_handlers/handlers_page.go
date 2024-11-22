@@ -3,7 +3,6 @@ package lp_handlers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	pageserv "github.com/DimTur/lp_learning_platform/internal/services/page"
@@ -110,6 +109,7 @@ func (s *serverAPI) GetImagePage(ctx context.Context, req *lpv1.GetImagePageRequ
 			LastModifiedBy: page.BasePage.LastModifiedBy,
 			CreatedAt:      page.BasePage.CreatedAt.Format(time.RFC3339),
 			Modified:       page.BasePage.Modified.Format(time.RFC3339),
+			ContentType:    convertToContentType(page.BasePage.ContentType),
 		},
 		ImageFileUrl: page.ImageFileUrl,
 		ImageName:    page.ImageName,
@@ -138,6 +138,7 @@ func (s *serverAPI) GetVideoPage(ctx context.Context, req *lpv1.GetVideoPageRequ
 			LastModifiedBy: page.BasePage.LastModifiedBy,
 			CreatedAt:      page.BasePage.CreatedAt.Format(time.RFC3339),
 			Modified:       page.BasePage.Modified.Format(time.RFC3339),
+			ContentType:    convertToContentType(page.BasePage.ContentType),
 		},
 		VideoFileUrl: page.VideoFileUrl,
 		VideoName:    page.VideoName,
@@ -166,6 +167,7 @@ func (s *serverAPI) GetPDFPage(ctx context.Context, req *lpv1.GetPDFPageRequest)
 			LastModifiedBy: page.BasePage.LastModifiedBy,
 			CreatedAt:      page.BasePage.CreatedAt.Format(time.RFC3339),
 			Modified:       page.BasePage.Modified.Format(time.RFC3339),
+			ContentType:    convertToContentType(page.BasePage.ContentType),
 		},
 		PdfFileUrl: page.PdfFileUrl,
 		PdfName:    page.PdfName,
@@ -221,6 +223,8 @@ func (s *serverAPI) UpdateImagePage(ctx context.Context, req *lpv1.UpdateImagePa
 		switch {
 		case errors.Is(err, pageserv.ErrInvalidCredentials):
 			return nil, status.Error(codes.InvalidArgument, "bad request")
+		case errors.Is(err, pageserv.ErrPageNotFound):
+			return nil, status.Error(codes.NotFound, "image page not found")
 		default:
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -245,6 +249,8 @@ func (s *serverAPI) UpdateVideoPage(ctx context.Context, req *lpv1.UpdateVideoPa
 		switch {
 		case errors.Is(err, pageserv.ErrInvalidCredentials):
 			return nil, status.Error(codes.InvalidArgument, "bad request")
+		case errors.Is(err, pageserv.ErrPageNotFound):
+			return nil, status.Error(codes.NotFound, "video page not found")
 		default:
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -269,6 +275,8 @@ func (s *serverAPI) UpdatePDFPage(ctx context.Context, req *lpv1.UpdatePDFPageRe
 		switch {
 		case errors.Is(err, pageserv.ErrInvalidCredentials):
 			return nil, status.Error(codes.InvalidArgument, "bad request")
+		case errors.Is(err, pageserv.ErrPageNotFound):
+			return nil, status.Error(codes.NotFound, "pdf page not found")
 		default:
 			return nil, status.Error(codes.Internal, err.Error())
 		}
@@ -297,19 +305,6 @@ func (s *serverAPI) DeletePage(ctx context.Context, req *lpv1.DeletePageRequest)
 	}, nil
 }
 
-func ContentTypeToString(contentType lpv1.ContentType) (string, error) {
-	switch contentType {
-	case lpv1.ContentType_IMAGE:
-		return "image", nil
-	case lpv1.ContentType_VIDEO:
-		return "video", nil
-	case lpv1.ContentType_PDF:
-		return "pdf", nil
-	default:
-		return "unknown", fmt.Errorf("unsupported content type: %s", contentType)
-	}
-}
-
 func convertToContentType(contentTypeStr string) lpv1.ContentType {
 	switch contentTypeStr {
 	case "image":
@@ -317,6 +312,8 @@ func convertToContentType(contentTypeStr string) lpv1.ContentType {
 	case "video":
 		return lpv1.ContentType_VIDEO
 	case "pdf":
+		return lpv1.ContentType_PDF
+	case "question":
 		return lpv1.ContentType_PDF
 	default:
 		return lpv1.ContentType_CONTENT_TYPE_UNSPECIFIED
