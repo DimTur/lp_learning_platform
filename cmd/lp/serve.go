@@ -13,6 +13,7 @@ import (
 	"github.com/DimTur/lp_learning_platform/internal/app/consumers"
 	"github.com/DimTur/lp_learning_platform/internal/config"
 	"github.com/DimTur/lp_learning_platform/internal/services/rabbitmq"
+	"github.com/DimTur/lp_learning_platform/internal/services/redis"
 	attstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
 	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
 	lessonstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
@@ -56,6 +57,18 @@ func NewServeCmd() *cobra.Command {
 			questionStorage := questionstorage.NewQuestionsStorage(storagePool)
 			attemptStorage := attstorage.NewAttemptsStorage(storagePool)
 
+			// Init Redis
+			rAttempts := &redis.RedisAttempts{
+				Host:     cfg.Redis.Host,
+				Port:     cfg.Redis.Port,
+				DB:       cfg.Redis.AttemptsDB,
+				Password: cfg.Redis.Password,
+			}
+			redisAttempts, err := redis.NewRedisClient(*rAttempts)
+			if err != nil {
+				log.Error("failed to close redis", slog.Any("err", err))
+			}
+
 			validate := validator.New()
 
 			// Init RabbitMQ
@@ -94,6 +107,7 @@ func NewServeCmd() *cobra.Command {
 				pageStorage,
 				questionStorage,
 				attemptStorage,
+				redisAttempts,
 				rmq,
 				rmq,
 				cfg.GRPCServer.Address,

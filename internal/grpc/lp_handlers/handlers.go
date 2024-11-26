@@ -3,6 +3,7 @@ package lp_handlers
 import (
 	"context"
 
+	"github.com/DimTur/lp_learning_platform/internal/services/redis"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
@@ -63,7 +64,10 @@ type QuestionHandlers interface {
 }
 
 type AttemptHandlers interface {
-	CreateAttempt(ctx context.Context, attempt attempts.CreateLessonAttempt) (int64, error)
+	TryLesson(ctx context.Context, questionPage *attempts.GetQuestionPageAttempts) ([]attempts.QuestionPageAttempt, error)
+	UpdatePageAttempt(ctx context.Context, updPAttempt *redis.UpdatePageAttempt) error
+	CompleteLesson(ctx context.Context, req *attempts.CompleteLessonRequest) (*attempts.CompleteLessonResp, error)
+	GetLessonAttempts(ctx context.Context, inputParams *attempts.GetLessonAttempts) (*attempts.GetLessonAttemptsResp, error)
 }
 
 type serverAPI struct {

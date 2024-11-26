@@ -26,5 +26,9 @@ var (
 	ErrRollBack              = errors.New("failed to rollback transaction")
 	ErrCommitTransaction     = errors.New("failed to commit transaction")
 
+	ErrLessonAttemtNotFound = errors.New("lesson attempt not found")
+	ErrPageAttemtsNotFound  = errors.New("page attempts not found")
+	ErrAnswerNotFound       = errors.New("page answer not found")
+
 	ErrPlanAlreadySharedWithUser = errors.New("plan already shared with user")
 )

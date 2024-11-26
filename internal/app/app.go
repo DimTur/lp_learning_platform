@@ -55,6 +55,10 @@ type PlanRabbitMq interface {
 	plan.RabbitMQQueues
 }
 
+type AttemptsRedis interface {
+	attempt.AttemptRedisStore
+}
+
 type App struct {
 	GRPCSrv *grpcapp.Server
 }
@@ -66,6 +70,7 @@ func NewApp(
 	pageStorage PageStorage,
 	questionStorage QuestionStorage,
 	attemptStorage AttemptStorage,
+	attemptRedis AttemptsRedis,
 	channelRabbitMq ChannelRabbitMq,
 	planRabbitMq PlanRabbitMq,
 	grpcAddr string,
@@ -118,6 +123,7 @@ func NewApp(
 		validator,
 		attemptStorage,
 		attemptStorage,
+		attemptRedis,
 	)
 
 	grpcServer, err := grpcapp.NewGRPCServer(
