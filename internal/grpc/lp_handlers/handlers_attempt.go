@@ -132,6 +132,27 @@ func (s *serverAPI) GetLessonAttempts(ctx context.Context, req *lpv1.GetLessonAt
 	}, nil
 }
 
+func (s *serverAPI) CheckPermissionForUser(ctx context.Context, req *lpv1.CheckPermissionForUserRequest) (*lpv1.CheckPermissionForUserResponse, error) {
+	resp, err := s.attemptHandlers.CheckPermissionForUser(ctx, &attempts.PermissionForUser{
+		UserID:          req.GetUserId(),
+		LessonAttemptID: req.GetLessonAttemptId(),
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, attemptserve.ErrPermissionsDenied):
+			return nil, status.Error(codes.PermissionDenied, "permissions denied")
+		case errors.Is(err, attemptserve.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	return &lpv1.CheckPermissionForUserResponse{
+		Success: resp,
+	}, nil
+}
+
 func stringToAnswer(answer string) lpv1.Answer {
 	switch answer {
 	case "OPTION_A":

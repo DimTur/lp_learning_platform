@@ -518,6 +518,29 @@ func (a *AttemptsPostgresStorage) GetLessonAttempts(ctx context.Context, inputPa
 	return &attempts, nil
 }
 
+const checkPermissionForUserQuery = `
+	SELECT EXIST (
+		SELECT 1
+		FROM attempt_lessonattempt la
+		WHERE la.id = $1 AND la.user_id = $2)`
+
+func (a *AttemptsPostgresStorage) CheckPermissionForUser(ctx context.Context, userAtt *PermissionForUser) (bool, error) {
+	const op = "storage.postgresql.attempts.attempts.CheckPermissionForUser"
+
+	var exists bool
+	err := a.db.QueryRow(
+		ctx,
+		checkPermissionForUserQuery,
+		userAtt.LessonAttemptID,
+		userAtt.UserID,
+	).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return exists, nil
+}
+
 func (a *AttemptsPostgresStorage) checkPgError(err error, op string) error {
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == "23505" {

@@ -26,6 +26,7 @@ type AttemptProvider interface {
 	GetCurrentAnswerForAttempt(ctx context.Context, pageID int64) (string, error)
 	CheckLessonAttempt(ctx context.Context, lessonAttempt *attempts.GetQuestionPageAttempts) (int64, error)
 	GetLessonAttempts(ctx context.Context, input *attempts.GetLessonAttempts) (*attempts.GetLessonAttemptsResp, error)
+	CheckPermissionForUser(ctx context.Context, userAtt *attempts.PermissionForUser) (bool, error)
 }
 
 type AttemptRedisStore interface {
@@ -43,6 +44,7 @@ var (
 	ErrFailedToSaveInRedis  = errors.New("failed to save in redis")
 	ErrAnswerNotFound       = errors.New("page answer not found")
 	ErrLessonAttemtNotFound = errors.New("lesson attempt not found")
+	ErrPermissionsDenied    = errors.New("permissions denied")
 )
 
 type AttemptHandlers struct {
@@ -254,6 +256,32 @@ func (ah *AttemptHandlers) GetLessonAttempts(ctx context.Context, inputParams *a
 	}
 
 	return attempts, nil
+}
+
+func (ah *AttemptHandlers) CheckPermissionForUser(ctx context.Context, userAtt *attempts.PermissionForUser) (bool, error) {
+	const op = "attempts.CheckPermissionForUser"
+
+	log := ah.log.With(
+		slog.String("op", op),
+		slog.String("user_id", userAtt.UserID),
+		slog.Int64("lesson_attempt_id", userAtt.LessonAttemptID),
+	)
+
+	// Validation
+	err := ah.validator.Struct(userAtt)
+	if err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return false, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	log.Info("checking permissions for user")
+
+	perm, err := ah.attemptProvider.CheckPermissionForUser(ctx, userAtt)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, ErrPermissionsDenied)
+	}
+
+	return perm, nil
 }
 
 func (ah *AttemptHandlers) getExistingPageAttempts(ctx context.Context, lessonAttemptID int64, questionPage *attempts.GetQuestionPageAttempts, log *slog.Logger) ([]attempts.QuestionPageAttempt, error) {

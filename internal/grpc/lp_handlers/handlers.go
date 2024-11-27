@@ -68,6 +68,7 @@ type AttemptHandlers interface {
 	UpdatePageAttempt(ctx context.Context, updPAttempt *redis.UpdatePageAttempt) error
 	CompleteLesson(ctx context.Context, req *attempts.CompleteLessonRequest) (*attempts.CompleteLessonResp, error)
 	GetLessonAttempts(ctx context.Context, inputParams *attempts.GetLessonAttempts) (*attempts.GetLessonAttemptsResp, error)
+	CheckPermissionForUser(ctx context.Context, userAtt *attempts.PermissionForUser) (bool, error)
 }
 
 type serverAPI struct {

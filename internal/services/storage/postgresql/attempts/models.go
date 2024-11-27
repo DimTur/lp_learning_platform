@@ -153,3 +153,8 @@ type DBLessonAttempt struct {
 type GetLessonAttemptsResp struct {
 	LessonAttempts []LessonAttempt
 }
+
+type PermissionForUser struct {
+	UserID          string `json:"user_id" validate:"required"`
+	LessonAttemptID int64  `json:"lesson_attempt_id" validate:"required"`
+}
