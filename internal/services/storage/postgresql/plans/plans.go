@@ -128,7 +128,79 @@ func (p *PlansPostgresStorage) GetPlanByID(ctx context.Context, planCh *GetPlan)
 	return (Plan)(plan), nil
 }
 
-// TODO: if not group admin you didn't see is_published and public = false
+const getPlansAll = `
+	SELECT
+		p.id AS plan_id,
+		p.name AS plan_name,
+		p.description AS plan_description,
+		p.created_by AS plan_created_by,
+		p.last_modified_by AS plan_last_modified_by,
+		p.is_published AS plan_is_published,
+		p.public AS plan_public,
+		p.created_at AS plan_created_at,
+		p.modified AS plan_modified
+	FROM 
+		plans p
+	INNER JOIN 
+		channels_plans cp ON p.id = cp.plan_id
+	INNER JOIN 
+		channels c ON cp.channel_id = c.id
+	INNER JOIN
+		shared_plans_users spu ON p.id = spu.plan_id
+	WHERE 
+		cp.channel_id = $1
+		AND spu.user_id = $2
+	ORDER BY p.id
+	LIMIT $3 OFFSET $4;`
+
+func (p *PlansPostgresStorage) GetPlansAll(ctx context.Context, inputParams *GetPlans) ([]Plan, error) {
+	const op = "storage.postgresql.plans.plans.GetPlans"
+
+	var plans []DBPlan
+
+	rows, err := p.db.Query(
+		ctx,
+		getPlansAll,
+		inputParams.ChannelID,
+		inputParams.UserID,
+		inputParams.Limit,
+		inputParams.Offset,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var plan DBPlan
+		if err := rows.Scan(
+			&plan.ID,
+			&plan.Name,
+			&plan.Description,
+			&plan.CreatedBy,
+			&plan.LastModifiedBy,
+			&plan.IsPublished,
+			&plan.Public,
+			&plan.CreatedAt,
+			&plan.Modified,
+		); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrScanFailed)
+		}
+		plans = append(plans, plan)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	var mappedPlans []Plan
+	for _, plan := range plans {
+		mappedPlans = append(mappedPlans, Plan(plan))
+	}
+
+	return mappedPlans, nil
+}
+
 const getPlansQuery = `
 	SELECT
 		p.id AS plan_id,
@@ -151,6 +223,8 @@ const getPlansQuery = `
 	WHERE 
 		cp.channel_id = $1
 		AND spu.user_id = $2
+		AND is_public 
+		AND is_published
 	ORDER BY p.id
 	LIMIT $3 OFFSET $4;`
 

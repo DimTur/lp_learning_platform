@@ -29,6 +29,7 @@ type PlanHandlers interface {
 	CreatePlan(ctx context.Context, plan *plans.CreatePlan) (int64, error)
 	GetPlan(ctx context.Context, planCh *plans.GetPlan) (*plans.Plan, error)
 	GetPlans(ctx context.Context, inputParams *plans.GetPlans) ([]plans.Plan, error)
+	GetPlansAll(ctx context.Context, inputParams *plans.GetPlans) ([]plans.Plan, error)
 	UpdatePlan(ctx context.Context, updPlan *plans.UpdatePlanRequest) (int64, error)
 	DeletePlan(ctx context.Context, planCh *plans.DeletePlan) error
 	SharePlanWithUser(ctx context.Context, s *plans.SharePlanForUsers) error

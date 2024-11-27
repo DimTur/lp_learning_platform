@@ -100,6 +100,44 @@ func (s *serverAPI) GetPlans(ctx context.Context, req *lpv1.GetPlansRequest) (*l
 	}, nil
 }
 
+func (s *serverAPI) GetPlansAll(ctx context.Context, req *lpv1.GetPlansRequest) (*lpv1.GetPlansResponse, error) {
+	plans, err := s.planHandlers.GetPlansAll(ctx, &plans.GetPlans{
+		UserID:    req.GetUserId(),
+		ChannelID: req.GetChannelId(),
+		Limit:     req.GetLimit(),
+		Offset:    req.GetOffset(),
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, planserv.ErrPlanNotFound):
+			return nil, status.Error(codes.NotFound, "plans not found")
+		case errors.Is(err, planserv.ErrInvalidCredentials):
+			return nil, status.Error(codes.InvalidArgument, "bad request")
+		default:
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	var responsePlans []*lpv1.Plan
+	for _, plan := range plans {
+		responsePlans = append(responsePlans, &lpv1.Plan{
+			Id:             plan.ID,
+			Name:           plan.Name,
+			Description:    plan.Description,
+			CreatedBy:      plan.CreatedBy,
+			LastModifiedBy: plan.LastModifiedBy,
+			IsPublished:    plan.IsPublished,
+			Public:         plan.Public,
+			CreatedAt:      plan.CreatedAt.Format(time.RFC3339),
+			Modified:       plan.Modified.Format(time.RFC3339),
+		})
+	}
+
+	return &lpv1.GetPlansResponse{
+		Plans: responsePlans,
+	}, nil
+}
+
 func (s *serverAPI) UpdatePlan(ctx context.Context, req *lpv1.UpdatePlanRequest) (*lpv1.UpdatePlanResponse, error) {
 	id, err := s.planHandlers.UpdatePlan(ctx, &plans.UpdatePlanRequest{
 		ChannelID:      req.GetChannelId(),

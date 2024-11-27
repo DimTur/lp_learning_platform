@@ -28,6 +28,7 @@ type PlanSaver interface {
 type PlanProvider interface {
 	GetPlanByID(ctx context.Context, planCh *plans.GetPlan) (plans.Plan, error)
 	GetPlans(ctx context.Context, inputParams *plans.GetPlans) ([]plans.Plan, error)
+	GetPlansAll(ctx context.Context, inputParams *plans.GetPlans) ([]plans.Plan, error)
 	IsUserShareWithPlan(ctx context.Context, userPlan *plans.IsUserShareWithPlan) (bool, error)
 	CanShare(ctx context.Context, cs *plans.DBCanShare) (bool, error)
 }
@@ -169,7 +170,47 @@ func (ph *PlanHandlers) GetPlan(ctx context.Context, planCh *plans.GetPlan) (*pl
 	return &plan, nil
 }
 
-// GetPlans gets plans and returns them.
+// GetPlansAll gets all plans and returns them.
+func (ph *PlanHandlers) GetPlansAll(ctx context.Context, inputParams *plans.GetPlans) ([]plans.Plan, error) {
+	const op = "plans.GetPlansAll"
+
+	log := ph.log.With(
+		slog.String("op", op),
+		slog.Int64("getting plans included in channel with id", inputParams.ChannelID),
+	)
+
+	log.Info("getting plans")
+
+	// Validation
+	params := plans.GetPlans{
+		UserID:    inputParams.UserID,
+		ChannelID: inputParams.ChannelID,
+		Limit:     inputParams.Limit,
+		Offset:    inputParams.Offset,
+	}
+	params.SetDefaults()
+
+	if err := ph.validator.Struct(params); err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	var plans []plans.Plan
+	plans, err := ph.planProvider.GetPlansAll(ctx, &params)
+	if err != nil {
+		if errors.Is(err, storage.ErrPlanNotFound) {
+			ph.log.Warn("plans not found", slog.String("err", err.Error()))
+			return plans, fmt.Errorf("%s: %w", op, ErrPlanNotFound)
+		}
+
+		log.Error("failed to get plans", slog.String("err", err.Error()))
+		return plans, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return plans, nil
+}
+
+// GetPlans gets public and publish plans and returns them.
 func (ph *PlanHandlers) GetPlans(ctx context.Context, inputParams *plans.GetPlans) ([]plans.Plan, error) {
 	const op = "plans.GetPlans"
 
@@ -273,7 +314,7 @@ func (ph *PlanHandlers) DeletePlan(ctx context.Context, planCh *plans.DeletePlan
 	return nil
 }
 
-// SharePlanWithUser sharing channel with lerning group
+// SharePlanWithUser sharing plan with users
 func (ph *PlanHandlers) SharePlanWithUser(ctx context.Context, s *plans.SharePlanForUsers) error {
 	const op = "plan.SharePlanWithUser"
 
