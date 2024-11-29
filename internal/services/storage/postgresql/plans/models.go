@@ -48,10 +48,11 @@ type UpdatePlanRequest struct {
 }
 
 type SharePlanForUsers struct {
-	ChannelID int64    `json:"channel_id" validate:"required"`
-	PlanID    int64    `json:"plan_id" validate:"required"`
-	UsersIDs  []string `json:"users_ids" validate:"required"`
-	CreatedBy string   `json:"created_by" validate:"required"`
+	ChannelID int64     `json:"channel_id" validate:"required"`
+	PlanID    int64     `json:"plan_id" validate:"required"`
+	UserIDs   []string  `json:"user_ids" validate:"required"`
+	CreatedBy string    `json:"created_by" validate:"required"`
+	CreatedAt time.Time `json:"created_at" validate:"required"`
 }
 
 type DBPlan struct {
@@ -72,6 +73,13 @@ type DBSharePlanForUser struct {
 	UserID    string    `db:"user_id"`
 	CreatedBy string    `db:"created_by"`
 	CreatedAt time.Time `db:"created_at"`
+}
+
+type BatchSharePlan struct {
+	PlanID    int64
+	UserIDs   []string
+	CreatedBy string
+	CreatedAt time.Time
 }
 
 type DBCanShare struct {

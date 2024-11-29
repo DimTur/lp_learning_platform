@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
 	"github.com/jackc/pgx/v5"
@@ -399,6 +400,46 @@ func (c *PlansPostgresStorage) SharePlanWithUser(ctx context.Context, s *DBShare
 			}
 		}
 
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	return nil
+}
+
+// Forming the basic part of the request
+const baseQuery = `
+	INSERT INTO shared_plans_users (plan_id, user_id, created_by, created_at)
+	VALUES %s
+	ON CONFLICT (plan_id, user_id) DO NOTHING` // Ignore duplicates
+
+func (c *PlansPostgresStorage) BatchSharePlansWithUsers(ctx context.Context, bs *SharePlanForUsers) error {
+	const op = "storage.postgresql.plans.BatchSharePlansWithUsers"
+
+	if len(bs.UserIDs) == 0 {
+		return nil
+	}
+
+	// Prepare placeholders and arguments
+	valueStrings := make([]string, 0, len(bs.UserIDs))
+	valueArgs := make([]interface{}, 0, len(bs.UserIDs)*4)
+
+	for i, userID := range bs.UserIDs {
+		// $1, $2, $3, $4 -> dynamically increase placeholders
+		placeholders := fmt.Sprintf("($%d, $%d, $%d, $%d)", i*4+1, i*4+2, i*4+3, i*4+4)
+		valueStrings = append(valueStrings, placeholders)
+		valueArgs = append(valueArgs, bs.PlanID, userID, bs.CreatedBy, bs.CreatedAt)
+	}
+
+	// Combining placeholders into one query
+	query := fmt.Sprintf(baseQuery, strings.Join(valueStrings, ", "))
+
+	// Do query
+	_, err := c.db.Exec(ctx, query, valueArgs...)
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			fmt.Printf("Postgres error code: %s, message: %s\n", pgErr.Code, pgErr.Message)
+		}
 		return fmt.Errorf("%s: %w", op, err)
 	}
 

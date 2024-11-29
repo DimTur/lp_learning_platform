@@ -100,6 +100,15 @@ func NewServeCmd() *cobra.Command {
 				log.Error("failed to declare and bind plan queue", slog.Any("err", err))
 			}
 
+			// Declare and bind Notification Queue
+			if err = declareQueueAndBind(rmq,
+				cfg.RabbitMQ.Notification.NotificationQueue,
+				cfg.RabbitMQ.ShareExchange.Name,
+				cfg.RabbitMQ.Notification.NotificationRoutingKey,
+			); err != nil {
+				log.Error("failed to declare and bind notification queue", slog.Any("err", err))
+			}
+
 			application, err := app.NewApp(
 				channelStorage,
 				planStorage,
@@ -189,7 +198,7 @@ func startConsumers(
 	wg *sync.WaitGroup,
 ) {
 	channelsConsumer := consumers.NewConsumeChannel(rmq, channelStorage, log)
-	plansConsumer := consumers.NewConsumePlan(rmq, planStorage, log)
+	plansConsumer := consumers.NewConsumePlan(rmq, planStorage, rmq, log)
 
 	wg.Add(2)
 	go func() {

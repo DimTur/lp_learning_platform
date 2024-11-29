@@ -23,6 +23,7 @@ type PlanSaver interface {
 	CreatePlan(ctx context.Context, plan *plans.CreatePlan) (int64, error)
 	UpdatePlan(ctx context.Context, updPlan *plans.UpdatePlanRequest) (int64, error)
 	SharePlanWithUser(ctx context.Context, s *plans.DBSharePlanForUser) error
+	BatchSharePlansWithUsers(ctx context.Context, bs *plans.SharePlanForUsers) error
 }
 
 type PlanProvider interface {
@@ -126,9 +127,11 @@ func (ph *PlanHandlers) CreatePlan(ctx context.Context, plan *plans.CreatePlan) 
 	}
 
 	s := &plans.SharePlanForUsers{
+		ChannelID: plan.ChannelID,
 		PlanID:    id,
-		UsersIDs:  []string{plan.CreatedBy},
+		UserIDs:   []string{plan.CreatedBy},
 		CreatedBy: plan.CreatedBy,
+		CreatedAt: now,
 	}
 	msgBody, err := json.Marshal(s)
 	if err != nil {
@@ -316,7 +319,10 @@ func (ph *PlanHandlers) DeletePlan(ctx context.Context, planCh *plans.DeletePlan
 
 // SharePlanWithUser sharing plan with users
 func (ph *PlanHandlers) SharePlanWithUser(ctx context.Context, s *plans.SharePlanForUsers) error {
-	const op = "plan.SharePlanWithUser"
+	const (
+		op        = "plan.SharePlanWithUser"
+		batchSize = 100
+	)
 
 	log := ph.log.With(
 		slog.String("op", op),
@@ -345,18 +351,39 @@ func (ph *PlanHandlers) SharePlanWithUser(ctx context.Context, s *plans.SharePla
 		return fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
 	}
 
-	msgBody, err := json.Marshal(s)
-	if err != nil {
-		ph.log.Error("err to marshal shared msg", slog.String("err", err.Error()))
-		return fmt.Errorf("%s: %w", op, err)
-	}
+	for i := 0; i < len(s.UserIDs); i += batchSize {
+		end := i + batchSize
+		if end > len(s.UserIDs) {
+			end = len(s.UserIDs)
+		}
+		batch := s.UserIDs[i:end]
 
-	if err = ph.rabbitMQQueues.Publish(ctx, exchangePlan, planRoutingKey, msgBody); err != nil {
-		ph.log.Error("err send sharing plan to exchange", slog.String("err", err.Error()))
-		return fmt.Errorf("%s: %w", op, err)
-	}
+		// Prepare data for current batch
+		batchRequest := &plans.SharePlanForUsers{
+			ChannelID: s.ChannelID,
+			PlanID:    s.PlanID,
+			UserIDs:   batch,
+			CreatedBy: s.CreatedBy,
+			CreatedAt: time.Now(),
+		}
 
-	log.Info("plan sent to share with users")
+		// Serialization and publication message
+		msgBody, err := json.Marshal(batchRequest)
+		if err != nil {
+			log.Error("failed to marshal batch request", slog.String("err", err.Error()))
+			return fmt.Errorf("%s: %w", op, err)
+		}
+
+		if err = ph.rabbitMQQueues.Publish(ctx, exchangePlan, planRoutingKey, msgBody); err != nil {
+			log.Error("failed to publish batch request", slog.String("err", err.Error()))
+			return fmt.Errorf("%s: %w", op, err)
+		}
+
+		log.Info("batch sent to share with users",
+			slog.Int("batch_size", len(batch)),
+			slog.Int("start_index", i),
+		)
+	}
 
 	return nil
 }

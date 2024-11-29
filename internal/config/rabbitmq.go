@@ -8,6 +8,7 @@ type RabbitMQ struct {
 	ShareExchange ShareExchange `yaml:"share_exchange"`
 	Channel       Channel       `yaml:"channel"`
 	Plan          Plan          `yaml:"plan"`
+	Notification  Notification  `yaml:"notification"`
 }
 
 type ShareExchange struct {

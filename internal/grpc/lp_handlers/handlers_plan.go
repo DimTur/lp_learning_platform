@@ -192,7 +192,7 @@ func (s *serverAPI) SharePlanWithUsers(ctx context.Context, req *lpv1.SharePlanW
 	if err := s.planHandlers.SharePlanWithUser(ctx, &plans.SharePlanForUsers{
 		ChannelID: req.GetChannelId(),
 		PlanID:    req.GetPlanId(),
-		UsersIDs:  req.GetUsersIds(),
+		UserIDs:   req.GetUsersIds(),
 		CreatedBy: req.GetCreatedBy(),
 	}); err != nil {
 		if errors.Is(err, planserv.ErrInvalidCredentials) {
