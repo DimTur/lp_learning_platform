@@ -17,6 +17,9 @@ const (
 	exchangePlan   = "share"
 	queuePlan      = "plan"
 	planRoutingKey = "plan"
+
+	queueNotification      = "notification_to_auth"
+	notificationRoutingKey = "notification_to_auth"
 )
 
 type PlanSaver interface {
@@ -375,9 +378,16 @@ func (ph *PlanHandlers) SharePlanWithUser(ctx context.Context, s *plans.SharePla
 		}
 
 		if err = ph.rabbitMQQueues.Publish(ctx, exchangePlan, planRoutingKey, msgBody); err != nil {
-			log.Error("failed to publish batch request", slog.String("err", err.Error()))
+			log.Error("failed to publish batch request to plan queue", slog.String("err", err.Error()))
 			return fmt.Errorf("%s: %w", op, err)
 		}
+
+		if err = ph.rabbitMQQueues.Publish(ctx, exchangePlan, notificationRoutingKey, msgBody); err != nil {
+			log.Error("failed to publish batch request to notification queue", slog.String("err", err.Error()))
+			return fmt.Errorf("%s: %w", op, err)
+		}
+
+		fmt.Println("batch ", batchRequest)
 
 		log.Info("batch sent to share with users",
 			slog.Int("batch_size", len(batch)),

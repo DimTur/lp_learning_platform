@@ -136,5 +136,5 @@ type DBChannelCreator struct {
 }
 
 type DBLearningGroupID struct {
-	ID string `db:"learning_group_id"`
+	LearningGroupID string `db:"learning_group_id"`
 }

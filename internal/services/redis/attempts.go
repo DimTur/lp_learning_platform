@@ -45,7 +45,7 @@ func (r *RedisClient) GetPageAttempts(ctx context.Context, lessonAttemptID int64
 	for field, value := range result {
 		// Parse PageAttempID from the name fields
 		var pageAttemptID int64
-		_, err := fmt.Sscan(field, "page_attempt:%d", &pageAttemptID)
+		_, err := fmt.Sscanf(field, "page_attempt:%d", &pageAttemptID)
 		if err != nil {
 			return nil, fmt.Errorf("%s: failed to parse field name %q: %w", op, field, err)
 		}

@@ -165,6 +165,9 @@ func (a *AttemptsPostgresStorage) CheckLessonAttempt(ctx context.Context, lesson
 		lessonAttempt.PlanID,
 	).Scan(&id)
 	if err != nil {
+		if err == pgx.ErrNoRows {
+			return 0, nil
+		}
 		return 0, a.checkPgError(err, op)
 	}
 
@@ -279,27 +282,29 @@ const (
 	SET
 		user_answer = COALESCE($2, qpa.user_answer)
 	WHERE
-		qpa.id = $1;`
+		qpa.id = $1
+	RETURNING
+		qpa.id;`
 
 	updAQAttemptQuery = `
 	UPDATE
 		question_abstractquestionattempt aqa
 	SET
 		modified = COALESCE($2, aqa.modified),
-		is_successful = COALESCE($3, aqa.is_successfull)
+		is_successful = COALESCE($3, aqa.is_successful)
 	WHERE
 		EXISTS (
 			SELECT 1
 			FROM question_questionpageattempt qpa
 			WHERE qpa.id = $1
-				AND qpa.page_attempt_id = aqa.id
+				AND qpa.question_attempt_id = aqa.id
 		)
 	RETURNING
 		aqa.id;`
 
 	updAPAttemptQuery = `
 	UPDATE
-		pages_abstractpageattemt apa
+		pages_abstractpageattempt apa
 	SET
 		modified = COALESCE($2, apa.modified)
 	WHERE
@@ -371,10 +376,9 @@ const updLessonAttemptQuery = `
 		attempt_lessonattempt la
 	SET
 		end_time = COALESCE($2, la.end_time),
-		last_modified_by = COALESCE($3, la.last_modified_by),
-		is_complete = COALESCE($4, la.is_complete),
-		is_successful = COALESCE($5, la.is_successful)
-		percentage_score = COALESCE($6, la.percentage_score)
+		is_complete = COALESCE($3, la.is_complete),
+		is_successful = COALESCE($4, la.is_successful),
+		percentage_score = COALESCE($5, la.percentage_score)
 	WHERE
 		la.id = $1
 	RETURNING
@@ -387,14 +391,13 @@ func (a *AttemptsPostgresStorage) UpdateLessonAttempt(ctx context.Context, updLA
 	err := a.db.QueryRow(
 		ctx,
 		updLessonAttemptQuery,
+		updLAttempt.LessonAttemptID,
 		updLAttempt.EndTime,
-		updLAttempt.UserID,
 		updLAttempt.IsComplete,
 		updLAttempt.IsSuccessful,
 		updLAttempt.PercentageScore,
 	).Scan(&lAttemptID)
 	if err != nil {
-		fmt.Println(err)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, fmt.Errorf("%s: %w", op, storage.ErrLessonAttemtNotFound)
 		}
@@ -458,13 +461,12 @@ func (a *AttemptsPostgresStorage) GetQuestionPages(ctx context.Context, lessonID
 const getLessonAttemptsQuery = `
 	SELECT
 		la.id AS id,
+		la.user_id AS user_id,
 		la.lesson_id AS lesson_id,
 		la.plan_id AS plan_id,
 		la.channel_id AS channel_id,
 		la.start_time AS start_time,
 		la.end_time AS end_time,
-		la.user_id AS user_id,
-		la.last_modified_by AS last_modified_by,
 		la.is_complete AS is_complete,
 		la.is_successful AS is_successful,
 		la.percentage_score AS percentage_score
@@ -505,7 +507,6 @@ func (a *AttemptsPostgresStorage) GetLessonAttempts(ctx context.Context, inputPa
 			&attempt.ChannelID,
 			&attempt.StartTime,
 			&attempt.EndTime,
-			&attempt.LastModifiedBy,
 			&attempt.IsComplete,
 			&attempt.IsSuccessful,
 			&attempt.PercentageScore,
@@ -519,10 +520,11 @@ func (a *AttemptsPostgresStorage) GetLessonAttempts(ctx context.Context, inputPa
 }
 
 const checkPermissionForUserQuery = `
-	SELECT EXIST (
+	SELECT EXISTS (
 		SELECT 1
 		FROM attempt_lessonattempt la
-		WHERE la.id = $1 AND la.user_id = $2)`
+		WHERE la.id = $1 AND la.user_id = $2
+	);`
 
 func (a *AttemptsPostgresStorage) CheckPermissionForUser(ctx context.Context, userAtt *PermissionForUser) (bool, error) {
 	const op = "storage.postgresql.attempts.attempts.CheckPermissionForUser"

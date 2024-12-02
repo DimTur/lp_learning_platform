@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS "attempt_lessonattempt" (
   "channel_id" integer NOT NULL,
   "start_time" timestamptz DEFAULT (now()),
   "end_time" timestamptz,
-  "user_id" integer NOT NULL,
+  "user_id" varchar(24) NOT NULL,
   "is_complete" boolean NOT NULL DEFAULT false,
   "is_successful" boolean NOT NULL DEFAULT false,
   "percentage_score" integer DEFAULT 0 CHECK (percentage_score BETWEEN 0 AND 100)

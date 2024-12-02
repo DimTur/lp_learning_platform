@@ -202,10 +202,20 @@ func (ah *AttemptHandlers) CompleteLesson(ctx context.Context, req *attempts.Com
 	}
 
 	// Colculate progress
-	percentageScore := int64(float64(successCounter) / float64(pageAttemptsCount) * 100)
-	updLessonAttempt.PercentageScore = percentageScore
-	if percentageScore >= 75 {
+	percentageScore := int64(0)
+
+	if pageAttemptsCount == 0 {
+		percentageScore = 100
+		updLessonAttempt.PercentageScore = percentageScore
 		updLessonAttempt.IsSuccessful = true
+	} else {
+		if pageAttemptsCount > 0 {
+			percentageScore = int64(float64(successCounter) / float64(pageAttemptsCount) * 100)
+		}
+		updLessonAttempt.PercentageScore = percentageScore
+		if percentageScore >= 75 {
+			updLessonAttempt.IsSuccessful = true
+		}
 	}
 
 	// Update lesson attempt
@@ -236,7 +246,16 @@ func (ah *AttemptHandlers) GetLessonAttempts(ctx context.Context, inputParams *a
 	)
 
 	// Validation
-	err := ah.validator.Struct(inputParams)
+	params := attempts.GetLessonAttempts{
+		UserID:   inputParams.UserID,
+		LessonID: inputParams.LessonID,
+		Limit:    inputParams.Limit,
+		Offset:   inputParams.Offset,
+	}
+	params.SetDefaults()
+
+	// Validation
+	err := ah.validator.Struct(params)
 	if err != nil {
 		log.Warn("invalid parameters", slog.String("err", err.Error()))
 		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
@@ -244,7 +263,7 @@ func (ah *AttemptHandlers) GetLessonAttempts(ctx context.Context, inputParams *a
 
 	log.Info("getting lesson attempts")
 
-	attempts, err := ah.attemptProvider.GetLessonAttempts(ctx, inputParams)
+	attempts, err := ah.attemptProvider.GetLessonAttempts(ctx, &params)
 	if err != nil {
 		if errors.Is(err, storage.ErrLessonAttemtNotFound) {
 			ah.log.Warn("lesson attempts not found", slog.String("err", err.Error()))
@@ -303,10 +322,10 @@ func (ah *AttemptHandlers) getExistingPageAttempts(ctx context.Context, lessonAt
 	if err != nil {
 		if errors.Is(err, storage.ErrPageAttemtsNotFound) {
 			log.Warn("lesson attempts not found", slog.String("err", err.Error()))
-			return nil, fmt.Errorf("%s: %w", op, ErrPageAttemtsNotFound)
+			return []attempts.QuestionPageAttempt{}, fmt.Errorf("%s: %w", op, ErrPageAttemtsNotFound)
 		}
 		log.Error("failed to get page attempts from DB", slog.String("err", err.Error()))
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return []attempts.QuestionPageAttempt{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	// Save attempts to Redis

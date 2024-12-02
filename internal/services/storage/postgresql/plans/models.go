@@ -52,7 +52,7 @@ type SharePlanForUsers struct {
 	PlanID    int64     `json:"plan_id" validate:"required"`
 	UserIDs   []string  `json:"user_ids" validate:"required"`
 	CreatedBy string    `json:"created_by" validate:"required"`
-	CreatedAt time.Time `json:"created_at" validate:"required"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
 type DBPlan struct {

@@ -101,7 +101,7 @@ func (s *serverAPI) GetLessonAttempts(ctx context.Context, req *lpv1.GetLessonAt
 	})
 	if err != nil {
 		switch {
-		case errors.Is(err, attemptserve.ErrAttemptNotFound):
+		case errors.Is(err, attemptserve.ErrLessonAttemtNotFound):
 			return nil, status.Error(codes.NotFound, "lesson attempt not found")
 		case errors.Is(err, attemptserve.ErrInvalidCredentials):
 			return nil, status.Error(codes.InvalidArgument, "bad request")
@@ -120,7 +120,6 @@ func (s *serverAPI) GetLessonAttempts(ctx context.Context, req *lpv1.GetLessonAt
 			ChannelId:       attempt.ChannelID,
 			StartTime:       attempt.StartTime.Format(time.RFC3339),
 			EndTime:         attempt.EndTime.Format(time.RFC3339),
-			LastModifiedBy:  attempt.LastModifiedBy,
 			IsComplete:      attempt.IsComplete,
 			IsSuccessful:    attempt.IsSuccessful,
 			PercentageScore: attempt.PercentageScore,

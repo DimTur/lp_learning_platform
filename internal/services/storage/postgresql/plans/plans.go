@@ -224,7 +224,7 @@ const getPlansQuery = `
 	WHERE 
 		cp.channel_id = $1
 		AND spu.user_id = $2
-		AND is_public 
+		AND public 
 		AND is_published
 	ORDER BY p.id
 	LIMIT $3 OFFSET $4;`

@@ -307,7 +307,6 @@ func (c *ChannelPostgresStorage) GetChannelCreator(ctx context.Context, channelI
 
 const sharingGroupsQuery = `
 	SELECT 
-		c.id AS channel_id,
 		sclg.learning_group_id AS learning_group_id
 	FROM 
 		channels c
@@ -329,11 +328,11 @@ func (c *ChannelPostgresStorage) GetLearningGroupsShareWithChannel(ctx context.C
 	for rows.Next() {
 		var id DBLearningGroupID
 		if err := rows.Scan(
-			&id.ID,
+			&id.LearningGroupID,
 		); err != nil {
 			return nil, fmt.Errorf("%s: %w", op, storage.ErrScanFailed)
 		}
-		lgIDs = append(lgIDs, id.ID)
+		lgIDs = append(lgIDs, id.LearningGroupID)
 	}
 
 	if err := rows.Err(); err != nil {
