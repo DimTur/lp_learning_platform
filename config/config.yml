@@ -70,8 +70,25 @@ rabbit_mq:
       exclusive: false
       no_wait: false
     notification_routing_key: notification_to_auth
+  spfu:
+    spfu_consumer:
+      queue: spfu
+      consumer: ""
+      autoAck: false
+      exclusive: false
+      noLocal: false
+      noWait: false
+      args:
+        x-consumer-timeout: 60000
+        x-consumer-prefetch-count: 5
 redis:
   host: localhost
   port: 6379
   attemts_db: 3
   password: ""
+clients:
+  sso:
+    address: ":8081"
+    timeout: "2s"
+    retries_count: 3
+    insecure: false

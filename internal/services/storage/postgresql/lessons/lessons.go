@@ -220,7 +220,6 @@ func (l *LessonsPostgresStorage) UpdateLesson(ctx context.Context, updLesson *Up
 		updLesson.LastModifiedBy,
 	).Scan(&id)
 	if err != nil {
-		fmt.Println(err)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, fmt.Errorf("%s: %w", op, storage.ErrLessonNotFound)
 		}

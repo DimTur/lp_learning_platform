@@ -18,6 +18,7 @@ const (
 
 type PlanStorage interface {
 	plan.PlanSaver
+	plan.PlanProvider
 }
 
 type RabbitMQQueues interface {

@@ -391,7 +391,6 @@ func (c *PlansPostgresStorage) SharePlanWithUser(ctx context.Context, s *DBShare
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
-			fmt.Printf("Postgres error code: %s, message: %s\n", pgErr.Code, pgErr.Message)
 			if pgErr.Code == "23505" {
 				return fmt.Errorf("%s: %w", op, storage.ErrPlanAlreadySharedWithUser)
 			}
@@ -438,7 +437,6 @@ func (c *PlansPostgresStorage) BatchSharePlansWithUsers(ctx context.Context, bs 
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
-			fmt.Printf("Postgres error code: %s, message: %s\n", pgErr.Code, pgErr.Message)
 		}
 		return fmt.Errorf("%s: %w", op, err)
 	}
@@ -469,4 +467,47 @@ func (c *PlansPostgresStorage) IsUserShareWithPlan(ctx context.Context, userPlan
 	}
 
 	return exists, nil
+}
+
+const getPlansForSharingQuery = `
+	SELECT
+		p.id AS plan_id,
+		sclg.channel_id AS channel_id
+	FROM
+		plans p
+	INNER JOIN
+		channels_plans cp ON p.id = cp.plan_id
+	INNER JOIN
+		shared_channels_learninggroups sclg ON cp.channel_id = sclg.channel_id
+	WHERE
+		sclg.learning_group_id = $1;`
+
+func (c *PlansPostgresStorage) GetPlansForSharing(ctx context.Context, lgPlan *LearningGroup) (map[int64][]int64, error) {
+	const op = "storage.postgresql.plans.plans.GetPlansForSharing"
+
+	rows, err := c.db.Query(
+		ctx,
+		getPlansForSharingQuery,
+		lgPlan.LgID,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	defer rows.Close()
+
+	channelPlansMap := make(map[int64][]int64)
+
+	for rows.Next() {
+		var channelID, planID int64
+		if err := rows.Scan(&planID, &channelID); err != nil {
+			return nil, fmt.Errorf("%s: %w", op, storage.ErrScanFailed)
+		}
+		channelPlansMap[channelID] = append(channelPlansMap[channelID], planID)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return channelPlansMap, nil
 }

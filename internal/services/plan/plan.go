@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"time"
 
+	ssomodels "github.com/DimTur/lp_learning_platform/internal/clients/sso/models.go"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage"
 	"github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
 	"github.com/go-playground/validator/v10"
@@ -35,7 +36,17 @@ type PlanProvider interface {
 	GetPlansAll(ctx context.Context, inputParams *plans.GetPlans) ([]plans.Plan, error)
 	IsUserShareWithPlan(ctx context.Context, userPlan *plans.IsUserShareWithPlan) (bool, error)
 	CanShare(ctx context.Context, cs *plans.DBCanShare) (bool, error)
+	GetPlansForSharing(ctx context.Context, lgPlan *plans.LearningGroup) (map[int64][]int64, error)
 }
+
+type ChannelProvider interface {
+	GetLearningGroupsShareWithChannel(ctx context.Context, channelID int64) ([]string, error)
+}
+
+type LearningGroupProvider interface {
+	GetLearners(ctx context.Context, lgID string) (*ssomodels.GetLearners, error)
+}
+
 type PlanDel interface {
 	DeletePlan(ctx context.Context, planCh *plans.DeletePlan) error
 }
@@ -53,12 +64,14 @@ var (
 )
 
 type PlanHandlers struct {
-	log            *slog.Logger
-	validator      *validator.Validate
-	planSaver      PlanSaver
-	planProvider   PlanProvider
-	planDel        PlanDel
-	rabbitMQQueues RabbitMQQueues
+	log                   *slog.Logger
+	validator             *validator.Validate
+	planSaver             PlanSaver
+	planProvider          PlanProvider
+	planDel               PlanDel
+	channelProvider       ChannelProvider
+	learningGroupProvider LearningGroupProvider
+	rabbitMQQueues        RabbitMQQueues
 }
 
 func New(
@@ -67,15 +80,19 @@ func New(
 	planSaver PlanSaver,
 	planProvider PlanProvider,
 	planDel PlanDel,
+	channelProvider ChannelProvider,
+	learningGroupProvider LearningGroupProvider,
 	rabbitMQQueues RabbitMQQueues,
 ) *PlanHandlers {
 	return &PlanHandlers{
-		log:            log,
-		validator:      validator,
-		planSaver:      planSaver,
-		planProvider:   planProvider,
-		planDel:        planDel,
-		rabbitMQQueues: rabbitMQQueues,
+		log:                   log,
+		validator:             validator,
+		planSaver:             planSaver,
+		planProvider:          planProvider,
+		planDel:               planDel,
+		channelProvider:       channelProvider,
+		learningGroupProvider: learningGroupProvider,
+		rabbitMQQueues:        rabbitMQQueues,
 	}
 }
 
@@ -291,6 +308,40 @@ func (ph *PlanHandlers) UpdatePlan(ctx context.Context, updPlan *plans.UpdatePla
 	}
 	log.Info("plan updated with ", slog.Int64("planID", id))
 
+	if updPlan.Public {
+		lgIDs, err := ph.channelProvider.GetLearningGroupsShareWithChannel(ctx, updPlan.ChannelID)
+		if err != nil {
+			log.Error("failed to get learning group ids", slog.String("err", err.Error()))
+			return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+		}
+
+		var userIDs []string
+		for _, lgID := range lgIDs {
+			learners, err := ph.learningGroupProvider.GetLearners(ctx, lgID)
+			if err != nil {
+				log.Error("failed to get learner ids", slog.String("err", err.Error()))
+				return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+			}
+
+			userIDs = append(userIDs, learners.Learners...)
+		}
+
+		if err := ph.SharePlanWithUser(ctx, &plans.SharePlanForUsers{
+			ChannelID: updPlan.ChannelID,
+			PlanID:    updPlan.PlanID,
+			UserIDs:   userIDs,
+			CreatedBy: updPlan.LastModifiedBy,
+			CreatedAt: time.Now(),
+		}); err != nil {
+			if errors.Is(err, ErrInvalidCredentials) {
+				return 0, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+			}
+
+			return 0, fmt.Errorf("%s: %w", op, err)
+		}
+
+	}
+
 	return id, nil
 }
 
@@ -387,8 +438,6 @@ func (ph *PlanHandlers) SharePlanWithUser(ctx context.Context, s *plans.SharePla
 			return fmt.Errorf("%s: %w", op, err)
 		}
 
-		fmt.Println("batch ", batchRequest)
-
 		log.Info("batch sent to share with users",
 			slog.Int("batch_size", len(batch)),
 			slog.Int("start_index", i),
@@ -421,4 +470,27 @@ func (ph *PlanHandlers) IsUserShareWithPlan(ctx context.Context, userPlan *plans
 	}
 
 	return isShare, nil
+}
+
+func (ph *PlanHandlers) GetPlansForSharing(ctx context.Context, lgPlan *plans.LearningGroup) (map[int64][]int64, error) {
+	const op = "plan.GetPlansForSharing"
+
+	log := ph.log.With(
+		slog.String("op", op),
+		slog.String("learning_group_id", lgPlan.LgID),
+	)
+
+	// Validation
+	err := ph.validator.Struct(lgPlan)
+	if err != nil {
+		log.Warn("invalid parameters", slog.String("err", err.Error()))
+		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	planChannelIDs, err := ph.planProvider.GetPlansForSharing(ctx, lgPlan)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
+	}
+
+	return planChannelIDs, nil
 }

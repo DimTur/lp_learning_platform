@@ -275,7 +275,6 @@ func (c *ChannelPostgresStorage) ShareChannelToGroup(ctx context.Context, s DBSh
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
-			fmt.Printf("Postgres error code: %s, message: %s\n", pgErr.Code, pgErr.Message)
 			if pgErr.Code == "23505" { // unique violation code
 				return fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
 			} else if pgErr.Code == "23503" { // foreign key violation code

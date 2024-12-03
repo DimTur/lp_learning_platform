@@ -59,6 +59,10 @@ type AttemptsRedis interface {
 	attempt.AttemptRedisStore
 }
 
+type SsoStorage interface {
+	plan.LearningGroupProvider
+}
+
 type App struct {
 	GRPCSrv *grpcapp.Server
 }
@@ -73,6 +77,7 @@ func NewApp(
 	attemptRedis AttemptsRedis,
 	channelRabbitMq ChannelRabbitMq,
 	planRabbitMq PlanRabbitMq,
+	ssoStorage SsoStorage,
 	grpcAddr string,
 	logger *slog.Logger,
 	validator *validator.Validate,
@@ -92,6 +97,8 @@ func NewApp(
 		planStorage,
 		planStorage,
 		planStorage,
+		channelStorage,
+		ssoStorage,
 		planRabbitMq,
 	)
 

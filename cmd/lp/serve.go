@@ -11,6 +11,7 @@ import (
 
 	"github.com/DimTur/lp_learning_platform/internal/app"
 	"github.com/DimTur/lp_learning_platform/internal/app/consumers"
+	ssogrpc "github.com/DimTur/lp_learning_platform/internal/clients/sso/grpc"
 	"github.com/DimTur/lp_learning_platform/internal/config"
 	"github.com/DimTur/lp_learning_platform/internal/services/rabbitmq"
 	"github.com/DimTur/lp_learning_platform/internal/services/redis"
@@ -56,6 +57,17 @@ func NewServeCmd() *cobra.Command {
 			pageStorage := pagestorage.NewPagesStorage(storagePool)
 			questionStorage := questionstorage.NewQuestionsStorage(storagePool)
 			attemptStorage := attstorage.NewAttemptsStorage(storagePool)
+
+			ssoClient, err := ssogrpc.New(
+				ctx,
+				log,
+				cfg.Clients.SSO.Address,
+				cfg.Clients.SSO.Timeout,
+				cfg.Clients.SSO.RetriesCount,
+			)
+			if err != nil {
+				return err
+			}
 
 			// Init Redis
 			rAttempts := &redis.RedisAttempts{
@@ -119,6 +131,7 @@ func NewServeCmd() *cobra.Command {
 				redisAttempts,
 				rmq,
 				rmq,
+				ssoClient,
 				cfg.GRPCServer.Address,
 				log,
 				validate,
@@ -199,8 +212,9 @@ func startConsumers(
 ) {
 	channelsConsumer := consumers.NewConsumeChannel(rmq, channelStorage, log)
 	plansConsumer := consumers.NewConsumePlan(rmq, planStorage, rmq, log)
+	learnersConsumer := consumers.NewConsumeSharedLearnersWithPlan(rmq, planStorage, rmq, log)
 
-	wg.Add(2)
+	wg.Add(3)
 	go func() {
 		defer wg.Done()
 		if err := channelsConsumer.Start(
@@ -230,6 +244,22 @@ func startConsumers(
 			cfg.RabbitMQ.Plan.PlanConsumer.ConsumerArgs.ToMap(),
 		); err != nil {
 			log.Error("failed to start share plans consumer", slog.Any("err", err))
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		if err := learnersConsumer.Start(
+			ctx,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.Queue,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.Consumer,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.AutoAck,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.Exclusive,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.NoLocal,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.NoWait,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.ConsumerArgs.ToMap(),
+		); err != nil {
+			log.Error("failed to start spfu consumer", slog.Any("err", err))
 		}
 	}()
 }

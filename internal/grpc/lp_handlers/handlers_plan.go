@@ -224,3 +224,24 @@ func (s *serverAPI) IsUserShareWithPlan(ctx context.Context, req *lpv1.IsUserSha
 		IsShare: isShare,
 	}, nil
 }
+
+func (s *serverAPI) GetPlansForSharing(ctx context.Context, req *lpv1.GetPlansForSharingRequest) (*lpv1.GetPlansForSharingResponse, error) {
+	resp, err := s.planHandlers.GetPlansForSharing(ctx, &plans.LearningGroup{
+		LgID: req.GetLearningGroupId(),
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	var plansForSharing []*lpv1.PlansForSharing
+	for channelID, planIDs := range resp {
+		plansForSharing = append(plansForSharing, &lpv1.PlansForSharing{
+			ChannelId: channelID,
+			PlanIds:   planIDs,
+		})
+	}
+
+	return &lpv1.GetPlansForSharingResponse{
+		PlansForSharing: plansForSharing,
+	}, nil
+}

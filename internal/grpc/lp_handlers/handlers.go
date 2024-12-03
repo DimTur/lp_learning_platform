@@ -34,6 +34,7 @@ type PlanHandlers interface {
 	DeletePlan(ctx context.Context, planCh *plans.DeletePlan) error
 	SharePlanWithUser(ctx context.Context, s *plans.SharePlanForUsers) error
 	IsUserShareWithPlan(ctx context.Context, userPlan *plans.IsUserShareWithPlan) (bool, error)
+	GetPlansForSharing(ctx context.Context, lgPlan *plans.LearningGroup) (map[int64][]int64, error)
 }
 
 type LessonHandlers interface {

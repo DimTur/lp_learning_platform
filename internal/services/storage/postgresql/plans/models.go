@@ -107,3 +107,17 @@ func (p *GetPlans) SetDefaults() {
 		p.Offset = 0
 	}
 }
+
+type LearningGroup struct {
+	LgID string `json:"learning_group_id" validate:"required"`
+}
+
+type DBPlansForSharing struct {
+	ChannelID int64 `db:"channel_id"`
+	PlanID    int64 `db:"plan_id"`
+}
+
+type PlansForSharing struct {
+	ChannelID int64
+	PlanID    int64
+}
