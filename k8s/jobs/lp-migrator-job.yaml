@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration
+  namespace: default
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: busybox
+        command: ['sh', '-c', 'until nc -z postgres 5432; do echo waiting for db; sleep 2; done;']
+      containers:
+      - name: migrator
+        image: lp-migrator:1.0.0
+        env:
+        - name: DB_HOST
+          value: "postgres"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "postgres"
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASS
+          value: "postgres"
+        - name: MIGRATIONS_PATH
+          value: "./migrations"
+        - name: MIGRATIONS_TABLE
+          value: "schema_migrations"
+        volumeMounts:
+        - name: migrations
+          mountPath: "/migrations"
+      restartPolicy: OnFailure
+      volumes:
+      - name: migrations
+        emptyDir: {}

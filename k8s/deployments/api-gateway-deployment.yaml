@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-app-deployment
+  labels:
+    app: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway-app
+  template:
+    metadata:
+      labels:
+        app: api-gateway-app
+    spec:
+      initContainers:
+      - name: wait-for-redis
+        image: busybox
+        command: ['sh', '-c', 'until nc -z redis 6379; do echo waiting for redis; sleep 2; done;']
+      containers:
+      - name: api-gateway-container
+        image: api-gateway-app:1.0.0
+        ports:
+        - containerPort: 8000
+        env:
+          - name: CONFIG_PATH
+            value: "/api-gateway/config.yaml"
+        volumeMounts:
+          - mountPath: /api-gateway/config.yaml
+            subPath: config.yaml
+            name: config-volume
+      volumes:
+      - name: config-volume
+        configMap:
+          name: api-gateway-config

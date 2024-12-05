@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nomification-config
+data:
+  config.yaml: |
+    server:
+      host: "localhost"
+      port: 8003
+    telegram_bot:
+      tg_bot_token: "7388737325:AAHYztU7O3Ct4wYt_-bbQZztE2IGE7e30SU"
+      tg_bot_host: "api.telegram.org"
+      batch_size: 100
+    rabbit_mq:
+      username: guest
+      password: guest
+      host: rabbitmq
+      port: 5672
+      otp:
+        otp_queue:
+          name: otp
+          durable: false
+          auto_deleted: false
+          exclusive: false
+          no_wait: true
+          args:
+            x_message_ttl: 60000
+        otp_exchange:
+          name: otp
+          kind: fanout
+          durable: false
+          auto_deleted: false
+          internal: false
+          no_wait: true
+          args:
+            alternate_exchange: alternate_exchange_otp
+        otp_consumer:
+          queue: otp
+          consumer: ""
+          autoAck: false
+          exclusive: false
+          noLocal: false
+          noWait: false
+          args:
+            x-consumer-timeout: 60000
+            x-consumer-prefetch-count: 5
+        otp_routing_key: otp
+      chat:
+        chat_id_exchange:
+          name: chat_id
+          kind: fanout
+          durable: false
+          auto_deleted: false
+          internal: false
+          no_wait: true
+          args:
+            alternate_exchange: alternate_exchange_chat_id
+        chat_id_queue:
+          name: chat_id
+          durable: false
+          auto_deleted: false
+          exclusive: false
+          no_wait: true
+          args:
+            x_message_ttl: 60000
+        chat_id_routing_key: chat_id
+      notification:
+        notification_queue:
+          name: notification
+        notification_exchange:
+          name: share
+        notification_consumer:
+          queue: notification
+          consumer: ""
+          autoAck: false
+          exclusive: false
+          noLocal: false
+          noWait: false
+          args:
+            x-consumer-timeout: 60000
+            x-consumer-prefetch-count: 5
+        notification_routing_key: notification

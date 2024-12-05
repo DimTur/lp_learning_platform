@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: lp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lp
+      component: postgres
+  template:
+    metadata:
+      labels:
+        app: lp
+        component: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17.0-alpine
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $POSTGRES_USER
+                - -d
+                - $POSTGRES_DB
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $POSTGRES_USER
+                - -d
+                - $POSTGRES_DB
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data

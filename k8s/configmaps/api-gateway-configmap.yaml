@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+data:
+  config.yaml: |
+    http_server:
+      address: ":8000"
+      timeout: "2s"
+      iddle_timeout: "60s"
+    clients:
+      sso:
+        address: "sso-service.default.svc.cluster.local:8001"
+        timeout: "2s"
+        retries_count: 3
+        insecure: false
+      lp:
+        address: "lp-app-service:8002"
+        timeout: "2s"
+        retries_count: 3
+        insecure: false
+    tracer:
+      opentelemetry:
+        address: "localhost:4318"
+        service_name: "api_gateway"
+    meter:
+      prometheus:
+        service_name: "api_gateway"
+    redis:
+      host: redis
+      port: 6379
+      permissions_db: 2
+      password: ""

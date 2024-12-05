@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-app-deployment
+  labels:
+    app: notification
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification-app
+  template:
+    metadata:
+      labels:
+        app: notification-app
+    spec:
+      initContainers:
+      - name: wait-for-rabbitmq
+        image: busybox
+        command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done;']
+      containers:
+      - name: notification-container
+        image: notification-app:1.0.0
+        ports:
+        - containerPort: 8003
+        env:
+          - name: CONFIG_PATH
+            value: "/notification/config.yaml"
+        volumeMounts:
+          - mountPath: /notification/config.yaml
+            subPath: config.yaml
+            name: config-volume
+      volumes:
+      - name: config-volume
+        configMap:
+          name: nomification-config

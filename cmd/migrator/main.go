@@ -7,7 +7,6 @@ import (
 
 	// Library for migrations
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/joho/godotenv"
 
 	// Driver for perfirming migrations
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -16,9 +15,9 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		panic("Error loading .env file")
-	}
+	// if err := godotenv.Load(); err != nil {
+	// 	panic("Error loading .env file")
+	// }
 
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
