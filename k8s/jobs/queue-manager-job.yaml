@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: queue-manager
+  namespace: default
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: wait-for-rabbitmq
+        image: busybox
+        command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done;']
+      containers:
+      - name: queue-manager
+        image: queue-manager-app:1.0.0
+        command: ["./queue-manager", "serve", "--config=/queue-manager/config.yaml"]
+        env:
+          - name: CONFIG_PATH
+            value: "/queue-manager/config.yaml"
+        volumeMounts:
+          - mountPath: /queue-manager/config.yaml
+            subPath: config.yaml
+            name: config-volume
+      volumes:
+      - name: config-volume
+        configMap:
+          name: queue-manager-config
+      restartPolicy: OnFailure

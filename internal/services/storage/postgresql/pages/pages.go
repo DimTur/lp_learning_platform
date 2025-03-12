@@ -2,6 +2,7 @@ package pages
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -68,7 +69,7 @@ func (p *PagesPostgresStorage) updateAbstractPage(ctx context.Context, page Upda
 	}
 
 	commonFields := page.GetCommonFields()
-	_, err = tx.Exec(
+	result, err := tx.Exec(
 		ctx,
 		updateAbstractPageQuery,
 		commonFields.ID,
@@ -76,6 +77,10 @@ func (p *PagesPostgresStorage) updateAbstractPage(ctx context.Context, page Upda
 	)
 	if err != nil {
 		return 0, nil, fmt.Errorf("update abstract: %w", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return 0, nil, storage.ErrPageNotFound
 	}
 
 	return commonFields.ID, tx, err
@@ -113,8 +118,7 @@ func (p *PagesPostgresStorage) CreatePage(ctx context.Context, page CreatePage) 
 	return pageID, nil
 }
 
-const (
-	getImagePageByIDQuery = `
+const getImagePageByIDQuery = `
 	SELECT 
 		ab.id AS abstractpage_id, 
 		ab.lesson_id lesson_id, 
@@ -129,8 +133,55 @@ const (
 		pages_abstractpages ab
 	INNER JOIN
 		image_imagepage ip ON ab.id =  ip.abstractpage_id
-	WHERE abstractpage_id = $1`
-	getVideoPageByIDQuery = `
+	WHERE 
+		abstractpage_id = $1
+		AND lesson_id = $2;`
+
+func (p *PagesPostgresStorage) GetImagePage(ctx context.Context, pageLesson *GetPage) (Page, error) {
+	const op = "storage.postgresql.pages.pages.GetImagePage"
+
+	var (
+		page        Page
+		dbImagePage DBImagePage
+	)
+	err := p.db.QueryRow(
+		ctx,
+		getImagePageByIDQuery,
+		pageLesson.PageID,
+		pageLesson.LessonID,
+	).Scan(
+		&dbImagePage.ID,
+		&dbImagePage.LessonID,
+		&dbImagePage.CreatedBy,
+		&dbImagePage.LastModifiedBy,
+		&dbImagePage.CreatedAt,
+		&dbImagePage.Modified,
+		&dbImagePage.ContentType,
+		&dbImagePage.ImageFileUrl,
+		&dbImagePage.ImageName,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
+	}
+
+	page = &ImagePage{
+		BasePage: BasePage{
+			ID:             dbImagePage.ID,
+			LessonID:       dbImagePage.LessonID,
+			CreatedBy:      dbImagePage.CreatedBy,
+			LastModifiedBy: dbImagePage.LastModifiedBy,
+			CreatedAt:      dbImagePage.CreatedAt,
+			Modified:       dbImagePage.Modified,
+			ContentType:    dbImagePage.ContentType,
+		},
+		ImageFileUrl: dbImagePage.ImageFileUrl,
+		ImageName:    dbImagePage.ImageName,
+	}
+
+	return page, nil
+}
+
+const getVideoPageByIDQuery = `
 	SELECT 
 		ab.id AS abstractpage_id, 
 		ab.lesson_id lesson_id, 
@@ -145,8 +196,55 @@ const (
 		pages_abstractpages ab
 	INNER JOIN
 		video_videopage vp ON ab.id =  vp.abstractpage_id
-	WHERE abstractpage_id = $1`
-	getPDFPageByIDQuery = `
+	WHERE 
+		abstractpage_id = $1
+		AND lesson_id = $2;`
+
+func (p *PagesPostgresStorage) GetVideoPage(ctx context.Context, pageLesson *GetPage) (Page, error) {
+	const op = "storage.postgresql.pages.pages.GetVideoPage"
+
+	var (
+		page        Page
+		dbVideoPage DBVideoPage
+	)
+	err := p.db.QueryRow(
+		ctx,
+		getVideoPageByIDQuery,
+		pageLesson.PageID,
+		pageLesson.LessonID,
+	).Scan(
+		&dbVideoPage.ID,
+		&dbVideoPage.LessonID,
+		&dbVideoPage.CreatedBy,
+		&dbVideoPage.LastModifiedBy,
+		&dbVideoPage.CreatedAt,
+		&dbVideoPage.Modified,
+		&dbVideoPage.ContentType,
+		&dbVideoPage.VideoFileUrl,
+		&dbVideoPage.VideoName,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
+	}
+
+	page = &VideoPage{
+		BasePage: BasePage{
+			ID:             dbVideoPage.ID,
+			LessonID:       dbVideoPage.LessonID,
+			CreatedBy:      dbVideoPage.CreatedBy,
+			LastModifiedBy: dbVideoPage.LastModifiedBy,
+			CreatedAt:      dbVideoPage.CreatedAt,
+			Modified:       dbVideoPage.Modified,
+			ContentType:    dbVideoPage.ContentType,
+		},
+		VideoFileUrl: dbVideoPage.VideoFileUrl,
+		VideoName:    dbVideoPage.VideoName,
+	}
+
+	return page, nil
+}
+
+const getPDFPageByIDQuery = `
 	SELECT 
 		ab.id AS abstractpage_id, 
 		ab.lesson_id lesson_id, 
@@ -161,111 +259,49 @@ const (
 		pages_abstractpages ab
 	INNER JOIN
 		pdf_pdfpage pdf ON ab.id =  pdf.abstractpage_id
-	WHERE abstractpage_id = $1`
-)
+	WHERE 
+		abstractpage_id = $1
+		AND lesson_id = $2;`
 
-func (p *PagesPostgresStorage) GetPageByID(ctx context.Context, pageID int64, contentType string) (Page, error) {
-	const op = "storage.postgresql.pages.pages.GetPageByID"
+func (p *PagesPostgresStorage) GetPDFPage(ctx context.Context, pageLesson *GetPage) (Page, error) {
+	const op = "storage.postgresql.pages.pages.GetPDFPage"
 
-	var page Page
+	var (
+		page      Page
+		dbPDFPage DBPDFPage
+	)
+	err := p.db.QueryRow(
+		ctx,
+		getPDFPageByIDQuery,
+		pageLesson.PageID,
+		pageLesson.LessonID,
+	).Scan(
+		&dbPDFPage.ID,
+		&dbPDFPage.LessonID,
+		&dbPDFPage.CreatedBy,
+		&dbPDFPage.LastModifiedBy,
+		&dbPDFPage.CreatedAt,
+		&dbPDFPage.Modified,
+		&dbPDFPage.ContentType,
+		&dbPDFPage.PdfFileUrl,
+		&dbPDFPage.PdfName,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
+	}
 
-	switch contentType {
-	case "image":
-		var dbImagePage DBImagePage
-		err := p.db.QueryRow(ctx, getImagePageByIDQuery, pageID).Scan(
-			&dbImagePage.ID,
-			&dbImagePage.LessonID,
-			&dbImagePage.CreatedBy,
-			&dbImagePage.LastModifiedBy,
-			&dbImagePage.CreatedAt,
-			&dbImagePage.Modified,
-			&dbImagePage.ContentType,
-			&dbImagePage.ImageFileUrl,
-			&dbImagePage.ImageName,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
-		}
-
-		page = &ImagePage{
-			BasePage: BasePage{
-				ID:             dbImagePage.ID,
-				LessonID:       dbImagePage.LessonID,
-				CreatedBy:      dbImagePage.CreatedBy,
-				LastModifiedBy: dbImagePage.LastModifiedBy,
-				CreatedAt:      dbImagePage.CreatedAt,
-				Modified:       dbImagePage.Modified,
-				ContentType:    dbImagePage.ContentType,
-			},
-			ImageFileUrl: dbImagePage.ImageFileUrl,
-			ImageName:    dbImagePage.ImageName,
-		}
-
-	case "video":
-		var dbVideoPage DBVideoPage
-		query := getVideoPageByIDQuery
-		err := p.db.QueryRow(ctx, query, pageID).Scan(
-			&dbVideoPage.ID,
-			&dbVideoPage.LessonID,
-			&dbVideoPage.CreatedBy,
-			&dbVideoPage.LastModifiedBy,
-			&dbVideoPage.CreatedAt,
-			&dbVideoPage.Modified,
-			&dbVideoPage.ContentType,
-			&dbVideoPage.VideoFileUrl,
-			&dbVideoPage.VideoName,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
-		}
-
-		page = &VideoPage{
-			BasePage: BasePage{
-				ID:             dbVideoPage.ID,
-				LessonID:       dbVideoPage.LessonID,
-				CreatedBy:      dbVideoPage.CreatedBy,
-				LastModifiedBy: dbVideoPage.LastModifiedBy,
-				CreatedAt:      dbVideoPage.CreatedAt,
-				Modified:       dbVideoPage.Modified,
-				ContentType:    dbVideoPage.ContentType,
-			},
-			VideoFileUrl: dbVideoPage.VideoFileUrl,
-			VideoName:    dbVideoPage.VideoName,
-		}
-
-	case "pdf":
-		var dbPDFPage DBPDFPage
-		err := p.db.QueryRow(ctx, getPDFPageByIDQuery, pageID).Scan(
-			&dbPDFPage.ID,
-			&dbPDFPage.LessonID,
-			&dbPDFPage.CreatedBy,
-			&dbPDFPage.LastModifiedBy,
-			&dbPDFPage.CreatedAt,
-			&dbPDFPage.Modified,
-			&dbPDFPage.ContentType,
-			&dbPDFPage.PdfFileUrl,
-			&dbPDFPage.PdfName,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
-		}
-
-		page = &PDFPage{
-			BasePage: BasePage{
-				ID:             dbPDFPage.ID,
-				LessonID:       dbPDFPage.LessonID,
-				CreatedBy:      dbPDFPage.CreatedBy,
-				LastModifiedBy: dbPDFPage.LastModifiedBy,
-				CreatedAt:      dbPDFPage.CreatedAt,
-				Modified:       dbPDFPage.Modified,
-				ContentType:    dbPDFPage.ContentType,
-			},
-			PdfFileUrl: dbPDFPage.PdfFileUrl,
-			PdfName:    dbPDFPage.PdfName,
-		}
-
-	default:
-		return nil, fmt.Errorf("%s: %w", op, storage.ErrUnContType)
+	page = &PDFPage{
+		BasePage: BasePage{
+			ID:             dbPDFPage.ID,
+			LessonID:       dbPDFPage.LessonID,
+			CreatedBy:      dbPDFPage.CreatedBy,
+			LastModifiedBy: dbPDFPage.LastModifiedBy,
+			CreatedAt:      dbPDFPage.CreatedAt,
+			Modified:       dbPDFPage.Modified,
+			ContentType:    dbPDFPage.ContentType,
+		},
+		PdfFileUrl: dbPDFPage.PdfFileUrl,
+		PdfName:    dbPDFPage.PdfName,
 	}
 
 	return page, nil
@@ -288,14 +324,20 @@ const getPagesQuery = `
 	ORDER BY abstractpage_id
 	LIMIT $2 OFFSET $3`
 
-func (p *PagesPostgresStorage) GetPages(ctx context.Context, lessonID int64, limit, offset int64) ([]BasePage, error) {
+func (p *PagesPostgresStorage) GetPages(ctx context.Context, inputParams *GetPages) ([]BasePage, error) {
 	const op = "storage.postgresql.pages.pages.GetPages"
 
 	var pages []DBBasePage
 
-	rows, err := p.db.Query(ctx, getPagesQuery, lessonID, limit, offset)
+	rows, err := p.db.Query(
+		ctx,
+		getPagesQuery,
+		inputParams.LessonID,
+		inputParams.Limit,
+		inputParams.Offset,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
 	}
 	defer rows.Close()
 
@@ -332,7 +374,12 @@ func (p *PagesPostgresStorage) UpdatePage(ctx context.Context, updPage UpdatePag
 
 	pageID, tx, err := p.updateAbstractPage(ctx, updPage)
 	if err != nil {
-		return 0, fmt.Errorf("update page abstract: %w", err)
+		switch {
+		case errors.Is(err, storage.ErrPageNotFound):
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
+		default:
+			return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
+		}
 	}
 	defer func(err error) {
 		if err != nil {
@@ -350,11 +397,11 @@ func (p *PagesPostgresStorage) UpdatePage(ctx context.Context, updPage UpdatePag
 			updPage.GetContentTypeSpecificFields()...)...,
 	)
 	if err != nil {
-		return 0, fmt.Errorf("update page specific: %w", storage.ErrInvalidCredentials)
+		return 0, fmt.Errorf("%s: %w", op, storage.ErrInvalidCredentials)
 	}
 
 	if err = tx.Commit(ctx); err != nil {
-		return 0, fmt.Errorf("update page commit: %w", storage.ErrCommitTransaction)
+		return 0, fmt.Errorf("%s: %w", op, storage.ErrCommitTransaction)
 	}
 
 	return pageID, nil
@@ -362,14 +409,21 @@ func (p *PagesPostgresStorage) UpdatePage(ctx context.Context, updPage UpdatePag
 
 const deletePageQuery = `
 	DELETE FROM pages_abstractpages
-	WHERE id = $1`
+	WHERE 
+		id = $1
+		AND lesson_id = $2;`
 
-func (p *PagesPostgresStorage) DeletePage(ctx context.Context, id int64) error {
+func (p *PagesPostgresStorage) DeletePage(ctx context.Context, pageLesson *DeletePage) error {
 	const op = "storage.postgresql.pages.pages.DeletePage"
 
-	res, err := p.db.Exec(ctx, deletePageQuery, id)
+	res, err := p.db.Exec(
+		ctx,
+		deletePageQuery,
+		pageLesson.PageID,
+		pageLesson.LessonID,
+	)
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, storage.ErrPageNotFound)
+		return fmt.Errorf("%s: %w", op, err)
 	}
 
 	if res.RowsAffected() == 0 {

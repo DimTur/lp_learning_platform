@@ -10,26 +10,74 @@ import (
 	"github.com/DimTur/lp_learning_platform/internal/services/page"
 	"github.com/DimTur/lp_learning_platform/internal/services/plan"
 	"github.com/DimTur/lp_learning_platform/internal/services/question"
-	attstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
-	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
-	lessonstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
-	pagestorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
-	planstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/plans"
-	questiontorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/questions"
 	"github.com/go-playground/validator/v10"
 )
+
+type ChannelStorage interface {
+	channel.ChannelSaver
+	channel.ChannelProvider
+	channel.ChannelDel
+}
+
+type PlanlStorage interface {
+	plan.PlanSaver
+	plan.PlanProvider
+	plan.PlanDel
+}
+
+type LessonStorage interface {
+	lesson.LessonSaver
+	lesson.LessonProvider
+	lesson.LessonDel
+}
+
+type PageStorage interface {
+	page.PageSaver
+	page.PageProvider
+	page.PageDel
+}
+
+type QuestionStorage interface {
+	question.QuestionPageSaver
+	question.QuestionPageProvider
+}
+
+type AttemptStorage interface {
+	attempt.AttemptSaver
+	attempt.AttemptProvider
+}
+
+type ChannelRabbitMq interface {
+	channel.RabbitMQQueues
+}
+
+type PlanRabbitMq interface {
+	plan.RabbitMQQueues
+}
+
+type AttemptsRedis interface {
+	attempt.AttemptRedisStore
+}
+
+type SsoStorage interface {
+	plan.LearningGroupProvider
+}
 
 type App struct {
 	GRPCSrv *grpcapp.Server
 }
 
 func NewApp(
-	channelStorage *channelstorage.ChannelPostgresStorage,
-	planStorage *planstorage.PlansPostgresStorage,
-	lessonStorage *lessonstorage.LessonsPostgresStorage,
-	pageStorage *pagestorage.PagesPostgresStorage,
-	questionStorage *questiontorage.QuestionsPostgresStorage,
-	attemptStorage *attstorage.AttemptsPostgresStorage,
+	channelStorage ChannelStorage,
+	planStorage PlanlStorage,
+	lessonStorage LessonStorage,
+	pageStorage PageStorage,
+	questionStorage QuestionStorage,
+	attemptStorage AttemptStorage,
+	attemptRedis AttemptsRedis,
+	channelRabbitMq ChannelRabbitMq,
+	planRabbitMq PlanRabbitMq,
+	ssoStorage SsoStorage,
 	grpcAddr string,
 	logger *slog.Logger,
 	validator *validator.Validate,
@@ -40,6 +88,7 @@ func NewApp(
 		channelStorage,
 		channelStorage,
 		channelStorage,
+		channelRabbitMq,
 	)
 
 	lpGRPCPlanHandlers := plan.New(
@@ -48,6 +97,9 @@ func NewApp(
 		planStorage,
 		planStorage,
 		planStorage,
+		channelStorage,
+		ssoStorage,
+		planRabbitMq,
 	)
 
 	lpGRPCLessonHandlers := lesson.New(
@@ -78,6 +130,7 @@ func NewApp(
 		validator,
 		attemptStorage,
 		attemptStorage,
+		attemptRedis,
 	)
 
 	grpcServer, err := grpcapp.NewGRPCServer(

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lp-service
+  labels:
+    app: lp-app
+spec:
+  selector:
+    app: lp-app
+  ports:
+    - protocol: TCP
+      port: 8002
+      targetPort: 8002

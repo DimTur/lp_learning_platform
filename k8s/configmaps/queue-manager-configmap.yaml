@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: queue-manager-config
+data:
+  config.yaml: |
+    rabbit_mq:
+      username: guest
+      password: guest
+      host: rabbitmq
+      port: 5672
+      share:
+        share_exchange:
+          name: share
+          kind: direct
+          durable: true
+          auto_deleted: false
+          internal: false
+          no_wait: false
+          args:
+            alternate_exchange: alternate_exchange_share
+      otp:
+        otp_exchange:
+          name: otp
+          kind: fanout
+          durable: false
+          auto_deleted: false
+          internal: false
+          no_wait: true
+          args:
+            alternate_exchange: alternate_exchange_otp
+        otp_queue:
+          name: otp
+          durable: false
+          auto_deleted: false
+          exclusive: false
+          no_wait: true
+          args:
+            x_message_ttl: 60000
+        otp_routing_key: otp
+      chat:
+        chat_id_exchange:
+          name: chat_id
+          kind: fanout
+          durable: false
+          auto_deleted: false
+          internal: false
+          no_wait: true
+          args:
+            alternate_exchange: alternate_exchange_chat_id
+        chat_id_queue:
+          name: chat_id
+          durable: false
+          auto_deleted: false
+          exclusive: false
+          no_wait: true
+          args:
+            x_message_ttl: 60000
+        chat_id_routing_key: chat_id
+      notification:
+        notification_queue:
+            name: notification
+            durable: true
+            auto_deleted: false
+            exclusive: false
+            no_wait: false
+        notification_routing_key: notification
+        notification_to_auth_queue:
+          name: notification_to_auth
+          durable: true
+          auto_deleted: false
+          exclusive: false
+          no_wait: false
+        notification_to_auth_routing_key: notification_to_auth
+      spfu:
+        spfu_queue:
+            name: spfu
+            durable: true
+            auto_deleted: false
+            exclusive: false
+            no_wait: false
+        spfu_routing_key: spfu
+      plan:
+        plan_queue:
+          name: plan
+          durable: true
+          auto_deleted: false
+          exclusive: false
+          no_wait: false
+        plan_routing_key: plan
+      channel:
+        channel_queue:
+          name: channel
+          durable: true
+          auto_deleted: false
+          exclusive: false
+          no_wait: false
+        channel_routing_key: channel

@@ -3,15 +3,15 @@ package lp_handlers
 import (
 	"context"
 	"errors"
-	"fmt"
+	"time"
 
 	questionserv "github.com/DimTur/lp_learning_platform/internal/services/question"
+	pagestore "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/pages"
 	questionstore "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/questions"
 	"github.com/DimTur/lp_learning_platform/internal/utils"
-	lpv1 "github.com/DimTur/lp_learning_platform/pkg/server/grpc"
+	lpv1 "github.com/DimTur/lp_protos/gen/go/lp"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *serverAPI) CreateQuestionPage(ctx context.Context, req *lpv1.CreateQuestionPageRequest) (*lpv1.CreateQuestionPageResponse, error) {
@@ -19,10 +19,10 @@ func (s *serverAPI) CreateQuestionPage(ctx context.Context, req *lpv1.CreateQues
 		return nil, err
 	}
 
-	page := questionstore.CreateQuestionPage{
+	pageID, err := s.questionHandlers.CreateQuestionPage(ctx, &questionstore.CreateQuestionPage{
 		LessonID:       req.LessonId,
 		CreatedBy:      req.CreatedBy,
-		LastModifiedBy: req.LastModifiedBy,
+		LastModifiedBy: req.CreatedBy,
 		ContentType:    "question",
 		QuestionType:   "multichoice",
 		Question:       req.Question,
@@ -32,12 +32,7 @@ func (s *serverAPI) CreateQuestionPage(ctx context.Context, req *lpv1.CreateQues
 		OptionD:        req.GetOptionD(),
 		OptionE:        req.GetOptionE(),
 		Answer:         req.Answer.String(),
-	}
-
-	answer := req.GetAnswer()
-	fmt.Println(answer)
-
-	pageID, err := s.questionHandlers.CreateQuestionPage(ctx, page)
+	})
 	if err != nil {
 		if errors.Is(err, questionserv.ErrInvalidCredentials) {
 			return nil, status.Error(codes.InvalidArgument, "invalid credentials")
@@ -52,10 +47,13 @@ func (s *serverAPI) CreateQuestionPage(ctx context.Context, req *lpv1.CreateQues
 }
 
 func (s *serverAPI) GetQuestionPage(ctx context.Context, req *lpv1.GetQuestionPageRequest) (*lpv1.GetQuestionPageResponse, error) {
-	page, err := s.questionHandlers.GetQuestionPageByID(ctx, req.GetId())
+	page, err := s.questionHandlers.GetQuestionPageByID(ctx, &pagestore.GetPage{
+		PageID:   req.GetPageId(),
+		LessonID: req.GetLessonId(),
+	})
 	if err != nil {
-		if errors.Is(err, questionserv.ErrPageNotFound) {
-			return nil, status.Error(codes.NotFound, "page not found")
+		if errors.Is(err, questionserv.ErrQuestionNotFound) {
+			return nil, status.Error(codes.NotFound, "question page not found")
 		}
 
 		return nil, status.Error(codes.Internal, err.Error())
@@ -67,8 +65,8 @@ func (s *serverAPI) GetQuestionPage(ctx context.Context, req *lpv1.GetQuestionPa
 			LessonId:       page.LessonID,
 			CreatedBy:      page.CreatedBy,
 			LastModifiedBy: page.LastModifiedBy,
-			CreatedAt:      timestamppb.New(page.CreatedAt),
-			Modified:       timestamppb.New(page.Modified),
+			CreatedAt:      page.CreatedAt.Format(time.RFC3339),
+			Modified:       page.Modified.Format(time.RFC3339),
 			ContentType:    lpv1.ContentType_QUESTION,
 			QuestionType:   lpv1.QuestionType_MULTICHOICE,
 			Question:       page.Question,
@@ -89,7 +87,7 @@ func (s *serverAPI) UpdateQuestionPage(ctx context.Context, req *lpv1.UpdateQues
 
 	answer := req.GetAnswer().String()
 
-	updQuestionPage := questionstore.UpdateQuestionPage{
+	id, err := s.questionHandlers.UpdateQuestionPage(ctx, &questionstore.UpdateQuestionPage{
 		ID:             req.GetId(),
 		LastModifiedBy: req.GetLastModifiedBy(),
 		Question:       req.Question,
@@ -99,13 +97,13 @@ func (s *serverAPI) UpdateQuestionPage(ctx context.Context, req *lpv1.UpdateQues
 		OptionD:        req.OptionD,
 		OptionE:        req.OptionE,
 		Answer:         &answer,
-	}
-
-	id, err := s.questionHandlers.UpdateQuestionPage(ctx, updQuestionPage)
+	})
 	if err != nil {
 		switch {
 		case errors.Is(err, questionserv.ErrInvalidCredentials):
 			return nil, status.Error(codes.InvalidArgument, "bad request")
+		case errors.Is(err, questionserv.ErrQuestionNotFound):
+			return nil, status.Error(codes.NotFound, "question page not found")
 		default:
 			return nil, status.Error(codes.Internal, err.Error())
 		}

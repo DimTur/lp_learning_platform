@@ -1,14 +1,20 @@
 package lp
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/DimTur/lp_learning_platform/internal/app"
+	"github.com/DimTur/lp_learning_platform/internal/app/consumers"
+	ssogrpc "github.com/DimTur/lp_learning_platform/internal/clients/sso/grpc"
 	"github.com/DimTur/lp_learning_platform/internal/config"
+	"github.com/DimTur/lp_learning_platform/internal/services/rabbitmq"
+	"github.com/DimTur/lp_learning_platform/internal/services/redis"
 	attstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/attempts"
 	channelstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/channels"
 	lessonstorage "github.com/DimTur/lp_learning_platform/internal/services/storage/postgresql/lessons"
@@ -32,26 +38,14 @@ func NewServeCmd() *cobra.Command {
 
 			ctx, cancel := signal.NotifyContext(cmd.Context(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 			defer cancel()
+			var wg sync.WaitGroup
 
-			cfg, err := config.Parse(configPath)
+			cfg, err := loadConfig(configPath)
 			if err != nil {
 				return err
 			}
 
-			// storage, err := sqlite.New(cfg.Storage.SQLitePath)
-			// if err != nil {
-			// 	return err
-			// }
-
-			dsn := fmt.Sprintf(
-				"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-				cfg.Storage.User,
-				cfg.Storage.Password,
-				cfg.Storage.Host,
-				cfg.Storage.Port,
-				cfg.Storage.DBName,
-			)
-			storagePool, err := pgxpool.New(ctx, dsn)
+			storagePool, err := initDBConnection(ctx, cfg)
 			if err != nil {
 				return err
 			}
@@ -64,7 +58,68 @@ func NewServeCmd() *cobra.Command {
 			questionStorage := questionstorage.NewQuestionsStorage(storagePool)
 			attemptStorage := attstorage.NewAttemptsStorage(storagePool)
 
+			ssoClient, err := ssogrpc.New(
+				ctx,
+				log,
+				cfg.Clients.SSO.Address,
+				cfg.Clients.SSO.Timeout,
+				cfg.Clients.SSO.RetriesCount,
+			)
+			if err != nil {
+				return err
+			}
+
+			// Init Redis
+			rAttempts := &redis.RedisAttempts{
+				Host:     cfg.Redis.Host,
+				Port:     cfg.Redis.Port,
+				DB:       cfg.Redis.AttemptsDB,
+				Password: cfg.Redis.Password,
+			}
+			redisAttempts, err := redis.NewRedisClient(*rAttempts)
+			if err != nil {
+				log.Error("failed to close redis", slog.Any("err", err))
+			}
+
 			validate := validator.New()
+
+			// Init RabbitMQ
+			rmq, err := initRabbitMQ(cfg)
+			if err != nil {
+				log.Error("failed init rabbit mq", slog.Any("err", err))
+			}
+
+			// Declare Share exchange
+			if err := declareExchange(rmq, cfg); err != nil {
+				log.Error("failed to declare Share exchange", slog.Any("err", err))
+			}
+
+			// Declare and bind Channel Queue
+			if err = declareQueueAndBind(rmq,
+				cfg.RabbitMQ.Channel.ChannelQueue,
+				cfg.RabbitMQ.ShareExchange.Name,
+				cfg.RabbitMQ.Channel.ChannelRoutingKey,
+			); err != nil {
+				log.Error("failed to declare and bind Channel queue", slog.Any("err", err))
+			}
+
+			// Declare and bind Plan Queue
+			if err = declareQueueAndBind(rmq,
+				cfg.RabbitMQ.Plan.PlanQueue,
+				cfg.RabbitMQ.ShareExchange.Name,
+				cfg.RabbitMQ.Plan.PlanRoutingKey,
+			); err != nil {
+				log.Error("failed to declare and bind plan queue", slog.Any("err", err))
+			}
+
+			// Declare and bind Notification Queue
+			if err = declareQueueAndBind(rmq,
+				cfg.RabbitMQ.Notification.NotificationQueue,
+				cfg.RabbitMQ.ShareExchange.Name,
+				cfg.RabbitMQ.Notification.NotificationRoutingKey,
+			); err != nil {
+				log.Error("failed to declare and bind notification queue", slog.Any("err", err))
+			}
 
 			application, err := app.NewApp(
 				channelStorage,
@@ -73,6 +128,10 @@ func NewServeCmd() *cobra.Command {
 				pageStorage,
 				questionStorage,
 				attemptStorage,
+				redisAttempts,
+				rmq,
+				rmq,
+				ssoClient,
 				cfg.GRPCServer.Address,
 				log,
 				validate,
@@ -81,6 +140,8 @@ func NewServeCmd() *cobra.Command {
 				return err
 			}
 
+			startConsumers(ctx, cfg, rmq, channelStorage, planStorage, log, &wg)
+
 			grpcCloser, err := application.GRPCSrv.Run()
 			if err != nil {
 				return err
@@ -88,11 +149,9 @@ func NewServeCmd() *cobra.Command {
 
 			log.Info("server listening:", slog.Any("port", cfg.GRPCServer.Address))
 			<-ctx.Done()
+			wg.Wait()
 
-			// if err := storagePool.Close(); err != nil {
-			// 	log.Error("storage.Close", slog.Any("err", err))
-			// }
-
+			rmq.Close()
 			grpcCloser()
 
 			return nil
@@ -101,4 +160,131 @@ func NewServeCmd() *cobra.Command {
 
 	c.Flags().StringVar(&configPath, "config", "", "path to config")
 	return c
+}
+
+func loadConfig(configPath string) (*config.Config, error) {
+	return config.Parse(configPath)
+}
+
+func initDBConnection(ctx context.Context, cfg *config.Config) (*pgxpool.Pool, error) {
+	dsn := fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.Storage.User,
+		cfg.Storage.Password,
+		cfg.Storage.Host,
+		cfg.Storage.Port,
+		cfg.Storage.DBName,
+	)
+	return pgxpool.New(ctx, dsn)
+}
+
+func initRabbitMQ(cfg *config.Config) (*rabbitmq.RMQClient, error) {
+	rmqUrl := fmt.Sprintf(
+		"amqp://%s:%s@%s:%d/",
+		cfg.RabbitMQ.UserName,
+		cfg.RabbitMQ.Password,
+		cfg.RabbitMQ.Host,
+		cfg.RabbitMQ.Port,
+	)
+	return rabbitmq.NewClient(rmqUrl)
+}
+
+func declareExchange(rmq *rabbitmq.RMQClient, cfg *config.Config) error {
+	return rmq.DeclareExchange(
+		cfg.RabbitMQ.ShareExchange.Name,
+		cfg.RabbitMQ.ShareExchange.Kind,
+		cfg.RabbitMQ.ShareExchange.Durable,
+		cfg.RabbitMQ.ShareExchange.AutoDeleted,
+		cfg.RabbitMQ.ShareExchange.Internal,
+		cfg.RabbitMQ.ShareExchange.NoWait,
+		cfg.RabbitMQ.ShareExchange.Args.ToMap(),
+	)
+}
+
+func startConsumers(
+	ctx context.Context,
+	cfg *config.Config,
+	rmq *rabbitmq.RMQClient,
+	channelStorage *channelstorage.ChannelPostgresStorage,
+	planStorage *planstorage.PlansPostgresStorage,
+	log *slog.Logger,
+	wg *sync.WaitGroup,
+) {
+	channelsConsumer := consumers.NewConsumeChannel(rmq, channelStorage, log)
+	plansConsumer := consumers.NewConsumePlan(rmq, planStorage, rmq, log)
+	learnersConsumer := consumers.NewConsumeSharedLearnersWithPlan(rmq, planStorage, rmq, log)
+
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		if err := channelsConsumer.Start(
+			ctx,
+			cfg.RabbitMQ.Channel.ChannelConsumer.Queue,
+			cfg.RabbitMQ.Channel.ChannelConsumer.Consumer,
+			cfg.RabbitMQ.Channel.ChannelConsumer.AutoAck,
+			cfg.RabbitMQ.Channel.ChannelConsumer.Exclusive,
+			cfg.RabbitMQ.Channel.ChannelConsumer.NoLocal,
+			cfg.RabbitMQ.Channel.ChannelConsumer.NoWait,
+			cfg.RabbitMQ.Channel.ChannelConsumer.ConsumerArgs.ToMap(),
+		); err != nil {
+			log.Error("failed to start share channels consumer", slog.Any("err", err))
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		if err := plansConsumer.Start(
+			ctx,
+			cfg.RabbitMQ.Plan.PlanConsumer.Queue,
+			cfg.RabbitMQ.Plan.PlanConsumer.Consumer,
+			cfg.RabbitMQ.Plan.PlanConsumer.AutoAck,
+			cfg.RabbitMQ.Plan.PlanConsumer.Exclusive,
+			cfg.RabbitMQ.Plan.PlanConsumer.NoLocal,
+			cfg.RabbitMQ.Plan.PlanConsumer.NoWait,
+			cfg.RabbitMQ.Plan.PlanConsumer.ConsumerArgs.ToMap(),
+		); err != nil {
+			log.Error("failed to start share plans consumer", slog.Any("err", err))
+		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		if err := learnersConsumer.Start(
+			ctx,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.Queue,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.Consumer,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.AutoAck,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.Exclusive,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.NoLocal,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.NoWait,
+			cfg.RabbitMQ.Spfu.SpfuConsumer.ConsumerArgs.ToMap(),
+		); err != nil {
+			log.Error("failed to start spfu consumer", slog.Any("err", err))
+		}
+	}()
+}
+
+func declareQueueAndBind(rmq *rabbitmq.RMQClient, queueConfig config.QueueConfig, exchangeName, routingKey string) error {
+	// Announcement of the queue
+	if _, err := rmq.DeclareQueue(
+		queueConfig.Name,
+		queueConfig.Durable,
+		queueConfig.AutoDeleted,
+		queueConfig.Exclusive,
+		queueConfig.NoWait,
+		queueConfig.Args.ToMap(),
+	); err != nil {
+		return fmt.Errorf("failed to declare queue %s: %w", queueConfig.Name, err)
+	}
+
+	// Binding a queue to an exchange
+	if err := rmq.BindQueueToExchange(
+		queueConfig.Name,
+		exchangeName,
+		routingKey,
+	); err != nil {
+		return fmt.Errorf("failed to bind queue %s to exchange %s: %w", queueConfig.Name, exchangeName, err)
+	}
+
+	return nil
 }
